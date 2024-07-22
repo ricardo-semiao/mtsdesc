@@ -15,17 +15,19 @@ URL: https://https://github.com/ricardo-semiao/varr,
 BugReports: https://github.com/ricardo-semiao/varr/issues
 Suggests: 
     ggh4x (>= 0.2.0),
-    ggsci (>= 3.0.0),
+    ggsci (>= 3.1.0),
     knitr,
     RColorBrewer (>= 1.1.0),
     rmarkdown,
     strucchange (>= 1.5.0),
     testthat (>= 3.0.0),
-    vdiffr,
+    vdiffr (>= 1.0.0),
     viridis (>= 0.6.0)
 Imports: 
+    cli (>= 3.6.0),
     dplyr (>= 1.1.0),
-    ggplot2 (>= 3.4.0),
+    ggplot2 (>= 3.5.0),
+    glue (>= 1.6.0),
     magrittr (>= 2.0.0),
     purrr (>= 1.0.0),
     rlang (>= 1.1.0),
