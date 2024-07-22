@@ -1,7 +1,7 @@
 param_series <- function() {
-  paste0(
-    "@param series A character vector with variables (column names) to ",
-    "consider. Defaults to all (\\code{NULL})."
+  glue(
+    "@param series A character vector with series (column names) to
+    consider. Defaults to all (\\code{NULL})."
   )
 }
 

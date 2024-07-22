@@ -1,6 +1,9 @@
 utils::globalVariables(".") # Remove CRAN note towards the magrittr dot
 
-# Palette helpers ---------------------------------------------------------
+
+
+# Palette Helpers ---------------------------------------------------------
+
 suported_palettes <- list(
   base = c(
     "rainbow", "heat.colors", "terrain.colors",
@@ -64,7 +67,9 @@ get_pallete <- function(palette, n, ...) {
 }
 
 
-# Ggplot helpers ----------------------------------------------------------
+
+# Ggplot Helpers ----------------------------------------------------------
+
 create_sec_axis <- function(xseclab = "Impulse", yseclab = "Response") {
   my_sec_axis <- function(name) {
     ggplot2::sec_axis(~., name = name, breaks = NULL, labels = NULL)
@@ -97,110 +102,6 @@ define_facet <- function(facet, var_row, var_col, ...) {
 }
 
 
-# Test helpers ------------------------------------------------------------
-get_names <- function(x, type = NULL) {
-  if (inherits(x, c("data.frame", "matrix"))) {
-    return(colnames(x))
-  }
-  if (inherits(x, "varest")) {
-    return(names(x$varresult))
-  }
-  if (inherits(x, "varprd")) {
-    return(names(x$fcst))
-  }
-  if (inherits(x, "varstabil")) {
-    return(x$names)
-  }
-  if (inherits(x, "varfevd")) {
-    return(names(x))
-  }
-  if (inherits(x, "varirf")) {
-    return(x[[type]])
-  }
-}
 
-test <- list(
-  class_arg = function(arg, classes) {
-    arg_name <- rlang::ensym(arg)
-    if (!inherits(arg, classes)) {
-      stop(paste0(
-        "`", arg_name, "` must inherit one of ",
-        paste0("'", classes, "'", collapse = ", ")
-      ))
-    }
-  },
-  series = function(arg, x, type = NULL) {
-    arg_name <- rlang::ensym(arg)
-    names <- get_names(x, type)
-    if (!inherits(arg, c("character", "NULL"))) {
-      stop(paste0("`", arg_name, "` must inherit one of 'character', 'NULL'"))
-    }
-    if (!all(arg %in% names)) { # !is.null(arg) &&
-      stop(paste0(
-        "`", arg_name, "` must be one of ",
-        paste0("'", names, "'", collapse = ", ")
-      ))
-    }
-  },
-  index = function(index, n, alternative = NULL) {
-    required <- alternative %||% deparse(rlang::enexpr(n))
-    stopifnot(
-      "`index` of wrong class" = is.null(index) || is.character(index) || is.double(index) || is.integer(index),
-      "`index` musn't have duplicated entries" = !anyDuplicated(index)
-    )
-    if (length(index) != n) {
-      stop(paste0("`index` must have a length of ", required))
-    }
-  },
-  categorical_arg = function(arg, options) {
-    arg_name <- rlang::ensym(arg)
-    if (!(arg %in% options)) {
-      stop(paste0("`", arg_name, "` must be one of", paste0("'", options, "'", collapse = ", ")))
-    }
-  },
-  boolean_arg = function(arg) {
-    arg_name <- rlang::ensym(arg)
-    if (!(isTRUE(arg) || isFALSE(arg))) {
-      stop(paste0("`", arg_name, "` must be `TRUE` or `FALSE`"))
-    }
-  },
-  interval_arg = function(arg, lower, upper, alternative = NULL) {
-    arg_name <- rlang::ensym(arg)
-    if (!identical(arg, alternative) && (!is.numeric(arg) || (arg <= lower || upper <= arg))) {
-      stop(paste0(
-        "`", arg_name, "` must be ", alternative,
-        " or ", lower, " < x < ", upper
-      ))
-    }
-  },
-  dataset_arg = function(arg) {
-    arg_name <- rlang::ensym(arg)
-    if (inherits(arg, c("data.frame", "matrix"))) {
-      numeric_cols <- sapply(arg, is.numeric)
-      if (!all(numeric_cols)) {
-        warning(paste0("Ignoring non numeric columns in `", arg_name, "`"))
-        return(arg[, numeric_cols])
-      }
-    }
-    return(arg)
-  },
-  ggplot_arg = function(args) {
-    arg_name <- deparse(rlang::ensym(arg))
-    arg_subname <- gsub("args_(.+)", "\\1", arg_name)
-    if (arg_subname == "facet") {
-      cond <- all(names(args) %in% union(
-        names(formals(ggplot2::facet_grid)),
-        names(formals(ggplot2::facet_wrap))
-      ))
-      if (!cond) warning(paste0("Unknown arguments in ", arg_name))
-    } else {
-      cond <- all(names(args) %in% names(
-        formals(match.fun(paste0("ggplot2::geom_", arg_subname)))
-      ))
-      if (!cond) warning(paste0("Unknown arguments in ", arg_name))
-    }
-  }
-)
+# Test Helpers ------------------------------------------------------------
 
-# Function version for automate tests with testthat
-test_fun <- function() test
