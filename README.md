@@ -1,18 +1,18 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# varutils
+# varr
 
 <!-- badges: start -->
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
-status](https://www.r-pkg.org/badges/version/varutils)](https://CRAN.R-project.org/package=varutils)
-[![R-CMD-check](https://github.com/ricardo-semiao/varutils/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ricardo-semiao/varutils/actions/workflows/R-CMD-check.yaml)
+status](https://www.r-pkg.org/badges/version/varr)](https://CRAN.R-project.org/package=varr)
+[![R-CMD-check](https://github.com/ricardo-semiao/varr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ricardo-semiao/varr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The varutils R package is being developed to provide general utility
+The varr R package is being developed to provide general utility
 functions for projects involving Vector Auto-Regressive models, with
 specifically the [vars
 package](https://cran.r-project.org/web/packages/vars/index.html).
@@ -40,12 +40,12 @@ expand the package to other VAR-like objects.
 
 ## Installation
 
-You can install the development version of varutils from
+You can install the development version of varr from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ricardo-semiao/varutils")
+devtools::install_github("ricardo-semiao/varr")
 ```
 
 ## Upcoming changes

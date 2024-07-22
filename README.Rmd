@@ -13,15 +13,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-# varutils
+# varr
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/varutils)](https://CRAN.R-project.org/package=varutils)
-[![R-CMD-check](https://github.com/ricardo-semiao/varutils/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ricardo-semiao/varutils/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/varr)](https://CRAN.R-project.org/package=varr)
+[![R-CMD-check](https://github.com/ricardo-semiao/varr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ricardo-semiao/varr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The varutils R package is being developed to provide general utility functions for projects involving Vector Auto-Regressive models, with specifically the [vars package](https://cran.r-project.org/web/packages/vars/index.html).
+The varr R package is being developed to provide general utility functions for projects involving Vector Auto-Regressive models, with specifically the [vars package](https://cran.r-project.org/web/packages/vars/index.html).
 
 **Disclaimer:** this package is in the early most stage of life. It hasn't been thoroughly tested and can present several bugs. I don't recommend using it for large-scale projects, yet.
 
@@ -39,11 +39,11 @@ In the future, I intent to add functions for quick (not thorough) analysis and r
 
 ## Installation
 
-You can install the development version of varutils from [GitHub](https://github.com/) with:
+You can install the development version of varr from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ricardo-semiao/varutils")
+devtools::install_github("ricardo-semiao/varr")
 ```
 
 

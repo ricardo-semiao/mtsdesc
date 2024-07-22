@@ -1,5 +1,5 @@
 ---
-title: "Colors in varutils"
+title: "Colors in varr"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{palettes}
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Some `varutils` functions give the chance for the user to change the colors of the graph trough the argument `colors`. This argument can have multiple specifications:
+Some `varr` functions give the chance for the user to change the colors of the graph trough the argument `colors`. This argument can have multiple specifications:
 
 - `NULL`, for the default ggplot colors
 - A palette from a package, in the format `"pgk::palette_name"`
