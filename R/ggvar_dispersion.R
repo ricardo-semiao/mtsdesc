@@ -1,3 +1,34 @@
+# Helper functions used between more than one method:
+dispersion_helpers <- env()
+
+dispersion_helpers$format <- function(x, series) {
+  res_and_fit <- dplyr::bind_cols(
+    tibble::as_tibble(stats::residuals(x)) %>%
+      dplyr::rename_with(~glue("residual__{.x}")),
+    tibble::as_tibble(stats::fitted(x)) %>%
+      dplyr::rename_with(~glue("fitted__{.x}"))
+  )
+
+  res_and_fit %>%
+    dplyr::select(dplyr::ends_with(series)) %>%
+    tidyr::pivot_longer(dplyr::everything(),
+      names_sep = "__",
+      names_to = c(".value", "serie")
+    )
+}
+
+
+#' @noRd
+test_dispersion <- function(series, env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+}
+
+#' @noRd 
+setup_dispersion <- function(x, series, ...) {
+  UseMethod("setup_dispersion")
+}
+
+
 #' Plot VAR Residuals Dispersion
 #'
 #' Plots a scatterplot of the residuals versus fitted values of a VAR model,
@@ -35,45 +66,12 @@ ggvar_dispersion <- function(
   )
 }
 
-#' @noRd
-test_dispersion <- function(series, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-}
-
-
-#' @noRd 
-setup_dispersion <- function(x, series, ...) {
-  UseMethod("setup_dispersion")
-}
 
 #' @noRd 
 setup_dispersion.varest <- function(x, series, ...) {
   series <- series %||% names(x$varresult)
   
-  data <- setup_dispersion_common()$format(x, series)
+  data <- dispersion_helpers$format(x, series)
 
   list(data = data)
-}
-
-#' @noRd 
-setup_dispersion_common <- function() {
-  assets <- list()
-
-  assets$format <- function(x, series) {
-    res_and_fit <- dplyr::bind_cols(
-      tibble::as_tibble(stats::residuals(x)) %>%
-        dplyr::rename_with(~glue("residual__{.x}")),
-      tibble::as_tibble(stats::fitted(x)) %>%
-        dplyr::rename_with(~glue("fitted__{.x}"))
-    )
-
-    res_and_fit %>%
-      dplyr::select(dplyr::ends_with(series)) %>%
-      tidyr::pivot_longer(dplyr::everything(),
-        names_sep = "__",
-        names_to = c(".value", "serie")
-      )
-  }
-
-  assets
 }

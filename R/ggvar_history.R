@@ -1,3 +1,27 @@
+# Helper functions used between more than one method:
+history_helpers <- env()
+
+history_helpers$format <- function(x, series, index) {
+  x %>%
+    dplyr::select(dplyr::all_of(series)) %>%
+    dplyr::mutate(index = index) %>%
+    tidyr::pivot_longer(-"index", values_to = "value", names_to = "serie")
+}
+
+
+#' @noRd
+test_history <- function(series, index, graph_type, env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$type(index, c("NULL", "integer", "double"), env)
+  test$category(graph_type, c("faceted", "colored"), env)
+}
+
+#' @noRd
+setup_history <- function(x, series, index, ...) {
+  UseMethod("setup_history")
+}
+
+
 #' Plot Values of Dataset or VAR Residuals
 #'
 #' Plots the historic values of variables in a dataset, or residuals of a VAR
@@ -37,7 +61,7 @@ ggvar_history <- function(
     colors <- get_pallete(colors, length(setup$series))
   }
 
-  graph_add <- inject(c(
+  graph_add <- inject(list(
     if (graph_type == "faceted") {
       list(
         ggplot2::geom_line(!!!args_line),
@@ -49,7 +73,8 @@ ggvar_history <- function(
         ggplot2::scale_color_manual(values = colors)
       )
     }
-  ))
+  )) %>%
+  purrr::list_flatten()
   
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
@@ -60,53 +85,27 @@ ggvar_history <- function(
 
 
 #' @noRd
-test_history <- function(series, index, graph_type, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$type(index, c("NULL", "integer", "double"), env)
-  test$category(graph_type, c("faceted", "colored"), env)
-}
-
-
-#' @noRd
-setup_history <- function(x, series, index, ...) {
-  UseMethod("setup_history")
-}
-
-#' @noRd
 setup_history.varest <- function(x, series, index, ...) {
-  series <- series %||% names(x$varresult)
-  index <- index %||% (x$p + 1):x$totobs
+  x <- as.data.frame(stats::residuals(x))
+
+  series <- series %||% colnames(x)
+  index <- index %||% seq_len(nrow(x))
   title <- "VAR Residuals Historic Values"
 
-  data <- as.data.frame(stats::residuals(x)) %>%
-    setup_history_common()$format(series, index)
+  data <- history_helpers$format(x, series, index)
 
   list(data = data, series = series, title = title)
 }
 
 #' @noRd
 setup_history.default <- function(x, series, index, ...) {
-  x <- as.data.frame(x)
-  x <- setup$ignore_cols(x)
+  x <- as.data.frame(x) %>% ignore_cols()
 
   series <- series %||% colnames(x)
   index <- index %||% seq_len(nrow(x))
   title <- "Series Historic Values"
 
-  data <- x %>%
-    setup_history_common()$format(series, index)
+  data <- history_helpers$format(x, series, index)
 
   list(data = data, series = series, title = title)
-}
-
-#' @noRd
-setup_history_common <- function() {
-  assets <- list()
-
-  assets$format <- function(x, series, index) {
-    x %>%
-      dplyr::select(dplyr::all_of(series)) %>%
-      dplyr::mutate(index = index) %>%
-      tidyr::pivot_longer(-"index", values_to = "value", names_to = "serie")
-  }
 }

@@ -103,5 +103,14 @@ define_facet <- function(facet, facet_x, facet_y, ...) {
 
 
 
-# Test Helpers ------------------------------------------------------------
+# Others  ---------------------------------------------------------------
+ignore_cols <- function(arg) {
+  isnumeric_cols <- sapply(arg, \(x) is_integer(x) || is_double(x))
 
+  if (all(isnumeric_cols)) {
+    arg
+  } else {
+    cli::cli_warn("Ignoring non numeric columns (or equivalent) in {.var x}.")
+    arg[, isnumeric_cols]
+  }
+}

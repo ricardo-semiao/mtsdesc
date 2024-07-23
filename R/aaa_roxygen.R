@@ -47,7 +47,7 @@ param_facet_type <- function() {
 param_colors <- function() {
   glue("
   @param colors A vector of colors for each variable. Passed to \\
-  \\link[ggplot2]{{scale_color_manual}}. See \\code{vignette('colors')}.
+  \\link[ggplot2]{{scale_color_manual}}. See \\code{{vignette('colors')}}.
   ")
 }
 

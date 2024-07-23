@@ -1,3 +1,39 @@
+# Helper functions used between more than one method:
+distribution_helpers <- env()
+
+distribution_helpers$format_hist <- function(x, series) {
+  x %>%
+    dplyr::select(dplyr::all_of(series)) %>%
+    tidyr::pivot_longer(dplyr::everything(),
+      names_to = "serie", values_to = "residual"
+    )
+}
+
+distribution_helpers$format_dens <- function(x, series) {
+  x %>%
+    dplyr::select(dplyr::all_of(series)) %>%
+    purrr::imap_dfr(function(col, colname) {
+      tibble::tibble(
+        residual = seq(min(col), max(col), length = 200),
+        serie = colname,
+        density = stats::dnorm(.data$residual, sd = stats::sd(col))
+      )
+    })
+}
+
+
+#' @noRd
+test_distribution <- function(series, plot_normal, env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$type(plot_normal, c("TRUE", "FALSE"), env)
+}
+
+#' @noRd
+setup_distribution <- function(x, series, plot_normal, ...) {
+  UseMethod("setup_distribution")
+}
+
+
 #' Plot VAR Residuals Distribution
 #'
 #' Plots the histogram of the residuals of a VAR model, or of the variables in a
@@ -47,69 +83,27 @@ ggvar_distribution <- function(
 
 
 #' @noRd
-test_distribution <- function(series, plot_normal, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$type(plot_normal, c("TRUE", "FALSE"), env)
-}
-
-#' @noRd
-setup_distribution <- function(x, series, plot_normal, ...) {
-  UseMethod("setup_distribution")
-}
-
-#' @noRd
 setup_distribution.varest <- function(x, series, plot_normal, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   title <- "VAR Residuals Distribution"
   series <- series %||% colnames(x)
 
-  data_hist <- format_distribution_common()$format_hist(x, series)
-  data_density <- if (plot_normal) {
-    format_distribution_common()$format_density(x, series)
-  }
-
-  list(data_hist = data_hist, data_density = data_density, title = title)
-}
-
-#' @noRd
-setup_distribution.default <- function(x, series, plot_normal, ...) {
-  x <- as.data.frame(x)
-
-  title <- "Time Series Distribution"
-  series <- series %||% colnames(x)
-
-  data_hist <- format_distribution_common()$format_hist(x, series)
-  data_dens <- if (plot_normal) {
-    format_distribution_common()$format_dens(x, series)
-  }
+  data_hist <- distribution_helpers$format_hist(x, series)
+  data_dens <- if (plot_normal) distribution_helpers$format_dens(x, series)
 
   list(data_hist = data_hist, data_dens = data_dens, title = title)
 }
 
 #' @noRd
-format_distribution_common <- function() {
-  assets <- list()
+setup_distribution.default <- function(x, series, plot_normal, ...) {
+  x <- as.data.frame(x) %>% ignore_cols()
 
-  assets$format_hist <- function(x, series) {
-    x %>%
-      dplyr::select(dplyr::all_of(series)) %>%
-      tidyr::pivot_longer(dplyr::everything(),
-        names_to = "serie", values_to = "residual"
-      )
-  }
+  title <- "Time Series Distribution"
+  series <- series %||% colnames(x)
 
-  assets$format_dens <- function(x, series) {
-    x %>%
-      dplyr::select(dplyr::all_of(series)) %>%
-      purrr::imap_dfr(function(col, colname) {
-        tibble::tibble(
-          residual = seq(min(col), max(col), length = 200),
-          serie = colname,
-          density = stats::dnorm(.data$residual, sd = stats::sd(col))
-        )
-      })
-  }
+  data_hist <- distribution_helpers$format_hist(x, series)
+  data_dens <- if (plot_normal) distribution_helpers$format_dens(x, series)
 
-  assets
+  list(data_hist = data_hist, data_dens = data_dens, title = title)
 }

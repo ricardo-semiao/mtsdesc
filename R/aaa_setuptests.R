@@ -63,39 +63,3 @@ test$interval <- function(arg, lower, upper, alt = NULL, env) {
     )
   }
 }
-
-
-setup <- list()
-
-setup$ignore_cols <- function(arg) {
-  isnumeric_cols <- sapply(arg, \(x) is_integer(x) || is_double(x))
-
-  if (all(isnumeric_cols)) {
-    arg
-  } else {
-    cli::cli_warn("Ignoring non numeric columns (or equivalent) in {.var x}.")
-    arg[, isnumeric_cols]
-  }
-}
-
-
-function(x, type = NULL) {
-  if (inherits(x, c("data.frame", "matrix"))) {
-    return(colnames(x))
-  }
-  if (inherits(x, "varest")) {
-    return(names(x$varresult))
-  }
-  if (inherits(x, "varprd")) {
-    return(names(x$fcst))
-  }
-  if (inherits(x, "varstabil")) {
-    return(x$names)
-  }
-  if (inherits(x, "varfevd")) {
-    return(names(x))
-  }
-  if (inherits(x, "varirf")) {
-    return(x[[type]])
-  }
-}
