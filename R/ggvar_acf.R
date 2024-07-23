@@ -115,8 +115,6 @@ ggvar_acf <- function(
 }
 
 
-
-
 #' @noRd
 setup_acf.varest <- function(x, series, lag.max, type, na.action, demean,
   ...) {

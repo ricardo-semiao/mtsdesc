@@ -40,8 +40,7 @@ setup_fevd <- function(x, series, n.ahead, ...) {
 #' @eval param_args_geom()
 #' @eval param_args(c("facet_wrap", "geom_point"))
 #' @eval param_colors()
-#' @param ... If \code{geom="line"}, additional arguments to
-#'  \link[ggplot2]{geom_point}
+#' @eval param_dots("setup_fevd")
 #'
 #' @return An object of class \code{ggplot}.
 #'
