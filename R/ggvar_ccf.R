@@ -53,11 +53,12 @@ test_ccf <- function(
     x, series, type, lag.max, graph_type, ci, facet_type,
     env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
-  test$category(type, c("correlation", "covariance"), env)
-  test$type(lag.max, c("NULL", "integer", "double"), env)
   test$category(graph_type, c("segment", "area"), env)
   test$interval(ci, 0, 1, FALSE, env)
   test$category(facet_type, c("ggplot", "ggh4x"), env)
+
+  test$category(type, c("correlation", "covariance"), env)
+  test$type(lag.max, c("NULL", "integer", "double"), env)
 }
 
 
@@ -68,23 +69,22 @@ setup_ccf <- function(x, series, type, lag.max, na.action, ...) {
 
 #' @noRd
 setup_ccf.varest <- function(x, series, type, lag.max, na.action, ...) {
-  series <- series %||% names(x$varresult)
+  x <- as.data.frame(stats::residuals(x))
 
-  data <- as.data.frame(stats::residuals(x)) %>%
-    setup_ccf_common$format(series, type, na.action)
+  series <- series %||% colnames(x)
+
+  data <- setup_ccf_common()$format(x, series, type, na.action)
 
   list(data = data)
 }
 
 #' @noRd
 setup_ccf.default <- function(x, series, type, lag.max, na.action, ...) {
-  x <- as.data.frame(x)
-  x <- setup$ignore_cols(x)
+  x <- as.data.frame(x) %>% setup$ignore_cols()
 
   series <- series %||% colnames(x)
 
-  data <- x %>%
-    setup_ccf_common$format(series, type, na.action)
+  data <- setup_ccf_common()$format(x, series, type, na.action)
 
   list(data = data)
 }

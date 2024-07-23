@@ -31,11 +31,11 @@ ggvar_history <- function(
     ...) {
   test_history(series, index, graph_type)
 
+  setup <- setup_history(x, series, index, ...)
+
   if (graph_type == "colored") {
     colors <- get_pallete(colors, length(setup$series))
   }
-
-  setup <- setup_history(x, series, index, ...)
 
   graph_add <- inject(c(
     if (graph_type == "faceted") {
@@ -79,9 +79,9 @@ setup_history.varest <- function(x, series, index, ...) {
   title <- "VAR Residuals Historic Values"
 
   data <- as.data.frame(stats::residuals(x)) %>%
-    setup_history_common$format(series, index)
+    setup_history_common()$format(series, index)
 
-  list(data = data, series = series, index = index, title = title)
+  list(data = data, series = series, title = title)
 }
 
 #' @noRd
@@ -94,9 +94,9 @@ setup_history.default <- function(x, series, index, ...) {
   title <- "Series Historic Values"
 
   data <- x %>%
-    setup_history_common$format(series, index)
+    setup_history_common()$format(series, index)
 
-  list(data = data, series = series, index = index, title = title)
+  list(data = data, series = series, title = title)
 }
 
 #' @noRd

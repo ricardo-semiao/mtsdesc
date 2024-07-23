@@ -1,13 +1,3 @@
-#' @noRd
-setup_ggvar_dispersion <- function(x, series) {
-  test$class_arg(x, c("varest"))
-  test$series(series, x)
-
-  list(
-    series = series %||% get_names(x)
-  )
-}
-
 #' Plot VAR Residuals Dispersion
 #'
 #' Plots a scatterplot of the residuals versus fitted values of a VAR model,
@@ -16,6 +6,7 @@ setup_ggvar_dispersion <- function(x, series) {
 #' @param x A "varest" object to get residuals and fitted values from.
 #' @eval param_series()
 #' @eval param_args(c("geom_point", "geom_hline", "facet_wrap"))
+#' @eval param_dots("setup_dispersion")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -27,29 +18,62 @@ ggvar_dispersion <- function(
     x, series = NULL,
     args_point = list(),
     args_hline = list(),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_dispersion(x, series)
-  reassign <- c("series")
-  list2env(setup[reassign], envir = rlang::current_env())
+    args_facet = list(),
+    ...) {
+  test_dispersion(series)
 
-  # Data:
-  data <- data.frame(
-    residual.. = stats::residuals(x),
-    fitted.. = stats::fitted(x)
-  ) %>%
-    dplyr::select(dplyr::ends_with(series)) %>%
-    tidyr::pivot_longer(dplyr::everything(),
-      names_sep = "\\.\\.\\.",
-      names_to = c(".value", "serie")
+  setup <- setup_dispersion(x, series, ...)
+
+  inject(
+    ggplot(setup$data, aes(.data$fitted, .data$residual)) +
+      ggplot2::geom_point(!!!args_point) +
+      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
+      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
+      ggplot2::labs(
+        title = "VAR Residuals Dispersion", x = "Fitted", y = "Residuals"
+      )
+  )
+}
+
+#' @noRd
+test_dispersion <- function(series, env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+}
+
+
+#' @noRd 
+setup_dispersion <- function(x, series, ...) {
+  UseMethod("setup_dispersion")
+}
+
+#' @noRd 
+setup_dispersion.varest <- function(x, series, ...) {
+  series <- series %||% names(x$varresult)
+  
+  data <- setup_dispersion_common()$format(x, series)
+
+  list(data = data)
+}
+
+#' @noRd 
+setup_dispersion_common <- function() {
+  assets <- list()
+
+  assets$format <- function(x, series) {
+    res_and_fit <- dplyr::bind_cols(
+      tibble::as_tibble(stats::residuals(x)) %>%
+        dplyr::rename_with(~glue("residual__{.x}")),
+      tibble::as_tibble(stats::fitted(x)) %>%
+        dplyr::rename_with(~glue("fitted__{.x}"))
     )
 
-  # Graph:
-  ggplot(data, aes(.data$fitted, .data$residual)) +
-    inject(ggplot2::geom_point(!!!args_point)) +
-    inject(ggplot2::geom_hline(yintercept = 0, !!!args_hline)) +
-    inject(ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)) +
-    ggplot2::labs(
-      title = "VAR Residuals Dispersion", x = "Fitted", y = "Residuals"
-    )
+    res_and_fit %>%
+      dplyr::select(dplyr::ends_with(series)) %>%
+      tidyr::pivot_longer(dplyr::everything(),
+        names_sep = "__",
+        names_to = c(".value", "serie")
+      )
+  }
+
+  assets
 }

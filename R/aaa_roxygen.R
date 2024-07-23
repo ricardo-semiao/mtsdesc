@@ -78,10 +78,10 @@ param_linetypes <- function() {
 }
 
 param_dots <- function(fun_names) {
-  fun_names <- paste0("var:::", fun_names) %>% pluralize_or()
+  fun_names <- paste0("varr:::", fun_names) %>% pluralize_or()
   glue("
   @param ... Arguments passed to \\code{{{fun_names}}}, the generic \\
-  function that formats \\code{{x}} into a 'graphable' format. Use them if you \\
-  create a method that needs extra arguments.
+  function that formats \\code{{x}} into a 'graphable' format. Use them only \\
+  if you have created a method for some unsupported class of \\code{{x}}.
   ")
 }

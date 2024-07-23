@@ -79,10 +79,11 @@ ggvar_acf <- function(
 test_acf <- function(x, series, type, lag.max, graph_type, ci,
   env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
-  test$category(type, c("correlation", "covariance", "partial"), env)
-  test$type(lag.max, c("NULL", "integer", "double"), env)
   test$category(graph_type, c("segment", "area"), env)
   test$interval(ci, 0, 1, FALSE, env)
+  
+  test$category(type, c("correlation", "covariance", "partial"), env)
+  test$type(lag.max, c("NULL", "integer", "double"), env)
 }
 
 
@@ -93,11 +94,12 @@ setup_acf <- function(x, series, type, lag.max, na.action, demean, ...) {
 
 #' @noRd
 setup_acf.varest <- function(x, series, type, na.action, demean, ...) {
-  series <- series %||% names(x$varresult)
-  title <- paste(setup_acf_common$title_base(type), "Series")
+  x <- as.data.frame(stats::residuals(x))
 
-  data <- as.data.frame(stats::residuals(x)) %>%
-    setup_acf_common$format(series, type, na.action, demean)
+  series <- series %||% colnames(x)
+  title <- paste(setup_acf_common()$title_base(type), "Series")
+
+  data <- setup_acf_common()$format(x, series, type, na.action, demean)
 
   list(data = data, title = title)
 }
@@ -105,11 +107,12 @@ setup_acf.varest <- function(x, series, type, na.action, demean, ...) {
 #' @noRd
 setup_acf.default <- function(
     x, series, type, lag.max, na.action, demean, ...) {
+  x <- as.data.frame(x)
+  
   series <- series %||% colnames(x)
-  title <- paste(setup_acf_common$title_base(type), "VAR Residuals")
+  title <- paste(setup_acf_common()$title_base(type), "VAR Residuals")
 
-  data <- as.data.frame(x) %>%
-    setup_acf_common$format(series, type, na.action, demean)
+  data <- setup_acf_common()$format(x, series, type, na.action, demean)
 
   list(data = data, title = title)
 }

@@ -9,6 +9,21 @@ get_available_methods <- function(f) {
 
 test <- list()
 
+test$type <- function(arg, types, env) {#, n = NULL
+  arg_name <- rlang::ensym(arg)
+
+  notpass <- tolower(types) %>%
+    purrr::map_lgl(~get(glue("is_{.x}"))(arg)) %>% #, n
+    any() %>%
+    `!`()
+
+  if (notpass) {
+    cli::cli_abort("{.var {arg_name}} is not one of {.or {types}}",
+      call = env
+    )
+  }
+}
+
 test$index <- function(index, n, required = NULL, env) {
   arg_name <- rlang::ensym(arg)
   required <- required %||% deparse(rlang::enexpr(n))
@@ -49,63 +64,22 @@ test$interval <- function(arg, lower, upper, alt = NULL, env) {
   }
 }
 
-test$data <- function(arg, env) {
-  arg_name <- rlang::ensym(arg)
-
-  if (! class(arg) %in% get_available_methods(as.data.frame)) {
-    cli::cli_abort("{arg_name} is not coercible to data.frame", call = env)
-  }
-}
-
-test$ggplot_arg <- function(args) {
-  arg_name <- deparse(rlang::ensym(arg))
-  arg_subname <- gsub("args_(.+)", "\\1", arg_name)
-  if (arg_subname == "facet") {
-    cond <- all(names(args) %in% union(
-      names(formals(ggplot2::facet_grid)),
-      names(formals(ggplot2::facet_wrap))
-    ))
-    if (!cond) warning(paste0("Unknown arguments in ", arg_name))
-  } else {
-    cond <- all(names(args) %in% names(
-      formals(match.fun(paste0("ggplot2::geom_", arg_subname)))
-    ))
-    if (!cond) warning(paste0("Unknown arguments in ", arg_name))
-  }
-}
-
-test$type <- function(arg, types, env) {
-  arg_name <- rlang::ensym(arg)
-
-  notpass <- tolower(types) %>%
-    purrr::map_lgl(~get(glue("is_{.x}"))(arg)) %>%
-    any() %>%
-    `!`()
-
-  if (notpass) {
-    cli::cli_abort("{.var {arg_name}} is not one of {.or {types}}",
-      call = env
-    )
-  }
-}
-
 
 setup <- list()
 
 setup$ignore_cols <- function(arg) {
-  arg_name <- rlang::ensym(arg)
-  isnumeric_cols <- sapply(arg, \(x) is_integer(x) | is_double(x))
+  isnumeric_cols <- sapply(arg, \(x) is_integer(x) || is_double(x))
 
   if (all(isnumeric_cols)) {
     arg
   } else {
-    cli::cli_warn("Ignoring non numeric columns in `{arg_name}`")
+    cli::cli_warn("Ignoring non numeric columns (or equivalent) in {.var x}.")
     arg[, isnumeric_cols]
   }
 }
 
 
-get_names <- function(x, type = NULL) {
+function(x, type = NULL) {
   if (inherits(x, c("data.frame", "matrix"))) {
     return(colnames(x))
   }
