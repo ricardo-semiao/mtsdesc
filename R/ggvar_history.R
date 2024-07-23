@@ -69,13 +69,6 @@ test_history <- function(series, index, graph_type, env = caller_env()) {
 
 #' @noRd
 setup_history <- function(x, series, index, ...) {
-  format_data_common <- function(x, series, index) {
-    x %>%
-      dplyr::select(dplyr::all_of(series)) %>%
-      dplyr::mutate(index = index) %>%
-      tidyr::pivot_longer(-c("index"), values_to = "value", names_to = "serie")
-  }
-
   UseMethod("setup_history")
 }
 
@@ -86,7 +79,7 @@ setup_history.varest <- function(x, series, index, ...) {
   title <- "VAR Residuals Historic Values"
 
   data <- as.data.frame(stats::residuals(x)) %>%
-    format_data_common(series, index)
+    setup_history_common$format(series, index)
 
   list(data = data, series = series, index = index, title = title)
 }
@@ -101,7 +94,19 @@ setup_history.default <- function(x, series, index, ...) {
   title <- "Series Historic Values"
 
   data <- x %>%
-    format_data_common(series, index)
+    setup_history_common$format(series, index)
 
   list(data = data, series = series, index = index, title = title)
+}
+
+#' @noRd
+setup_history_common <- function() {
+  assets <- list()
+
+  assets$format <- function(x, series, index) {
+    x %>%
+      dplyr::select(dplyr::all_of(series)) %>%
+      dplyr::mutate(index = index) %>%
+      tidyr::pivot_longer(-"index", values_to = "value", names_to = "serie")
+  }
 }

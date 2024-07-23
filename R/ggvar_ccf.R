@@ -1,0 +1,113 @@
+#' @rdname ggvar_acf
+#' @export
+ggvar_ccf <- function(
+    x, series = NULL,
+    type = "correlation", lag.max = NULL,
+    graph_type = "segment",
+    args_geom = list(),
+    args_ribbon = list(linetype = 2, color = "blue", fill = NA),
+    args_hline = list(),
+    args_facet = list(),
+    ci = 0.95, facet_type = "ggplot",
+    na.action = stats::na.fail,
+    ...) {
+  test_ccf(x, series, type, lag.max, graph_type, ci, facet_type)
+
+  title <- switch(type,
+    "correlation" = "Cross-correlation of Series",
+    "covariance" = "Cross-covariance of Series"
+  )
+
+  setup <- setup_ccf(x, series, type, lag.max, na.action, ...)
+
+  graph_add <- inject(c(
+    if (graph_type == "segment") {
+      list(
+        ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
+      )
+    } else if (graph_type == "area") {
+      list(
+        ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
+      )
+    },
+    if (!is_false(ci)) {
+      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(x))
+      list(
+        ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
+      )
+    },
+    list(define_facet(facet_type, "facet_x", "facet_y", !!!args_facet))
+  ))
+
+  inject(
+    ggplot(setup$data, aes(.data$lag, .data$value)) +
+      graph_add +
+      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
+      ggplot2::labs(title = title, x = "Lags", y = "Values")
+  )
+}
+
+
+#' @noRd
+test_ccf <- function(
+    x, series, type, lag.max, graph_type, ci, facet_type,
+    env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$category(type, c("correlation", "covariance"), env)
+  test$type(lag.max, c("NULL", "integer", "double"), env)
+  test$category(graph_type, c("segment", "area"), env)
+  test$interval(ci, 0, 1, FALSE, env)
+  test$category(facet_type, c("ggplot", "ggh4x"), env)
+}
+
+
+#'@noRd
+setup_ccf <- function(x, series, type, lag.max, na.action, ...) {
+  UseMethod("setup_ccf")
+}
+
+#' @noRd
+setup_ccf.varest <- function(x, series, type, lag.max, na.action, ...) {
+  series <- series %||% names(x$varresult)
+
+  data <- as.data.frame(stats::residuals(x)) %>%
+    setup_ccf_common$format(series, type, na.action)
+
+  list(data = data)
+}
+
+#' @noRd
+setup_ccf.default <- function(x, series, type, lag.max, na.action, ...) {
+  x <- as.data.frame(x)
+  x <- setup$ignore_cols(x)
+
+  series <- series %||% colnames(x)
+
+  data <- x %>%
+    setup_ccf_common$format(series, type, na.action)
+
+  list(data = data)
+}
+
+#' @noRd 
+setup_ccf_common <- function() {
+  assets <- list()
+
+  assets$format <- function(x, series, type, na.action) {
+    lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
+
+    x %>%
+      dplyr::select(dplyr::all_of(series)) %>%
+      stats::acf(lag.max, type, plot = FALSE, na.action) %>%
+      purrr::pluck("acf") %>%
+      purrr::array_tree(3) %>%
+      purrr::map2_dfr(series, ~ data.frame(.y, 0:lag.max, .x)) %>%
+      purrr::set_names(c("facet_x", "lag", series)) %>%
+      tidyr::pivot_longer(-c("facet_x", "lag"),
+        names_to = "facet_y",
+        values_to = "value"
+      )
+  }
+
+  assets
+}
