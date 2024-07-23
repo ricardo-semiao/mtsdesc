@@ -93,21 +93,15 @@ ggvar_acf <- function(
 
   setup <- setup_acf(x, series, lag.max, type, na.action, demean, ...)
 
-  graph_add <- inject(c(
+  graph_add <- inject(list(
     if (graph_type == "segment") {
-      list(
-        ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
-      )
+      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
     } else if (graph_type == "area") {
-      list(
-        ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
-      )
+      ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
     },
     if (!is_false(ci)) {
       dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
-      list(
-        ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
-      )
+      ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
     }
   ))
 

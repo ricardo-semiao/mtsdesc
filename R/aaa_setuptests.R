@@ -1,12 +1,3 @@
-get_available_methods <- function(f) {
-  f_name <- as_string(ensym(f))
-  utils::methods(f_name) %>%
-    attr("info") %>%
-    rownames() %>%
-    gsub(paste0(f_name, "."), "", ., fixed = TRUE)
-}
-
-
 test <- list()
 
 test$type <- function(arg, types, env) {#, n = NULL
