@@ -2,39 +2,36 @@
 % Please edit documentation in R/ggvar_history.R
 \name{ggvar_history}
 \alias{ggvar_history}
-\alias{ggvar_history_colored}
 \title{Plot Values of Dataset or VAR Residuals}
 \usage{
 ggvar_history(
   x,
   series = NULL,
   index = NULL,
+  graph_type = "faceted",
   args_line = list(),
   args_facet = list(),
-  ...
-)
-
-ggvar_history_colored(
-  x,
-  series = NULL,
-  index = NULL,
   colors = NULL,
-  args_line = list()
+  ...
 )
 }
 \arguments{
 \item{x}{Either a "varest" object for plotting the residuals, or an dataset
 (object coercible to data.frame) with numeric variables.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{index}{A vector of labels to the x-axis, normally dates. Must have  length equal to \code{x$obs} or \code{nrow(x)}. Defaults to a numeric sequence.}
+\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to \code{x$obs} or \code{nrow(x)}. Defaults to a integer sequence.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
+\item{graph_type}{The type of the plot, \code{'faceted'} or \code{'colored'}.}
 
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2]{geom_line}.}
 
-\item{colors}{A vector of colors for each variable. Passed to\link[ggplot2]{scale_color_manual}. See \code{vignette("colors")}.}
+\item{args_facet}{Additional arguments passed to \link[ggplot2]{facet_wrap}.}
+
+\item{colors}{A vector of colors for each variable. Passed to \link[ggplot2]{scale_color_manual}. See \codevignette 'colors' not found.}
+
+\item{...}{Arguments passed to \code{var:::setup_history}, the generic function that formats \code{x} into a 'graphable' format. Use them if you create a method that needs extra arguments.}
 }
 \value{
 An object of class \code{ggplot}.

@@ -2,9 +2,7 @@
 % Please edit documentation in R/ggvar_acf.R
 \name{ggvar_acf}
 \alias{ggvar_acf}
-\alias{ggvar_ccf_grid}
-\alias{ggvar_ccf_ind}
-\alias{ggvar_ccf_wrap}
+\alias{ggvar_ccf}
 \title{Plot autocorrelation (and similars) of dataset}
 \usage{
 ggvar_acf(
@@ -12,73 +10,73 @@ ggvar_acf(
   series = NULL,
   type = "correlation",
   lag.max = NULL,
-  ci = 0.95,
-  ...,
-  geom = "segment",
+  graph_type = "segment",
   args_geom = list(),
   args_ribbon = list(linetype = 2, color = "blue", fill = NA),
   args_hline = list(),
-  args_facet = list()
+  args_facet = list(),
+  ci = 0.95,
+  na.action = na.fail,
+  demean = TRUE,
+  ...
 )
 
-ggvar_ccf_grid(
+ggvar_ccf(
   x,
   series = NULL,
   type = "correlation",
   lag.max = NULL,
-  ci = 0.95,
-  ...,
-  geom = "segment",
-  facet = "ggplot",
+  graph_type = "segment",
   args_geom = list(),
   args_ribbon = list(linetype = 2, color = "blue", fill = NA),
   args_hline = list(),
-  args_facet = list()
+  args_facet = list(),
+  ci = 0.95,
+  facet_type = "ggplot",
+  na.action = na.fail,
+  ...
 )
-
-ggvar_ccf_ind(x, serie_x, serie_y, ...)
-
-ggvar_ccf_wrap(x, series, ...)
 }
 \arguments{
 \item{x}{A dataset (object coercible to data.frame) or a "varest" object to
 get residuals from.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{type}{The type of ACF to be computed, passed to \link[stats]{acf}. Can
-be either "correlation", "covariance", or "partial".}
+\item{type}{The type of ACF to be computed. Can be either "correlation",
+"covariance", or "partial". Passed to \link[stats]{acf}.}
 
 \item{lag.max}{The number of lags used to calculate the ACF, passed to
-\link[stats]{acf}. defaults to \code{10 * log(nrow(x) / ncol(x), base = 10)}.}
+\link[stats]{acf}.}
+
+\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2]{geom_segment} or \code{'area'}, for \link[ggplot2]{geom_area}.}
+
+\item{args_geom}{Arguments passed to the chosen \code{{geom}}.}
+
+\item{args_ribbon}{Additional arguments passed to \link[ggplot2]{geom_ribbon}.}
+
+\item{args_hline}{Additional arguments passed to \link[ggplot2]{geom_hline}.}
+
+\item{args_facet}{Additional arguments passed to \link[ggplot2]{facet_wrap}.}
 
 \item{ci}{The level of confidence for the ACF confidence interval. Set to
 \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.}
 
-\item{...}{Additional arguments passed to \link[stats]{acf}.}
+\item{na.action}{Function to be called to handle missing values.
+\code{na.pass} can be used.Passed to \link[stats]{acf}.}
 
-\item{geom}{The ggplot geom used to create the plot, 'segment' (the default) for \link[ggplot2]{geom_segment}, 'area' for \link[ggplot2]{geom_area}.}
+\item{demean}{Logical. Should the covariances be about the sample means?
+Passed to \link[stats]{acf}.}
 
-\item{args_geom}{Arguments passed to the chosen \code{geom}.}
-
-\item{args_ribbon}{Aditional arguments passed to \link[ggplot2]{geom_ribbon}.}
-
-\item{args_hline}{Aditional arguments passed to \link[ggplot2]{geom_hline}.}
-
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
-
-\item{facet}{The facet "engine" to be used. 'ggplot2' for \link[ggplot2]{facet_grid}, 'ggh4x' for \link[ggh4x]{facet_grid2}}
-
-\item{serie_x, serie_y}{Variables to chose for x and y axis in
-\code{ggvar_ccf_ind}.}
+\item{...}{Arguments passed to \code{var:::setup_acf or var:::setup_ccf}, the generic function that formats \code{x} into a 'graphable' format. Use them if you create a method that needs extra arguments.}
 }
 \value{
 An object of class \code{ggplot}.
 }
 \description{
-\code{ggvar_acf} plots the result of a \link[stats]{acf} call for every
+\code{ggvar_acf} plots the auto-correlations (and similars) call for every
  series, using \link[ggplot2]{facet_wrap}. \code{ggvar_ccf} plots all the
- cross correlations (and similars) between the series, using
+ cross-correlations (and similars) between the series, using
  \link[ggplot2]{facet_grid}.
 }
 \examples{

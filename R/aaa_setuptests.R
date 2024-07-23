@@ -1,8 +1,3 @@
-pluralize_or <- function(x) {
-  pluralize_and <- utils::capture.output(cli::pluralize("{x}"))
-  gsub("and", "or", pluralize_and)
-}
-
 get_available_methods <- function(f) {
   f_name <- as_string(ensym(f))
   utils::methods(f_name) %>%
@@ -13,16 +8,6 @@ get_available_methods <- function(f) {
 
 
 test <- list()
-
-test$class_arg <- function(arg, classes) {
-  arg_name <- rlang::ensym(arg)
-  if (!inherits(arg, classes)) {
-    stop(paste0(
-      "`", arg_name, "` must inherit one of ",
-      paste0("'", classes, "'", collapse = ", ")
-    ))
-  }
-}
 
 test$index <- function(index, n, required = NULL, env) {
   arg_name <- rlang::ensym(arg)
@@ -36,28 +21,31 @@ test$index <- function(index, n, required = NULL, env) {
   }
 }
 
-test$categorical <- function(arg, options, env) {
+test$category <- function(arg, options, env) {
   arg_name <- rlang::ensym(arg)
 
   if (!arg %in% options) {
-    cli::abort("{.var {arg_name}} must be {pluralize_or(options)}", call = env)
+    cli::cli_abort("{.var {arg_name}} must be {.or {options}}", call = env)
   }
 }
 
-test$boolean_arg <- function(arg) {
-  arg_name <- rlang::ensym(arg)
-  if (!(isTRUE(arg) || isFALSE(arg))) {
-    stop(paste0("`", arg_name, "` must be `TRUE` or `FALSE`"))
-  }
-}
+test$interval <- function(arg, lower, upper, alt = NULL, env) {
+  arg_name <- ensym(arg)
+  text_add <- ""
 
-test$interval_arg <- function(arg, lower, upper, alternative = NULL) {
-  arg_name <- rlang::ensym(arg)
-  if (!identical(arg, alternative) && (!is.numeric(arg) || (arg <= lower || upper <= arg))) {
-    stop(paste0(
-      "`", arg_name, "` must be ", alternative,
-      " or ", lower, " < x < ", upper
-    ))
+  notpass <- !(is_integer(arg) || is_double(arg)) ||
+    (arg < lower || upper < arg)
+  if (!is_null(alt)) {
+    notpass <- !identical(arg, alt) && notpass
+    text_add <- glue(", or equal `{alt}`")
+  }
+
+  if (notpass) {
+    cli::cli_abort("
+    {.var {arg_name}} must be '{lower} < {arg_name} < {upper}'{text_add}.
+    ",
+      call = env
+    )
   }
 }
 
@@ -95,7 +83,7 @@ test$type <- function(arg, types, env) {
     `!`()
 
   if (notpass) {
-    cli::cli_abort("{.var {arg_name}} is not one of {pluralize_or(types)}",
+    cli::cli_abort("{.var {arg_name}} is not one of {.or {types}}",
       call = env
     )
   }
@@ -111,7 +99,7 @@ setup$ignore_cols <- function(arg) {
   if (all(isnumeric_cols)) {
     arg
   } else {
-    cli::warn("Ignoring non numeric columns in `{arg_name}`")
+    cli::cli_warn("Ignoring non numeric columns in `{arg_name}`")
     arg[, isnumeric_cols]
   }
 }

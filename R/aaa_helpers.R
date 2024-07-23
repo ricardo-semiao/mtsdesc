@@ -86,18 +86,18 @@ create_sec_axis <- function(xseclab = "Impulse", yseclab = "Response") {
 }
 
 
-define_facet <- function(facet, var_row, var_col, ...) {
-  if (facet == "ggh4x") {
-    if (!rlang::is_installed("ggh4x")) {
-      warning("Package ggh4x is not installed. Coercing `facet = 'ggplot'`.")
-      facet <- "ggplot"
+define_facet <- function(facet, facet_x, facet_y, ...) {
+  if (facet == "ggplot") {
+    ggplot2::facet_grid(stats::reformulate(facet_x, facet_y), ...)
+  } else if (facet == "ggh4x") {
+    if (!is_installed("ggh4x")) {
+      cli::cli_warn("
+      Package ggh4x is not installed. Coercing `facet` to `'ggplot'`.
+      ")
+      ggplot2::facet_grid(stats::reformulate(facet_x, facet_y), ...)
     } else {
-      ggh4x::facet_grid2(stats::reformulate(var_row, var_col), ...)
+      ggh4x::facet_grid2(stats::reformulate(facet_x, facet_y), ...)
     }
-  } else if (facet == "ggplot") {
-    ggplot2::facet_grid(stats::reformulate(var_row, var_col), ...)
-  } else {
-    stop("Invalid `facet` argument.")
   }
 }
 

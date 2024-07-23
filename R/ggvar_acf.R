@@ -1,69 +1,28 @@
-#' @noRd
-setup_ggvar_acf <- function(x, series, ci, type, lag.max, geom, facet = NULL) {
-  x <- test$dataset_arg(x)
-  test$class_arg(x, c("data.frame", "matrix", "varest"))
-  test$series(series, x)
-  test$categorical_arg(geom, c("segment", "area"))
-  test$interval_arg(ci, 0, 1, FALSE)
-  if (!is.null(facet)) test$categorical_arg(facet, c("ggplot", "ggh4x"))
-
-  if (inherits(x, c("varest"))) {
-    title_add <- "Residuals"
-    x <- as.data.frame(stats::residuals(x))
-  } else {
-    title_add <- "Series"
-    x <- as.data.frame(x)
-  }
-
-  lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
-  lag.min <- if (type == "partial") 1 else 0
-
-  list(
-    x = x,
-    series = series %||% get_names(x),
-    title_add = title_add,
-    lag.max = lag.max,
-    lag.min = lag.min
-  )
-}
-
-#' @noRd
-data_ggvar_ccf <- function(x, serie_x, serie_y, ...) {
-  ci <- stats::qnorm((1 - 0.95) / 2) / sqrt(nrow(x))
-  temp_ccf <- stats::ccf(x[[serie_x]], x[[serie_y]], plot = FALSE, ...)
-
-  tibble::tibble(
-    series = paste0(serie_x, " - ", serie_y),
-    lag = temp_ccf$lag[,,1],
-    value = temp_ccf$acf[,,1],
-    ci = ci
-  )
-}
-
-
 #' Plot autocorrelation (and similars) of dataset
 #'
-#' \code{ggvar_acf} plots the result of a \link[stats]{acf} call for every
+#' \code{ggvar_acf} plots the auto-correlations (and similars) call for every
 #'  series, using \link[ggplot2]{facet_wrap}. \code{ggvar_ccf} plots all the
-#'  cross correlations (and similars) between the series, using
+#'  cross-correlations (and similars) between the series, using
 #'  \link[ggplot2]{facet_grid}.
 #'
 #' @param x A dataset (object coercible to data.frame) or a "varest" object to
 #'  get residuals from.
 #' @eval param_series()
-#' @param serie_x,serie_y Variables to chose for x and y axis in
-#'  \code{ggvar_ccf_ind}.
-#' @param type The type of ACF to be computed, passed to \link[stats]{acf}. Can
-#'  be either "correlation", "covariance", or "partial".
+#' @param type The type of ACF to be computed. Can be either "correlation",
+#'  "covariance", or "partial". Passed to \link[stats]{acf}.
 #' @param lag.max The number of lags used to calculate the ACF, passed to
-#'  \link[stats]{acf}. defaults to \code{10 * log(nrow(x) / ncol(x), base = 10)}.
-#' @param ci The level of confidence for the ACF confidence interval. Set to
-#'  \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.
-#' @eval param_dots("stats::acf")
-#' @eval param_geom(c("geom_segment", "geom_area"))
-#' @eval param_facet()
+#'  \link[stats]{acf}.
+#' @eval param_graph_type(c("segment", "area"))
 #' @eval param_args_geom()
 #' @eval param_args(c("geom_ribbon", "geom_hline", "facet_wrap"))
+#' @param ci The level of confidence for the ACF confidence interval. Set to
+#'  \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.
+#' @eval param_facet()
+#' @param na.action Function to be called to handle missing values.
+#'  \code{na.pass} can be used.Passed to \link[stats]{acf}.
+#' @param demean Logical. Should the covariances be about the sample means?
+#'  Passed to \link[stats]{acf}.
+#' @eval param_dots(c("setup_acf", "setup_ccf"))
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -75,151 +34,213 @@ data_ggvar_ccf <- function(x, serie_x, serie_y, ...) {
 #' @export
 ggvar_acf <- function(
     x, series = NULL,
-    type = "correlation", lag.max = NULL, ci = 0.95, ...,
-    geom = "segment",
+    type = "correlation", lag.max = NULL,
+    graph_type = "segment",
     args_geom = list(),
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
     args_hline = list(),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_acf(x, series, ci, type, lag.max, geom)
-  reassign <- c("x", "series", "ci", "geom", "lag.max")
-  list2env(setup[reassign], envir = rlang::current_env())
+    args_facet = list(),
+    ci = 0.95,
+    na.action = na.fail, demean = TRUE,
+    ...) {
+  test_acf(x, series, type, lag.max, graph_type, ci)
 
-  title <- switch(type,
-    "correlation" = paste("Auto-correlation of", setup$title_add),
-    "covariance" = paste("Auto-covariance of", setup$title_add),
-    "partial" = paste("Auto-partial-correlation of", setup$title_add)
-  )
+  setup <- setup_acf(x, series, type, lag.max, na.action, demean, ...)
 
-  # Data:
-  data <- x %>%
-    dplyr::select(dplyr::all_of(series)) %>%
-    purrr::map2_dfr(series, function(col, name) {
-      tibble::tibble(
-        serie = name,
-        value = stats::acf(col, ...,
-         lag.max = lag.max, type = type, plot = FALSE
-        ) %>%
-          purrr::pluck("acf") %>%
-          `[`(, , 1),
-        lag = setup$lag.min:lag.max
+  graph_add <- inject(c(
+    if (graph_type == "segment") {
+      list(
+        ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
       )
-    })
-
-  # Graph:
-  ggplot_add <- list(
-    switch(geom,
-      "segment" = inject(ggplot2::geom_segment(aes(xend = .data$lag, yend = 0),
-                   !!!args_geom
-                  )),
-      "area" = inject(ggplot2::geom_area(aes(y = .data$value),
-                 !!!args_geom
-                ))
-    ),
-    if (!isFALSE(ci)) {
-      interval <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(x))
-      inject(ggplot2::geom_ribbon(aes(ymin = -interval, ymax = interval),
-       !!!args_ribbon
-      ))
+    } else if (graph_type == "area") {
+      list(
+        ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
+      )
+    },
+    if (!is_false(ci)) {
+      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(x))
+      list(
+        ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
+      )
     }
-  )
+  ))
 
-  ggplot(data, aes(.data$lag, .data$value)) +
-    ggplot_add +
-    inject(ggplot2::geom_hline(yintercept = 0, !!!args_hline)) +
-    inject(ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)) +
-    ggplot2::labs(title = title, x = "Lags", y = "Values")
+  inject(
+    ggplot(setup$data, aes(.data$lag, .data$value)) +
+      graph_add +
+      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
+      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
+      ggplot2::labs(title = setup$title, x = "Lags", y = "Values")
+  )
 }
 
 #' @rdname ggvar_acf
 #' @export
-ggvar_ccf_grid <- function(
+ggvar_ccf <- function(
     x, series = NULL,
-    type = "correlation", lag.max = NULL, ci = 0.95, ...,
-    geom = "segment", facet = "ggplot",
+    type = "correlation", lag.max = NULL,
+    graph_type = "segment",
     args_geom = list(),
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
     args_hline = list(),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_acf(x, series, ci, type, lag.max, geom, facet)
-  reassign <- c("x", "series", "ci", "geom", "palette", "lag.max")
-  list2env(setup[reassign], envir = rlang::current_env())
+    args_facet = list(),
+    ci = 0.95, facet_type = "ggplot",
+    na.action = na.fail,
+    ...) {
+  test_ccf(x, series, type, lag.max, graph_type, ci, facet_type)
 
   title <- switch(type,
-    "correlation" = paste("Cross-correlation of", setup$title_add),
-    "covariance" = paste("Cross-covariance of", setup$title_add),
-    "partial" = paste("Cross-partial-correlation of", setup$title_add)
+    "correlation" = "Cross-correlation of Series",
+    "covariance" = "Cross-covariance of Series"
   )
 
-  # Data:
-  data <- x %>%
-    dplyr::select(dplyr::all_of(series)) %>%
-    stats::acf(lag.max = lag.max, type = type, plot = FALSE, ...) %>%
-    purrr::pluck("acf") %>%
-    purrr::array_tree(3) %>%
-    purrr::map2_dfr(series, ~ data.frame(.y, setup$lag.min:lag.max, .x)) %>%
-    purrr::set_names(c("var_row", "lag", series)) %>%
-    tidyr::pivot_longer(dplyr::all_of(series),
-      names_to = "var_col",
-      values_to = "value"
-    )
+  setup <- setup_ccf(x, series, type, lag.max, na.action, ...)
 
-  # Graph:
-  ggplot_add <- list(
-    switch(geom,
-      "segment" = inject(ggplot2::geom_segment(aes(xend = .data$lag, yend = 0),
-                   !!!args_geom
-                  )),
-      "area" = inject(ggplot2::geom_area(aes(y = .data$value),
-                 !!!args_geom
-                ))
-    ),
-    if (!isFALSE(ci)) {
-      interval <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(x))
-      inject(ggplot2::geom_ribbon(aes(ymin = -interval, ymax = interval),
-       !!!args_ribbon
-      ))
+  graph_add <- inject(c(
+    if (graph_type == "segment") {
+      list(
+        ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
+      )
+    } else if (graph_type == "area") {
+      list(
+        ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
+      )
     },
-    inject(define_facet(facet, "var_row", "var_col", !!!args_facet))
+    if (!is_false(ci)) {
+      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(x))
+      list(
+        ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
+      )
+    },
+    list(define_facet(facet_type, "facet_x", "facet_y", !!!args_facet))
+  ))
+
+  inject(
+    ggplot(setup$data, aes(.data$lag, .data$value)) +
+      graph_add +
+      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
+      ggplot2::labs(title = title, x = "Lags", y = "Values")
+  )
+}
+
+
+#' @noRd
+test_acf <- function(x, series, type, lag.max, graph_type, ci,
+  env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$category(type, c("correlation", "covariance", "partial"), env)
+  test$type(lag.max, c("NULL", "integer", "double"), env)
+  test$category(graph_type, c("segment", "area"), env)
+  test$interval(ci, 0, 1, FALSE, env)
+}
+
+#'@noRd
+setup_acf <- function(x, series, type, lag.max, na.action, demean, ...) {
+  format_data_common <- function(x, series, type, na.action, demean) {
+    x %>%
+      dplyr::select(dplyr::all_of(series)) %>%
+      purrr::imap_dfr(function(col, colname) {
+        tibble::tibble(
+          serie = colname,
+          value = stats::acf(col, lag.max, type,
+            plot = FALSE, na.action, demean
+          )$acf[, , 1],
+          lag = lag.min:lag.max
+        )
+      })
+  }
+
+  title_base <- switch(type,
+    "correlation" = "Auto-correlation of",
+    "covariance" = "Auto-covariance of",
+    "partial" = "Auto-partial-correlation of"
   )
 
-  ggplot(data, aes(.data$lag, .data$value)) +
-    ggplot_add +
-    inject(ggplot2::geom_hline(yintercept = 0, !!!args_hline)) +
-    ggplot2::labs(title = title, x = "Lags", y = "Values")
+  lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
+  lag.min <- if (type == "partial") 1 else 0
+
+  UseMethod("setup_acf")
+}
+
+#' @noRd
+setup_acf.varest <- function(x, series, type, na.action, demean, ...) {
+  series <- series %||% names(x$varresult)
+  title <- paste(title_base, "Series")
+
+  data <- as.data.frame(stats::residuals(x)) %>%
+    format_data_common(series, type, na.action, demean)
+
+  list(data = data, title = title)
+}
+
+#' @noRd
+#setup_acf.acf <- function(x, series, ...) {}
+
+#' @noRd
+setup_acf.default <- function(
+    x, series, type, lag.max, na.action, demean, ...) {
+  series <- series %||% colnames(x)
+  title <- paste(title_base, "VAR Residuals")
+
+  data <- as.data.frame(x) %>%
+    format_data_common(series, type, na.action, demean)
+
+  list(data = data, title = title)
 }
 
 
-#' @rdname ggvar_acf
-#' @export
-ggvar_ccf_ind <- function(x, serie_x, serie_y, ...) {
-  data <- data_ggvar_ccf(x, serie_x, serie_y, ...)
-
-  ggplot(data, aes(x = .data$lag, y = .data$value)) +
-    ggplot2::geom_vline(xintercept = 0, color = "grey") +
-    ggplot2::geom_hline(yintercept = 0) +
-    ggplot2::geom_segment(aes(xend = .data$lag, yend = 0)) +
-    ggplot2::geom_ribbon(aes(ymin = -.data$ci, ymax = .data$ci), fill = NA) +
-    ggplot2::labs(
-      title = paste("Cross correlation of", serie_x, "and", serie_y),
-      y = "Value", x = "Lag"
-    )
+#' @noRd
+test_ccf <- function(
+    x, series, type, lag.max, graph_type, ci, facet_type,
+    env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$category(type, c("correlation", "covariance"), env)
+  test$type(lag.max, c("NULL", "integer", "double"), env)
+  test$category(graph_type, c("segment", "area"), env)
+  test$interval(ci, 0, 1, FALSE, env)
+  test$category(facet_type, c("ggplot", "ggh4x"), env)
 }
 
+#'@noRd
+setup_ccf <- function(x, series, type, lag.max, na.action, ...) {
+  format_data_common <- function(x, series, type, na.action) {
+    x %>%
+      dplyr::select(dplyr::all_of(series)) %>%
+      stats::acf(lag.max, type, plot = FALSE, na.action) %>%
+      purrr::pluck("acf") %>%
+      purrr::array_tree(3) %>%
+      purrr::map2_dfr(series, ~ data.frame(.y, 0:lag.max, .x)) %>%
+      purrr::set_names(c("facet_x", "lag", series)) %>%
+      tidyr::pivot_longer(-c(facet_x, lag),
+        names_to = "facet_y",
+        values_to = "value"
+      )
+  }
 
-#' @rdname ggvar_acf
-#' @export
-ggvar_ccf_wrap <- function(x, series, ...) {
-  combs <- asplit(utils::combn(series, 2), 2)
-  data <- purrr::map_dfr(combs, \(l) data_ggvar_ccf(x, l[1], l[2]), ...)
+  lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
 
-  ggplot(data, aes(x = .data$lag, y = .data$value)) +
-    ggplot2::geom_vline(xintercept = 0, color = "grey") +
-    ggplot2::geom_hline(yintercept = 0) +
-    ggplot2::geom_segment(aes(xend = .data$lag, yend = 0)) +
-    ggplot2::geom_ribbon(aes(ymin = -.data$ci, ymax = .data$ci), fill = NA) +
-    ggplot2::facet_wrap(vars(.data$series)) +
-    ggplot2::labs(y = "Cross correlation of variables", x = "Lag")
+  UseMethod("setup_ccf")
+}
+
+#' @noRd
+setup_ccf.varest <- function(x, series, type, lag.max, na.action, ...) {
+  series <- series %||% names(x$varresult)
+
+  data <- as.data.frame(stats::residuals(x)) %>%
+    format_data_common(series, type, na.action)
+
+  list(data = data)
+}
+
+#' @noRd
+setup_ccf.default <- function(x, series, type, lag.max, na.action, ...) {
+  x <- as.data.frame(x)
+  x <- setup$ignore_cols(x)
+
+  series <- series %||% colnames(x)
+
+  data <- #x %>%
+    format_data_common(x, series, type, na.action)
+
+  list(data = data)
 }

@@ -9,9 +9,10 @@
 #'  (object coercible to data.frame) with numeric variables.
 #' @eval param_series()
 #' @eval param_index("\\code{x$obs} or \\code{nrow(x)}")
-#' @param graph_type The type of the graph.
-#' @eval param_colors()
+#' @eval param_graph_type(c("faceted", "colored"), FALSE)
 #' @eval param_args(c("geom_line", "facet_wrap"))
+#' @eval param_colors()
+#' @eval param_dots("setup_history")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -22,27 +23,34 @@
 #'
 #' @export
 ggvar_history <- function(
-    x, series = NULL, index = NULL, graph_type = "faceted",
+    x, series = NULL, index = NULL,
+    graph_type = "faceted",
     args_line = list(),
     args_facet = list(),
     colors = NULL,
     ...) {
-  test_history(x, series, index, graph_type)
-  setup <- setup_history(x, series, index)
+  test_history(series, index, graph_type)
 
-  if (graph_type == "faceted") {
-    graph_add <- inject(list(
-      ggplot2::geom_line(!!!args_line),
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)
-    ))
-  } else if (graph_type == "colored") {
+  if (graph_type == "colored") {
     colors <- get_pallete(colors, length(setup$series))
-    graph_add <- inject(list(
-      ggplot2::geom_line(aes(color = .data$serie), !!!args_line),
-      ggplot2::scale_color_manual(values = colors)
-    ))
   }
 
+  setup <- setup_history(x, series, index, ...)
+
+  graph_add <- inject(c(
+    if (graph_type == "faceted") {
+      list(
+        ggplot2::geom_line(!!!args_line),
+        ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)
+      )
+    } else if (graph_type == "colored") {
+      list(
+        ggplot2::geom_line(aes(color = .data$serie), !!!args_line),
+        ggplot2::scale_color_manual(values = colors)
+      )
+    }
+  ))
+  
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
       graph_add +
@@ -52,20 +60,16 @@ ggvar_history <- function(
 
 
 #' @noRd
-test_history <- function(x, series, index, graph_type, env = caller_env()) {
-  test$data(x, env)
+test_history <- function(series, index, graph_type, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$type(index, c("NULL", "integer", "double"), env)
-  test$categorical(graph_type, c("faceted", "colored"), env)
+  test$category(graph_type, c("faceted", "colored"), env)
 }
 
 
 #' @noRd
-
-
-#' @noRd
 setup_history <- function(x, series, index, ...) {
-  formatdata <- function(x, series, index) {
+  format_data_common <- function(x, series, index) {
     x %>%
       dplyr::select(dplyr::all_of(series)) %>%
       dplyr::mutate(index = index) %>%
@@ -77,33 +81,27 @@ setup_history <- function(x, series, index, ...) {
 
 #' @noRd
 setup_history.varest <- function(x, series, index, ...) {
-  data <- as.data.frame(stats::residuals(x))
-
   series <- series %||% names(x$varresult)
   index <- index %||% (x$p + 1):x$totobs
   title <- "VAR Residuals Historic Values"
 
-  list(
-    data = formatdata(data, series, index),
-    series = series,
-    index = index,
-    title = title
-  )
+  data <- as.data.frame(stats::residuals(x)) %>%
+    format_data_common(series, index)
+
+  list(data = data, series = series, index = index, title = title)
 }
 
 #' @noRd
 setup_history.default <- function(x, series, index, ...) {
   x <- as.data.frame(x)
-  data <- setup$ignore_cols(x)
+  x <- setup$ignore_cols(x)
 
   series <- series %||% colnames(x)
   index <- index %||% seq_len(nrow(x))
-  title <- "Time Series Historic Values"
+  title <- "Series Historic Values"
 
-  list(
-    data = formatdata(data, series, index),
-    series = series,
-    index = index,
-    title = title
-  )
+  data <- x %>%
+    format_data_common(series, index)
+
+  list(data = data, series = series, index = index, title = title)
 }
