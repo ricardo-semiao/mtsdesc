@@ -42,10 +42,10 @@ setup_distribution <- function(x, series, plot_normal, ...) {
 #'
 #' @param x Either a "varest" object for plotting the residuals, or an dataset
 #'  (object coercible to data.frame) with numeric variables.
-#' @eval param_series()
+#' @eval roxy$series()
 #' @param plot_normal Logical, whether or not a normal curve should be plotted.
-#' @eval param_args(c("geom_histogram", "geom_line", "facet_wrap"))
-#' @eval param_dots("distribution")
+#' @eval roxy$args(c("geom_histogram", "geom_line", "facet_wrap"))
+#' @eval roxy$dots("distribution")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -54,7 +54,8 @@ setup_distribution <- function(x, series, plot_normal, ...) {
 #'
 #' @export
 ggvar_distribution <- function(
-    x, series = NULL, plot_normal = TRUE,
+    x, series = NULL,
+    plot_normal = TRUE,
     args_histogram = list(bins = 30),
     args_line = list(),
     args_facet = list(),

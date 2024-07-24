@@ -78,7 +78,7 @@ ggvar_fit_colored <- function(
   reassign <- c("series", "colors")
   list2env(setup[reassign], envir = rlang::current_env())
 
-  colors <- get_pallete(colors, length(series))
+  colors <- get_colors(colors, length(series))
 
   # Data:
   data <- data_ggvar_fit(x, compare, series, index)

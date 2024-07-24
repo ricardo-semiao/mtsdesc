@@ -34,7 +34,7 @@ setup_select <- function(x, series, lag.max, type, criteria, trans, ...) {
 #'
 #' @param x A dataset (object coercible to data.frame) to pass to
 #'  \link[vars]{VARselect}, or, directly, a result of such call.
-#' @eval param_series()
+#' @eval roxy$series()
 #' @param lag.max Integer for the highest lag order. Passed to
 #'  \link[vars]{VARselect}.
 #' @param type Type of deterministic regressors to include. Passed to
@@ -43,8 +43,8 @@ setup_select <- function(x, series, lag.max, type, criteria, trans, ...) {
 #'  and "FPE".
 #' @param trans A transformation to apply to each criteria result (vector). Can
 #'  be a function, "none" (the default), or "index" to create index numbers.
-#' @eval param_args("geom_line")
-#' @eval param_dots("select", "vars::VARselect")
+#' @eval roxy$args("geom_line")
+#' @eval roxy$dots("select", "vars::VARselect")
 #'
 #' @return An object of class \code{ggplot}.
 #'

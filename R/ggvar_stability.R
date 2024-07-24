@@ -37,10 +37,10 @@ setup_stability <- function(x, series, ci, ...) {
 #'
 #' @param x A "varest" object to pass to \link[vars]{stability}, or, directly, a
 #'  "varstabil" object.
-#' @eval param_series()
+#' @eval roxy$series()
 #' @param ci The level of confidence for the \link[strucchange]{boundary}.
-#' @eval param_args(c("geom_line", "args_hline", "facet_wrap"))
-#' @eval param_dots("stability", "vars::stability")
+#' @eval roxy$args(c("geom_line", "args_hline", "facet_wrap"))
+#' @eval roxy$dots("stability", "vars::stability")
 #'
 #' @return An object of class \code{ggplot}.
 #'

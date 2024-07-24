@@ -1,12 +1,12 @@
 # Helper functions used between more than one method:
 ccf_helpers <- env()
 
-ccf_helpers$format <- function(x, series, lag.max, type, na.action, ...) {
+ccf_helpers$format <- function(x, series, lag.max, type, ...) {
   lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
 
   x %>%
     dplyr::select(dplyr::all_of(series)) %>%
-    stats::acf(lag.max, type, plot = FALSE, na.action, ...) %>%
+    stats::acf(lag.max, type, plot = FALSE, ...) %>%
     purrr::pluck("acf") %>%
     purrr::array_tree(3) %>%
     purrr::map2_dfr(series, ~ data.frame(.y, 0:lag.max, .x)) %>%
@@ -33,7 +33,7 @@ test_ccf <- function(
 }
 
 #'@noRd
-setup_ccf <- function(x, series, lag.max, type, na.action, ...) {
+setup_ccf <- function(x, series, lag.max, type, ci, ...) {
   UseMethod("setup_ccf")
 }
 
@@ -48,8 +48,8 @@ ggvar_ccf <- function(
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
     args_hline = list(),
     args_facet = list(),
-    ci = 0.95, facet_type = "ggplot",
-    na.action = stats::na.fail,
+    facet_type = "ggplot",
+    ci = 0.95,
     ...) {
   test_ccf(x, series, lag.max, type, graph_type, ci, facet_type)
 
@@ -83,23 +83,23 @@ ggvar_ccf <- function(
 
 
 #' @noRd
-setup_ccf.varest <- function(x, series, lag.max, type, na.action, ...) {
+setup_ccf.varest <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
 
-  data <- ccf_helpers$format(x, series, lag.max, type, na.action, ...)
+  data <- ccf_helpers$format(x, series, lag.max, type, ...)
 
   list(data = data)
 }
 
 #' @noRd
-setup_ccf.default <- function(x, series, lag.max, type, na.action, ...) {
+setup_ccf.default <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(x) %>% ignore_cols()
 
   series <- series %||% colnames(x)
 
-  data <- ccf_helpers$format(x, series, lag.max, type, na.action, ...)
+  data <- ccf_helpers$format(x, series, lag.max, type, ...)
 
   list(data = data)
 }

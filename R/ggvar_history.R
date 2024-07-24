@@ -32,12 +32,12 @@ setup_history <- function(x, series, index, ...) {
 #'
 #' @param x Either a "varest" object for plotting the residuals, or an dataset
 #'  (object coercible to data.frame) with numeric variables.
-#' @eval param_series()
-#' @eval param_index("\\code{x$obs} or \\code{nrow(x)}")
-#' @eval param_graph_type(c("faceted", "colored"), FALSE)
-#' @eval param_args(c("geom_line", "facet_wrap"))
-#' @eval param_colors()
-#' @eval param_dots("history")
+#' @eval roxy$series()
+#' @eval roxy$index("\\code{x$obs} or \\code{nrow(x)}")
+#' @eval roxy$graph_type(c("faceted", "colored"), FALSE)
+#' @eval roxy$args(c("geom_line", "facet_wrap"))
+#' @eval roxy$colors()
+#' @eval roxy$dots("history")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -59,7 +59,7 @@ ggvar_history <- function(
   setup <- setup_history(x, series, index, ...)
 
   if (graph_type == "colored") {
-    colors <- get_pallete(colors, length(setup$series))
+    colors <- get_colors(colors, length(setup$series))
   }
 
   graph_add <- inject(list(

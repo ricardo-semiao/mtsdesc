@@ -4,21 +4,23 @@ pluralize_or <- function(text) {
 }
 
 
-param_series <- function() {
+roxy <- list()
+
+roxy$series <- function() {
   glue("
   @param series A character vector with series (column names) to \\
   consider. Defaults to all (\\code{{NULL}}).
   ")
 }
 
-param_index <- function(len) {
+roxy$index <- function(len) {
   glue("
   @param index A vector of labels to the x-axis, normally dates. Must have \\
   length equal to {len}. Defaults to a integer sequence.
   ")
 }
 
-param_graph_type <- function(types, isgeoms = TRUE) {
+roxy$graph_type <- function(types, isgeoms = TRUE) {
   if (isgeoms) {
     texts <- purrr::map_chr(types, ~glue("
       \\code{{'{.x}'}}, for \\link[ggplot2]{{geom_{.x}}}
@@ -35,7 +37,7 @@ param_graph_type <- function(types, isgeoms = TRUE) {
   }
 }
 
-param_facet_type <- function() {
+roxy$facet_type <- function() {
   glue("
   @param facet The facet 'engine' to be used. \\code{{'ggplot2'}} for \\
   \\link[ggplot2]{{facet_grid}}, \\code{{'ggh4x'}} for \\
@@ -44,7 +46,7 @@ param_facet_type <- function() {
 }
 
 
-param_colors <- function() {
+roxy$colors <- function() {
   glue("
   @param colors A vector of colors for each variable. Passed to \\
   \\link[ggplot2]{{scale_color_manual}}. See \\code{{vignette('colors')}}.
@@ -52,7 +54,7 @@ param_colors <- function() {
 }
 
 
-param_args <- function(fun_name) {
+roxy$args <- function(fun_name) {
   param <- ifelse(
     grepl("facet", fun_name),
     "args_facet",
@@ -65,19 +67,19 @@ param_args <- function(fun_name) {
   ")
 }
 
-param_args_geom <- function() {
+roxy$args_geom <- function() {
   "@param args_geom Arguments passed to the chosen \\code{{geom}}."
 }
 
 
-param_linetypes <- function() {
-  glue("
-  @param linetypes A vector of line types (original, predicted). Passed to \\
-  \\link[ggplot2]{{scale_linetype_manual}}.
-  ")
-}
+#roxy$linetypes <- function() {
+#  glue("
+#  @param linetypes A vector of line types (original, predicted). Passed to \\
+#  \\link[ggplot2]{{scale_linetype_manual}}.
+#  ")
+#}
 
-param_dots <- function(fun_names, special_method = NULL) {
+roxy$dots <- function(fun_names, special_method = NULL) {
   fun_names <- paste0("varr:::setup_", fun_names) %>% pluralize_or()
   special_text <- ""
 

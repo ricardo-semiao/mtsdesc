@@ -36,9 +36,9 @@ setup_dispersion <- function(x, series, ...) {
 #'  using ggplot2.
 #'
 #' @param x A "varest" object to get residuals and fitted values from.
-#' @eval param_series()
-#' @eval param_args(c("geom_point", "geom_hline", "facet_wrap"))
-#' @eval param_dots("dispersion")
+#' @eval roxy$series()
+#' @eval roxy$args(c("geom_point", "geom_hline", "facet_wrap"))
+#' @eval roxy$dots("dispersion")
 #'
 #' @return An object of class \code{ggplot}.
 #'

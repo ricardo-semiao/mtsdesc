@@ -28,42 +28,34 @@ suported_palettes <- list(
     "pal_gsea", "pal_material"
   )
 )
-# knitr::kable(sapply(suported_palettes, \(x) paste(x, collapse = ", ")))
 
-get_pallete <- function(palette, n, ...) {
-  if (is.null(palette)) {
-    return(grDevices::hcl(
-      h = seq(15, 375, length = n + 1), l = 65, c = 100
-    )[1:n])
-  }
-
-  if (length(palette) == 1 && grepl("::", palette)) {
-    pkg_pal <- strsplit(palette, "::")[[1]]
+get_colors <- function(colors, n, ..., evn = caller_env()) {
+  if (is_null(colors)) {
+    grDevices::hcl(h = seq(15, 375, length = n + 1), l = 65, c = 100)[1:n]
+  } else if (length(colors) == 1 && grepl("::", colors)) {
+    pkg_pal <- strsplit(colors, "::")[[1]]
 
     if (!rlang::is_installed(pkg_pal[1])) {
-      stop(paste0("Package ", pkg_pal[1], " isn't installed"))
-    }
-    if (!pkg_pal[2] %in% suported_palettes[[pkg_pal[1]]]) {
-      stop(paste0(
-        "With package ", pkg_pal[1], ", palette should be one of:\n    ",
-        suported_palettes[[pkg_pal[1]]]
-      ))
+      cli::cli_abort("Package {.val {pkg_pal[1]}} isn't installed.", call = env)
+    } else if (!pkg_pal[2] %in% suported_palettes[[pkg_pal[1]]]) {
+      cli::cli_abort(
+        "With package {.val {pkg_pal[1]}}, palette should be one of: 
+        {.or {suported_palettes[[pkg_pal[1]]]}}."
+      )
     }
 
     if (pkg_pal[1] == "ggplot2") {
-      return(pkg_pal[2])
+      pkg_pal[2]
     } else if (pkg_pal[1] == "RColorBrewer") {
-      return(RColorBrewer::brewer.pal(n, pkg_pal[2], ...))
+      RColorBrewer::brewer.pal(n, pkg_pal[2], ...)
     } else if (pkg_pal[1] %in% c("base", "viridis", "ggsci")) {
-      return(match.fun(palette)(n, ...)[1:n])
+      match.fun(colors)(n, ...)[1:n]
     }
+  } else if (is_bare_character(colors)) {
+    colors
+  } else {
+    cli::cli_abort("Unrecognized {.val 'colors'} argument")
   }
-
-  if (is.atomic(palette)) {
-    return(palette)
-  }
-
-  stop("Unrecognized `palette` argument")
 }
 
 
@@ -104,6 +96,7 @@ define_facet <- function(facet, facet_x, facet_y, ...) {
 
 
 # Others  ---------------------------------------------------------------
+
 ignore_cols <- function(arg) {
   isnumeric_cols <- sapply(arg, \(x) is_integer(x) || is_double(x))
 

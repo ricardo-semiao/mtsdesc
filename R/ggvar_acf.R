@@ -54,18 +54,18 @@ setup_acf <- function(x, series, lag.max, type, ...) {
 #'
 #' @param x A dataset (object coercible to data.frame) or a "varest" object to
 #'  get residuals from.
-#' @eval param_series()
+#' @eval roxy$series()
 #' @param lag.max The number of lags used to calculate the ACF, passed to
 #'  \link[stats]{acf}.
 #' @param type The type of ACF to be computed. Can be either "correlation",
 #'  "covariance", or "partial". Passed to \link[stats]{acf}.
-#' @eval param_graph_type(c("segment", "area"))
-#' @eval param_args_geom()
-#' @eval param_args(c("geom_ribbon", "geom_hline", "facet_wrap"))
+#' @eval roxy$graph_type(c("segment", "area"))
+#' @eval roxy$args_geom()
+#' @eval roxy$args(c("geom_ribbon", "geom_hline", "facet_wrap"))
 #' @param ci The level of confidence for the ACF confidence interval. Set to
 #'  \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.
-#' @eval param_facet()
-#' @eval param_dots(c("setup_acf", "setup_ccf"), "stats::acf")
+#' @eval roxy$facet()
+#' @eval roxy$dots(c("setup_acf", "setup_ccf"), "stats::acf")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -84,11 +84,10 @@ ggvar_acf <- function(
     args_hline = list(),
     args_facet = list(),
     ci = 0.95,
-    na.action = stats::na.fail, demean = TRUE,
     ...) {
   test_acf(x, series, lag.max, type, graph_type, ci)
 
-  setup <- setup_acf(x, series, lag.max, type, na.action, demean, ...)
+  setup <- setup_acf(x, series, lag.max, type, ...)
 
   graph_add <- inject(list(
     if (graph_type == "segment") {
@@ -113,27 +112,25 @@ ggvar_acf <- function(
 
 
 #' @noRd
-setup_acf.varest <- function(x, series, lag.max, type, na.action, demean,
-  ...) {
+setup_acf.varest <- function(x, series, lag.max, type, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
   title <- paste(acf_helpers$title_base(type), "Series")
 
-  data <- acf_helpers$format(x, series, lag.max, type, na.action, demean, ...)
+  data <- acf_helpers$format(x, series, lag.max, type, ...)
 
   list(data = data, title = title)
 }
 
 #' @noRd
-setup_acf.default <- function(x, series, lag.max, type, na.action, demean,
-  ...) {
+setup_acf.default <- function(x, series, lag.max, type, ...) {
   x <- as.data.frame(x) %>% ignore_cols()
 
   series <- series %||% colnames(x)
   title <- paste(acf_helpers$title_base(type), "VAR Residuals")
 
-  data <- acf_helpers$format(x, series, lag.max, type, na.action, demean, ...)
+  data <- acf_helpers$format(x, series, lag.max, type, ...)
 
   list(data = data, title = title)
 }

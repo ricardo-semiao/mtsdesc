@@ -36,12 +36,12 @@ setup_fevd <- function(x, series, n.ahead, ...) {
 #'  "varfevd" object.
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
 #'  \link[vars]{fevd}. Unused if `x` is a "varfevd" object.
-#' @eval param_series()
-#' @eval param_graph_type(c("geom_segment", "geom_area", "geom_line"))
-#' @eval param_args_geom()
-#' @eval param_args(c("facet_wrap", "geom_point"))
-#' @eval param_colors()
-#' @eval param_dots("fevd", "vars::fevd")
+#' @eval roxy$series()
+#' @eval roxy$graph_type(c("geom_segment", "geom_area", "geom_line"))
+#' @eval roxy$args_geom()
+#' @eval roxy$args(c("facet_wrap", "geom_point"))
+#' @eval roxy$colors()
+#' @eval roxy$dots("fevd", "vars::fevd")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -62,7 +62,7 @@ ggvar_fevd <- function(
 
   setup <- setup_fevd(x, series, n.ahead, ...)
 
-  colors <- get_pallete(colors, length(setup$series))
+  colors <- get_colors(colors, length(setup$series))
 
   graph_add <- inject(list(
     if (graph_type == "bar") {
