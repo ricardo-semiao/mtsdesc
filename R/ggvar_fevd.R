@@ -30,12 +30,12 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 
 #' Plot for Forecast Error Variance Decomposition of a VAR
 #'
-#' Plots the result of a \link[vars]{fevd} call.
+#' Plots the result of a [fevd][vars::fevd] call.
 #'
-#' @param x A "varest" object to pass to \link[vars]{fevd}, or, directly, a
+#' @param x A "varest" object to pass to [fevd][vars::fevd], or, directly, a
 #'  "varfevd" object.
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
-#'  \link[vars]{fevd}. Unused if `x` is a "varfevd" object.
+#'  [fevd][vars::fevd]. Unused if `x` is a "varfevd" object.
 #' @eval roxy$series()
 #' @eval roxy$graph_type(c("segment", "area", "line"))
 #' @eval roxy$args_geom()
@@ -43,7 +43,7 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 #' @eval roxy$colors()
 #' @eval roxy$dots("fevd", "vars::fevd")
 #'
-#' @return An object of class \code{ggplot}.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' ggvar_fevd(vars::VAR(freeny[-2]), n.ahead = 10)

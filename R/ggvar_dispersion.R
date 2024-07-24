@@ -40,7 +40,7 @@ dispersion_setup <- function(x, series, ...) {
 #' @eval roxy$args_gg(c("geom_point", "geom_hline", "facet_wrap"))
 #' @eval roxy$dots("dispersion")
 #'
-#' @return An object of class \code{ggplot}.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' ggvar_dispersion(vars::VAR(freeny[-2]), args_facet = list(scales = "free_x"))

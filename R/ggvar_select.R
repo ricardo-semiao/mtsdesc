@@ -29,15 +29,15 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 
 #' Plot Information Criteria for VAR Lag Selection
 #'
-#' Plots the result of a call to \link[vars]{VARselect}.
+#' Plots the result of a call to [VARselect][vars::VARselect].
 #'
 #' @param x A dataset (object coercible to data.frame) to pass to
-#'  \link[vars]{VARselect}, or, directly, a result of such call.
+#'  [VARselect][vars::VARselect], or, directly, a result of such call.
 #' @eval roxy$series()
 #' @param lag.max Integer for the highest lag order. Passed to
-#'  \link[vars]{VARselect}.
+#'  [VARselect][vars::VARselect].
 #' @param type Type of deterministic regressors to include. Passed to
-#'  \link[vars]{VARselect}.
+#'  [VARselect][vars::VARselect].
 #' @param criteria The criteria to be considered. Any of "AIC", "HQ", "SC",
 #'  and "FPE".
 #' @param trans A transformation to apply to each criteria result (vector). Can
@@ -45,7 +45,7 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #' @eval roxy$args_gg("geom_line")
 #' @eval roxy$dots("select", "vars::VARselect")
 #'
-#' @return An object of class \code{ggplot}.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' ggvar_select(vars::VARselect(freeny[-2]))

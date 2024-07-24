@@ -47,25 +47,25 @@ acf_setup <- function(x, series, lag.max, type, ...) {
 
 #' Plot autocorrelation (and similars) of dataset
 #'
-#' \code{ggvar_acf} plots the auto-correlations (and similars) call for every
-#'  series, using \link[ggplot2]{facet_wrap}. \code{ggvar_ccf} plots all the
+#' `ggvar_acf` plots the auto-correlations (and similars) call for every
+#'  series, using [facet_wrap][ggplot2::facet_wrap]. `ggvar_ccf` plots all the
 #'  cross-correlations (and similars) between the series, in a grid.
 #'
 #' @param x A dataset (object coercible to data.frame) or a "varest" object to
 #'  get residuals from.
 #' @eval roxy$series()
 #' @param lag.max The number of lags used to calculate the ACF, passed to
-#'  \link[stats]{acf}.
+#'  [acf][stats::acf].
 #' @param type The type of ACF to be computed. Can be either "correlation",
-#'  "covariance", or "partial". Passed to \link[stats]{acf}.
+#'  "covariance", or "partial". Passed to [acf][stats::acf].
 #' @eval roxy$graph_type(c("segment", "area"))
 #' @eval roxy$args_geom()
 #' @eval roxy$args_gg(c("geom_ribbon", "geom_hline", "facet_wrap"))
 #' @param ci The level of confidence for the ACF confidence interval. Set to
-#'  \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.
+#'  `FALSE` to omit the [geom_ribbon][ggplot2::geom_ribbon].
 #' @eval roxy$dots(c("setup_acf", "setup_ccf"), "stats::acf")
 #'
-#' @return An object of class \code{ggplot}.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' ggvar_acf(freeny[-2], args_facet = list(scales = "free_y"))

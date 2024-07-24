@@ -47,7 +47,7 @@ distribution_setup <- function(x, series, plot_normal, ...) {
 #' @eval roxy$args_gg(c("geom_histogram", "geom_line", "facet_wrap"))
 #' @eval roxy$dots("distribution")
 #'
-#' @return An object of class \code{ggplot}.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' ggvar_distribution(vars::VAR(freeny[-2]))

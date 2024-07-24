@@ -19,23 +19,23 @@ setup_ggvar_irf <- function(
 
 #' Plot Impulse Response Functions of a VAR
 #'
-#' Plots the result of a \link[vars]{irf} call.
+#' Plots the result of a [irf][vars::irf] call.
 #'
-#' @param x A "varest" object to pass to \link[vars]{irf}, or, directly, a
+#' @param x A "varest" object to pass to [irf][vars::irf], or, directly, a
 #'  "varirf" object.
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
-#'  \link[vars]{irf}. Unused if \code{x} is "varirf".
+#'  [irf][vars::irf]. Unused if `x` is "varirf".
 #' @param series_impulse A character vector with variables to consider for the
-#'  impulses. Defaults to all (\code{NULL}).
+#'  impulses. Defaults to all (`NULL`).
 #' @param series_response A character vector with variables to consider for the
-#'  responses. Defaults to all (\code{NULL}).
-#' @param ci The level of confidence for the \link[vars]{irf}. Set to
-#'  \code{FALSE} to omit.
-#' @param ... Additional arguments passed to \link[vars]{irf}.
+#'  responses. Defaults to all (`NULL`).
+#' @param ci The level of confidence for the [irf][vars::irf]. Set to
+#'  `FALSE` to omit.
+#' @param ... Additional arguments passed to [irf][vars::irf].
 #' @eval roxy$facet_type()
 #' @eval roxy$args_gg(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
 #'
-#' @return An object of class \code{ggplot}.
+#' @return An object of class `ggplot`.
 #'
 #' @examples
 #' ggvar_irf(vars::VAR(freeny[-2]), n.ahead = 10,

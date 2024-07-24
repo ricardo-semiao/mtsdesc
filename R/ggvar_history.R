@@ -26,20 +26,20 @@ history_setup <- function(x, series, index, ...) {
 #' Plot Values of Dataset or VAR Residuals
 #'
 #' Plots the historic values of variables in a dataset, or residuals of a VAR
-#'  model. \code{ggvar_values} Plots each series in a facet.
-#'  \code{ggvar_values_colored} plots all in the same graph, each with a
+#'  model. `ggvar_values` Plots each series in a facet.
+#'  `ggvar_values_colored` plots all in the same graph, each with a
 #'  different color.
 #'
 #' @param x Either a "varest" object for plotting the residuals, or an dataset
 #'  (object coercible to data.frame) with numeric variables.
 #' @eval roxy$series()
-#' @eval roxy$index("\\code{x$obs} or \\code{nrow(x)}")
+#' @eval roxy$index(c("x$obs", "nrow(x)"))
 #' @eval roxy$graph_type(c("faceted", "colored"), FALSE)
 #' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
 #' @eval roxy$colors()
 #' @eval roxy$dots("history")
 #'
-#' @return An object of class \code{ggplot}.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' ggvar_history(freeny[-2], args_facet = list(scales = "free_y"))

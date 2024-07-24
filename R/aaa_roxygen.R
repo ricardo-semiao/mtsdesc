@@ -9,29 +9,30 @@ roxy <- list()
 roxy$series <- function() {
   glue("
   @param series A character vector with series (column names) to \\
-  consider. Defaults to all (\\code{{NULL}}).
+  consider. Defaults to all (`NULL`).
   ")
 }
 
-roxy$index <- function(len) {
+roxy$index <- function(lens) {
+  text <- glue("`{lens}`") %>% pluralize_or()
   glue("
   @param index A vector of labels to the x-axis, normally dates. Must have \\
-  length equal to {len}. Defaults to a integer sequence.
+  length equal to {text}. Defaults to a integer sequence.
   ")
 }
 
 
 roxy$graph_type <- function(types, isgeoms = TRUE) {
   if (isgeoms) {
-    texts <- purrr::map_chr(types, ~glue("
-      \\code{{'{.x}'}}, for \\link[ggplot2]{{geom_{.x}}}
-      ")) %>%
+    texts <- purrr::map_chr(types,
+      ~glue("`'{.x}'`, for [ggplot2::geom_{.x}]")
+    ) %>%
       pluralize_or()
     glue("
     @param graph_type The ggplot geom used to create the plot: {texts}.
     ")
   } else {
-    texts <- glue({"\\code{{'{types}'}}"}) %>% pluralize_or()
+    texts <- glue({"`'{types}'`"}) %>% pluralize_or()
     glue("
     @param graph_type The type of the plot, {texts}.
     ")
@@ -40,16 +41,15 @@ roxy$graph_type <- function(types, isgeoms = TRUE) {
 
 roxy$facet_type <- function() {
   glue("
-  @param facet The facet 'engine' to be used. \\code{{'ggplot2'}} for \\
-  \\link[ggplot2]{{facet_grid}}, \\code{{'ggh4x'}} for \\
-  \\link[ggh4x]{{facet_grid2}}
+  @param facet The facet 'engine' to be used. `'ggplot2'` for \\
+  [ggplot2::facet_grid], `'ggh4x'` for [ggh4x::facet_grid2].
   ")
 }
 
 roxy$colors <- function() {
   glue("
-  @param colors A vector of colors for each variable. Passed to \\
-  \\link[ggplot2]{{scale_color_manual}}. See \\code{{vignette('colors')}}.
+  @param colors A vector of colors for the 'geoms' and/or variables.
+  See [vignette('colors')].
   ")
 }
 
@@ -63,7 +63,7 @@ roxy$args_gg <- function(fun_name) {
   text <- ifelse(
     grepl("facet", fun_name),
     "the faceting engine used",
-    glue("\\link[ggplot2]{{{fun_name}}}")
+    glue("[ggplot2::{fun_name}]")
   )
 
   glue("
@@ -72,7 +72,7 @@ roxy$args_gg <- function(fun_name) {
 }
 
 roxy$args_geom <- function() {
-  "@param args_geom Arguments passed to the chosen \\code{{geom}}."
+  "@param args_geom Arguments passed to the chosen 'geom'."
 }
 
 
@@ -86,19 +86,21 @@ roxy$args_geom <- function() {
 
 roxy$dots <- function(fun_names, special_method = NULL) {
   fun_names <- glue("varr:::{fun_names}_setup") %>% pluralize_or()
-  special_text <- ""
 
-  if (!is_null(special_method)) {
-    parts <- strsplit(special_method, "::")[[1]]
-    special_text <- glue("
-    Pass adittional arguments to \\link[{parts[1]}]{{{parts[2]}}} here.
-    ")
+  special_text <- if (!is_null(special_method)) {
+    glue("Pass additional arguments to [special_method] here.")
+  } else {
+    ""
   }
-  
+
   glue("
-  @param ... Arguments passed to \\code{{{fun_names}}}, the generic \\
-  function that formats \\code{{x}} into a 'graphable' format. Use them only \\
-  if you have created a method for some unsupported class of \\code{{x}}.\\
-  {special_text}
+  @param ... Arguments passed to `{fun_names}`, the generic \\
+  function that formats `x` into a 'graphable' format. Use them only \\
+  if you have created a method for some unsupported class of `x`.{special_text}
   ")
+}
+
+
+roxy$return_gg <- function() {
+  "@return An object of class `'ggplot'`."
 }

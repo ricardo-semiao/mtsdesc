@@ -32,25 +32,25 @@ setup_ggvar_predict <- function(x, n.ahead, data_test, series, index, ci) {
 
 #' Plot the Predicted Values of a VAR
 #'
-#' Plots the result of a \link[vars]{predict.varest} call. Has an option to
+#' Plots the result of a [predict.varest][vars::predict.varest] call. Has an option to
 #'  overlay it with the true variables, if provided a test dataset.
 #'
 #' @param x A "varest" object to get predictions from, or, directly, a
 #'  "varprd" object.
 #' @param data_test A test data set (object coercible to data.frame), with the
-#'  actual series values. If \code{NULL}, no comparison is made.
+#'  actual series values. If `NULL`, no comparison is made.
 #' @param n.ahead An integer. The number of periods to predict, passed to
-#'  \link[stats]{predict}. Defaults to \code{nrow(data_test)} or the horizon of
-#'  the "varprd" object (\code{NULL}).
+#'  [predict][stats::predict]. Defaults to `nrow(data_test)` or the horizon of
+#'  the "varprd" object (`NULL`).
 #' @eval roxy$series()
-#' @eval roxy$index("\\code{n.ahead}")
+#' @eval roxy$index("`n.ahead`")
 #' @param ci The level of confidence for the prediction confidence interval. Set
-#'  to \code{FALSE} to omit. Passed to \link[stats]{predict}.
-#' @param ... Additional arguments passed to \link[stats]{predict}.
+#'  to `FALSE` to omit. Passed to [predict][stats::predict].
+#' @param ... Additional arguments passed to [predict][stats::predict].
 #' @eval roxy$linetypes()
 #' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
 #'
-#' @return An object of class \code{ggplot}.
+#' @return An object of class `ggplot`.
 #'
 #' @examples
 #' ggvar_predict(stats::predict(vars::VAR(freeny[-2])),

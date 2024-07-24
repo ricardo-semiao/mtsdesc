@@ -24,18 +24,18 @@ data_ggvar_fit <- function(x, compare, series, index) {
 #' Plot VAR Fitted Values
 #'
 #' Plots fitted values of a VAR model, versus the actual values.
-#'  \code{ggvar_fit} Plots each serie in a facet. \code{ggvar_fit_colored}
+#'  `ggvar_fit` Plots each serie in a facet. `ggvar_fit_colored`
 #'  plots all in the same graph, each with a different color.
 #'
 #' @param x A "varest" object to get fitted values from.
 #' @param compare Logical, should the "original" values be plotted?
 #' @eval roxy$series()
-#' @eval roxy$index("\\code{x$obs}")
+#' @eval roxy$index("`x$obs`")
 #' @eval roxy$colors()
 #' @eval roxy$linetypes()
 #' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
 #'
-#' @return An object of class \code{ggplot}.
+#' @return An object of class `ggplot`.
 #'
 #' @examples
 #' x <- vars::VAR(freeny[-2])
