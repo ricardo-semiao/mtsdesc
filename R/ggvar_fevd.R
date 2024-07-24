@@ -16,15 +16,15 @@ fevd_helpers$format <- function(x, series) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_fevd <- function(series, n.ahead, graph_type) {
+fevd_test <- function(series, n.ahead, graph_type) {
   test$type(series, c("NULL", "character"), env)
   test$interval(n.ahead, 1, Inf, env = env)
   test$category(graph_type, c("bar", "area", "line"), env)
 }
 
 #' @noRd
-setup_fevd <- function(x, series, n.ahead, ...) {
-  UseMethod("setup_fevd")
+fevd_setup <- function(x, series, n.ahead, ...) {
+  UseMethod("fevd_setup")
 }
 
 
@@ -37,9 +37,9 @@ setup_fevd <- function(x, series, n.ahead, ...) {
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
 #'  \link[vars]{fevd}. Unused if `x` is a "varfevd" object.
 #' @eval roxy$series()
-#' @eval roxy$graph_type(c("geom_segment", "geom_area", "geom_line"))
+#' @eval roxy$graph_type(c("segment", "area", "line"))
 #' @eval roxy$args_geom()
-#' @eval roxy$args(c("facet_wrap", "geom_point"))
+#' @eval roxy$args_gg(c("facet_wrap", "geom_point"))
 #' @eval roxy$colors()
 #' @eval roxy$dots("fevd", "vars::fevd")
 #'
@@ -58,9 +58,9 @@ ggvar_fevd <- function(
     args_point = list(),
     colors = NULL,
     ...) {
-  test_fevd(series, n.ahead, graph_type)
+  fevd_test(series, n.ahead, graph_type)
 
-  setup <- setup_fevd(x, series, n.ahead, ...)
+  setup <- fevd_setup(x, series, n.ahead, ...)
 
   colors <- get_colors(colors, length(setup$series))
 
@@ -94,7 +94,7 @@ ggvar_fevd <- function(
 
 
 #' @noRd 
-setup_fevd.varest <- function(x, series, n.ahead, ...) {
+fevd_setup.varest <- function(x, series, n.ahead, ...) {
   x <- vars::fevd(x, n.ahead, ...)
   
   series <- series %||% names(x)
@@ -105,7 +105,7 @@ setup_fevd.varest <- function(x, series, n.ahead, ...) {
 }
 
 #' @noRd 
-setup_fevd.fevd <- function(x, series, n.ahead, ...) {
+fevd_setup.fevd <- function(x, series, n.ahead, ...) {
   series <- series %||% names(x)
 
   data <- fevd_helpers$format(x, series)

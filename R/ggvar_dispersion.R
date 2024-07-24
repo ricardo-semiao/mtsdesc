@@ -20,13 +20,13 @@ dispersion_helpers$format <- function(x, series) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_dispersion <- function(series, env = caller_env()) {
+dispersion_test <- function(series, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
 }
 
 #' @noRd 
-setup_dispersion <- function(x, series, ...) {
-  UseMethod("setup_dispersion")
+dispersion_setup <- function(x, series, ...) {
+  UseMethod("dispersion_setup")
 }
 
 
@@ -37,7 +37,7 @@ setup_dispersion <- function(x, series, ...) {
 #'
 #' @param x A "varest" object to get residuals and fitted values from.
 #' @eval roxy$series()
-#' @eval roxy$args(c("geom_point", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_gg(c("geom_point", "geom_hline", "facet_wrap"))
 #' @eval roxy$dots("dispersion")
 #'
 #' @return An object of class \code{ggplot}.
@@ -52,9 +52,9 @@ ggvar_dispersion <- function(
     args_hline = list(),
     args_facet = list(),
     ...) {
-  test_dispersion(series)
+  dispersion_test(series)
 
-  setup <- setup_dispersion(x, series, ...)
+  setup <- dispersion_setup(x, series, ...)
 
   inject(
     ggplot(setup$data, aes(.data$fitted, .data$residual)) +
@@ -69,7 +69,7 @@ ggvar_dispersion <- function(
 
 
 #' @noRd 
-setup_dispersion.varest <- function(x, series, ...) {
+dispersion_setup.varest <- function(x, series, ...) {
   series <- series %||% names(x$varresult)
   
   data <- dispersion_helpers$format(x, series)

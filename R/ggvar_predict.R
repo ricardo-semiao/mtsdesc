@@ -42,13 +42,13 @@ setup_ggvar_predict <- function(x, n.ahead, data_test, series, index, ci) {
 #' @param n.ahead An integer. The number of periods to predict, passed to
 #'  \link[stats]{predict}. Defaults to \code{nrow(data_test)} or the horizon of
 #'  the "varprd" object (\code{NULL}).
-#' @eval param_series()
-#' @eval param_index("\\code{n.ahead}")
+#' @eval roxy$series()
+#' @eval roxy$index("\\code{n.ahead}")
 #' @param ci The level of confidence for the prediction confidence interval. Set
 #'  to \code{FALSE} to omit. Passed to \link[stats]{predict}.
 #' @param ... Additional arguments passed to \link[stats]{predict}.
-#' @eval param_linetypes()
-#' @eval param_args(c("geom_line", "geom_ribbon", "facet_wrap"))
+#' @eval roxy$linetypes()
+#' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
 #'
 #' @return An object of class \code{ggplot}.
 #'

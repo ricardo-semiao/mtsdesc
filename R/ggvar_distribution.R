@@ -24,14 +24,14 @@ distribution_helpers$format_dens <- function(x, series) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_distribution <- function(series, plot_normal, env = caller_env()) {
+distribution_test <- function(series, plot_normal, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$type(plot_normal, c("TRUE", "FALSE"), env)
 }
 
 #' @noRd
-setup_distribution <- function(x, series, plot_normal, ...) {
-  UseMethod("setup_distribution")
+distribution_setup <- function(x, series, plot_normal, ...) {
+  UseMethod("distribution_setup")
 }
 
 
@@ -44,7 +44,7 @@ setup_distribution <- function(x, series, plot_normal, ...) {
 #'  (object coercible to data.frame) with numeric variables.
 #' @eval roxy$series()
 #' @param plot_normal Logical, whether or not a normal curve should be plotted.
-#' @eval roxy$args(c("geom_histogram", "geom_line", "facet_wrap"))
+#' @eval roxy$args_gg(c("geom_histogram", "geom_line", "facet_wrap"))
 #' @eval roxy$dots("distribution")
 #'
 #' @return An object of class \code{ggplot}.
@@ -60,9 +60,9 @@ ggvar_distribution <- function(
     args_line = list(),
     args_facet = list(),
     ...) {
-  test_distribution(series, plot_normal)
+  distribution_test(series, plot_normal)
 
-  setup <- setup_distribution(x, series, plot_normal, ...)
+  setup <- distribution_setup(x, series, plot_normal, ...)
 
   graph_add <- inject(list(
     if (plot_normal) {
@@ -85,7 +85,7 @@ ggvar_distribution <- function(
 
 
 #' @noRd
-setup_distribution.varest <- function(x, series, plot_normal, ...) {
+distribution_setup.varest <- function(x, series, plot_normal, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   title <- "VAR Residuals Distribution"
@@ -98,7 +98,7 @@ setup_distribution.varest <- function(x, series, plot_normal, ...) {
 }
 
 #' @noRd
-setup_distribution.default <- function(x, series, plot_normal, ...) {
+distribution_setup.default <- function(x, series, plot_normal, ...) {
   x <- as.data.frame(x) %>% ignore_cols()
 
   title <- "Time Series Distribution"

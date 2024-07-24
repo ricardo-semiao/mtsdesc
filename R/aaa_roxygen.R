@@ -20,6 +20,7 @@ roxy$index <- function(len) {
   ")
 }
 
+
 roxy$graph_type <- function(types, isgeoms = TRUE) {
   if (isgeoms) {
     texts <- purrr::map_chr(types, ~glue("
@@ -45,7 +46,6 @@ roxy$facet_type <- function() {
   ")
 }
 
-
 roxy$colors <- function() {
   glue("
   @param colors A vector of colors for each variable. Passed to \\
@@ -54,16 +54,20 @@ roxy$colors <- function() {
 }
 
 
-roxy$args <- function(fun_name) {
+roxy$args_gg <- function(fun_name) {
   param <- ifelse(
     grepl("facet", fun_name),
     "args_facet",
     gsub("geom_(.+)", "args_\\1", fun_name)
   )
+  text <- ifelse(
+    grepl("facet", fun_name),
+    "the faceting engine used",
+    glue("\\link[ggplot2]{{{fun_name}}}")
+  )
 
   glue("
-  @param {param} Additional arguments passed to \\
-  \\link[ggplot2]{{{fun_name}}}.
+  @param {param} Additional arguments passed to {text}.
   ")
 }
 
@@ -79,8 +83,9 @@ roxy$args_geom <- function() {
 #  ")
 #}
 
+
 roxy$dots <- function(fun_names, special_method = NULL) {
-  fun_names <- paste0("varr:::setup_", fun_names) %>% pluralize_or()
+  fun_names <- glue("varr:::{fun_names}_setup") %>% pluralize_or()
   special_text <- ""
 
   if (!is_null(special_method)) {

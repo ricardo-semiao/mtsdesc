@@ -29,11 +29,11 @@ data_ggvar_fit <- function(x, compare, series, index) {
 #'
 #' @param x A "varest" object to get fitted values from.
 #' @param compare Logical, should the "original" values be plotted?
-#' @eval param_series()
-#' @eval param_index("\\code{x$obs}")
-#' @eval param_colors()
-#' @eval param_linetypes()
-#' @eval param_args(c("geom_line", "facet_wrap"))
+#' @eval roxy$series()
+#' @eval roxy$index("\\code{x$obs}")
+#' @eval roxy$colors()
+#' @eval roxy$linetypes()
+#' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
 #'
 #' @return An object of class \code{ggplot}.
 #'

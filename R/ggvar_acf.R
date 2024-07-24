@@ -29,7 +29,7 @@ acf_helpers$title_base <- function(type) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_acf <- function(x, series, lag.max, type, graph_type, ci,
+acf_test <- function(x, series, lag.max, type, graph_type, ci,
   env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$category(graph_type, c("segment", "area"), env)
@@ -40,8 +40,8 @@ test_acf <- function(x, series, lag.max, type, graph_type, ci,
 }
 
 #'@noRd
-setup_acf <- function(x, series, lag.max, type, ...) {
-  UseMethod("setup_acf")
+acf_setup <- function(x, series, lag.max, type, ...) {
+  UseMethod("acf_setup")
 }
 
 
@@ -49,8 +49,7 @@ setup_acf <- function(x, series, lag.max, type, ...) {
 #'
 #' \code{ggvar_acf} plots the auto-correlations (and similars) call for every
 #'  series, using \link[ggplot2]{facet_wrap}. \code{ggvar_ccf} plots all the
-#'  cross-correlations (and similars) between the series, using
-#'  \link[ggplot2]{facet_grid}.
+#'  cross-correlations (and similars) between the series, in a grid.
 #'
 #' @param x A dataset (object coercible to data.frame) or a "varest" object to
 #'  get residuals from.
@@ -61,10 +60,9 @@ setup_acf <- function(x, series, lag.max, type, ...) {
 #'  "covariance", or "partial". Passed to \link[stats]{acf}.
 #' @eval roxy$graph_type(c("segment", "area"))
 #' @eval roxy$args_geom()
-#' @eval roxy$args(c("geom_ribbon", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_gg(c("geom_ribbon", "geom_hline", "facet_wrap"))
 #' @param ci The level of confidence for the ACF confidence interval. Set to
 #'  \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.
-#' @eval roxy$facet()
 #' @eval roxy$dots(c("setup_acf", "setup_ccf"), "stats::acf")
 #'
 #' @return An object of class \code{ggplot}.
@@ -85,9 +83,9 @@ ggvar_acf <- function(
     args_facet = list(),
     ci = 0.95,
     ...) {
-  test_acf(x, series, lag.max, type, graph_type, ci)
+  acf_test(x, series, lag.max, type, graph_type, ci)
 
-  setup <- setup_acf(x, series, lag.max, type, ...)
+  setup <- acf_setup(x, series, lag.max, type, ...)
 
   graph_add <- inject(list(
     if (graph_type == "segment") {
@@ -112,7 +110,7 @@ ggvar_acf <- function(
 
 
 #' @noRd
-setup_acf.varest <- function(x, series, lag.max, type, ...) {
+acf_setup.varest <- function(x, series, lag.max, type, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
@@ -124,7 +122,7 @@ setup_acf.varest <- function(x, series, lag.max, type, ...) {
 }
 
 #' @noRd
-setup_acf.default <- function(x, series, lag.max, type, ...) {
+acf_setup.default <- function(x, series, lag.max, type, ...) {
   x <- as.data.frame(x) %>% ignore_cols()
 
   series <- series %||% colnames(x)

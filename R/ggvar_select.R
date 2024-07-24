@@ -13,7 +13,7 @@ select_helpers$format <- function(x, criteria, trans) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_select <- function(series, lag.max, type, criteria, trans,
+select_test <- function(series, lag.max, type, criteria, trans,
     env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$interval(lag.max, 1, Inf, env = env)
@@ -22,9 +22,8 @@ test_select <- function(series, lag.max, type, criteria, trans,
   test$category(trans, c("none", "index"), env)
 }
 
-#' @noRd
-setup_select <- function(x, series, lag.max, type, criteria, trans, ...) {
-  UseMethod("setup_select")
+select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
+  UseMethod("select_setup")
 }
 
 
@@ -43,7 +42,7 @@ setup_select <- function(x, series, lag.max, type, criteria, trans, ...) {
 #'  and "FPE".
 #' @param trans A transformation to apply to each criteria result (vector). Can
 #'  be a function, "none" (the default), or "index" to create index numbers.
-#' @eval roxy$args("geom_line")
+#' @eval roxy$args_gg("geom_line")
 #' @eval roxy$dots("select", "vars::VARselect")
 #'
 #' @return An object of class \code{ggplot}.
@@ -58,11 +57,11 @@ ggvar_select <- function(
     criteria = c("AIC", "HQ", "SC", "FPE"), trans = "none",
     args_line = list(),
     ...) {
-  test_select(series, lag.max, type, criteria, trans)
+  select_test(series, lag.max, type, criteria, trans)
 
   criteria <- paste0(criteria, "(n)")
 
-  setup <- setup_select(x, series, lag.max, type, criteria, trans, ...)
+  setup <- select_setup(x, series, lag.max, type, criteria, trans, ...)
 
   ggplot(setup$data, aes(.data$lag, .data$value, color = .data$name)) +
     inject(ggplot2::geom_line(!!!args_line)) +
@@ -73,14 +72,14 @@ ggvar_select <- function(
 }
 
 #' @noRd 
-setup_select.list <- function(x, series, lag.max, type, criteria, trans, ...) {
+select_setup.list <- function(x, series, lag.max, type, criteria, trans, ...) {
   data <- select_helpers$format(x, criteria, trans)
 
   list(data = data)
 }
 
 #' @noRd 
-setup_select.default <- function(x, series, lag.max, type, criteria, trans,
+select_setup.default <- function(x, series, lag.max, type, criteria, trans,
   ...) {
   series <- series %||% colnames(x)
 

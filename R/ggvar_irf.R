@@ -32,8 +32,8 @@ setup_ggvar_irf <- function(
 #' @param ci The level of confidence for the \link[vars]{irf}. Set to
 #'  \code{FALSE} to omit.
 #' @param ... Additional arguments passed to \link[vars]{irf}.
-#' @eval param_facet()
-#' @eval param_args(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
+#' @eval roxy$facet_type()
+#' @eval roxy$args_gg(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
 #'
 #' @return An object of class \code{ggplot}.
 #'

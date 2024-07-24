@@ -20,7 +20,7 @@ ccf_helpers$format <- function(x, series, lag.max, type, ...) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_ccf <- function(
+ccf_test <- function(
     x, series, lag.max, type, graph_type, ci, facet_type,
     env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -33,12 +33,15 @@ test_ccf <- function(
 }
 
 #'@noRd
-setup_ccf <- function(x, series, lag.max, type, ci, ...) {
-  UseMethod("setup_ccf")
+ccf_setup <- function(x, series, lag.max, type, ci, ...) {
+  UseMethod("ccf_setup")
 }
 
 
 #' @rdname ggvar_acf
+#' 
+#' @eval roxy$facet_type()
+#' 
 #' @export
 ggvar_ccf <- function(
     x, series = NULL,
@@ -51,14 +54,14 @@ ggvar_ccf <- function(
     facet_type = "ggplot",
     ci = 0.95,
     ...) {
-  test_ccf(x, series, lag.max, type, graph_type, ci, facet_type)
+  ccf_test(x, series, lag.max, type, graph_type, ci, facet_type)
 
   title <- switch(type,
     "correlation" = "Cross-correlation of Series",
     "covariance" = "Cross-covariance of Series"
   )
 
-  setup <- setup_ccf(x, series, lag.max, type, na.action, ...)
+  setup <- ccf_setup(x, series, lag.max, type, ci, ...)
 
   graph_add <- inject(list(
     if (graph_type == "segment") {
@@ -83,7 +86,7 @@ ggvar_ccf <- function(
 
 
 #' @noRd
-setup_ccf.varest <- function(x, series, lag.max, type, ci, ...) {
+ccf_setup.varest <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
@@ -94,7 +97,7 @@ setup_ccf.varest <- function(x, series, lag.max, type, ci, ...) {
 }
 
 #' @noRd
-setup_ccf.default <- function(x, series, lag.max, type, ci, ...) {
+ccf_setup.default <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(x) %>% ignore_cols()
 
   series <- series %||% colnames(x)

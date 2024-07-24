@@ -11,15 +11,15 @@ history_helpers$format <- function(x, series, index) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-test_history <- function(series, index, graph_type, env = caller_env()) {
+history_test <- function(series, index, graph_type, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$type(index, c("NULL", "integer", "double"), env)
   test$category(graph_type, c("faceted", "colored"), env)
 }
 
 #' @noRd
-setup_history <- function(x, series, index, ...) {
-  UseMethod("setup_history")
+history_setup <- function(x, series, index, ...) {
+  UseMethod("history_setup")
 }
 
 
@@ -35,7 +35,7 @@ setup_history <- function(x, series, index, ...) {
 #' @eval roxy$series()
 #' @eval roxy$index("\\code{x$obs} or \\code{nrow(x)}")
 #' @eval roxy$graph_type(c("faceted", "colored"), FALSE)
-#' @eval roxy$args(c("geom_line", "facet_wrap"))
+#' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
 #' @eval roxy$colors()
 #' @eval roxy$dots("history")
 #'
@@ -54,9 +54,9 @@ ggvar_history <- function(
     args_facet = list(),
     colors = NULL,
     ...) {
-  test_history(series, index, graph_type)
+  history_test(series, index, graph_type)
 
-  setup <- setup_history(x, series, index, ...)
+  setup <- history_setup(x, series, index, ...)
 
   if (graph_type == "colored") {
     colors <- get_colors(colors, length(setup$series))
@@ -86,7 +86,7 @@ ggvar_history <- function(
 
 
 #' @noRd
-setup_history.varest <- function(x, series, index, ...) {
+history_setup.varest <- function(x, series, index, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
@@ -99,7 +99,7 @@ setup_history.varest <- function(x, series, index, ...) {
 }
 
 #' @noRd
-setup_history.default <- function(x, series, index, ...) {
+history_setup.default <- function(x, series, index, ...) {
   x <- as.data.frame(x) %>% ignore_cols()
 
   series <- series %||% colnames(x)
