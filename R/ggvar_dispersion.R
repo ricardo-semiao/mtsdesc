@@ -18,6 +18,7 @@ dispersion_helpers$format <- function(x, series) {
 }
 
 
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_dispersion <- function(series, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -37,7 +38,7 @@ setup_dispersion <- function(x, series, ...) {
 #' @param x A "varest" object to get residuals and fitted values from.
 #' @eval param_series()
 #' @eval param_args(c("geom_point", "geom_hline", "facet_wrap"))
-#' @eval param_dots("setup_dispersion")
+#' @eval param_dots("dispersion")
 #'
 #' @return An object of class \code{ggplot}.
 #'

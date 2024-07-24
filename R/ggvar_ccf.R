@@ -1,12 +1,12 @@
 # Helper functions used between more than one method:
 ccf_helpers <- env()
 
-ccf_helpers$format <- function(x, series, lag.max, type, na.action) {
+ccf_helpers$format <- function(x, series, lag.max, type, na.action, ...) {
   lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
 
   x %>%
     dplyr::select(dplyr::all_of(series)) %>%
-    stats::acf(lag.max, type, plot = FALSE, na.action) %>%
+    stats::acf(lag.max, type, plot = FALSE, na.action, ...) %>%
     purrr::pluck("acf") %>%
     purrr::array_tree(3) %>%
     purrr::map2_dfr(series, ~ data.frame(.y, 0:lag.max, .x)) %>%
@@ -17,6 +17,8 @@ ccf_helpers$format <- function(x, series, lag.max, type, na.action) {
     )
 }
 
+
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_ccf <- function(
     x, series, lag.max, type, graph_type, ci, facet_type,
@@ -86,7 +88,7 @@ setup_ccf.varest <- function(x, series, lag.max, type, na.action, ...) {
 
   series <- series %||% colnames(x)
 
-  data <- ccf_helpers$format(x, series, lag.max, type, na.action)
+  data <- ccf_helpers$format(x, series, lag.max, type, na.action, ...)
 
   list(data = data)
 }
@@ -97,7 +99,7 @@ setup_ccf.default <- function(x, series, lag.max, type, na.action, ...) {
 
   series <- series %||% colnames(x)
 
-  data <- ccf_helpers$format(x, series, lag.max, type, na.action)
+  data <- ccf_helpers$format(x, series, lag.max, type, na.action, ...)
 
   list(data = data)
 }

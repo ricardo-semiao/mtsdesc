@@ -77,11 +77,21 @@ param_linetypes <- function() {
   ")
 }
 
-param_dots <- function(fun_names) {
-  fun_names <- paste0("varr:::", fun_names) %>% pluralize_or()
+param_dots <- function(fun_names, special_method = NULL) {
+  fun_names <- paste0("varr:::setup_", fun_names) %>% pluralize_or()
+  special_text <- ""
+
+  if (!is_null(special_method)) {
+    parts <- strsplit(special_method, "::")[[1]]
+    special_text <- glue("
+    Pass adittional arguments to \\link[{parts[1]}]{{{parts[2]}}} here.
+    ")
+  }
+  
   glue("
   @param ... Arguments passed to \\code{{{fun_names}}}, the generic \\
   function that formats \\code{{x}} into a 'graphable' format. Use them only \\
-  if you have created a method for some unsupported class of \\code{{x}}.
+  if you have created a method for some unsupported class of \\code{{x}}.\\
+  {special_text}
   ")
 }

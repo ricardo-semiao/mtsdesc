@@ -22,6 +22,7 @@ distribution_helpers$format_dens <- function(x, series) {
 }
 
 
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_distribution <- function(series, plot_normal, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -44,7 +45,7 @@ setup_distribution <- function(x, series, plot_normal, ...) {
 #' @eval param_series()
 #' @param plot_normal Logical, whether or not a normal curve should be plotted.
 #' @eval param_args(c("geom_histogram", "geom_line", "facet_wrap"))
-#' @eval param_dots("setup_distribution")
+#' @eval param_dots("distribution")
 #'
 #' @return An object of class \code{ggplot}.
 #'

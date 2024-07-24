@@ -14,6 +14,7 @@ fevd_helpers$format <- function(x, series) {
 }
 
 
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_fevd <- function(series, n.ahead, graph_type) {
   test$type(series, c("NULL", "character"), env)
@@ -40,7 +41,7 @@ setup_fevd <- function(x, series, n.ahead, ...) {
 #' @eval param_args_geom()
 #' @eval param_args(c("facet_wrap", "geom_point"))
 #' @eval param_colors()
-#' @eval param_dots("setup_fevd")
+#' @eval param_dots("fevd", "vars::fevd")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -94,7 +95,7 @@ ggvar_fevd <- function(
 
 #' @noRd 
 setup_fevd.varest <- function(x, series, n.ahead, ...) {
-  x <- vars::fevd(x, n.ahead)
+  x <- vars::fevd(x, n.ahead, ...)
   
   series <- series %||% names(x)
 

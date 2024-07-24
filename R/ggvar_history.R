@@ -9,6 +9,7 @@ history_helpers$format <- function(x, series, index) {
 }
 
 
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_history <- function(series, index, graph_type, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -36,7 +37,7 @@ setup_history <- function(x, series, index, ...) {
 #' @eval param_graph_type(c("faceted", "colored"), FALSE)
 #' @eval param_args(c("geom_line", "facet_wrap"))
 #' @eval param_colors()
-#' @eval param_dots("setup_history")
+#' @eval param_dots("history")
 #'
 #' @return An object of class \code{ggplot}.
 #'

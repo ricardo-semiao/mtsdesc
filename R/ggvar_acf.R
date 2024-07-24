@@ -1,7 +1,7 @@
 # Helper functions used between more than one method:
 acf_helpers <- env()
 
-acf_helpers$format <- function(x, series, lag.max, type, na.action, demean) {
+acf_helpers$format <- function(x, series, lag.max, type, ...) {
   lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))
   lag.min <- if (type == "partial") 1 else 0
 
@@ -11,7 +11,7 @@ acf_helpers$format <- function(x, series, lag.max, type, na.action, demean) {
       tibble::tibble(
         serie = colname,
         value = stats::acf(col, lag.max, type,
-          plot = FALSE, na.action, demean
+          plot = FALSE, ...
         )$acf[, , 1],
         lag = lag.min:lag.max
       )
@@ -27,6 +27,7 @@ acf_helpers$title_base <- function(type) {
 }
 
 
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_acf <- function(x, series, lag.max, type, graph_type, ci,
   env = caller_env()) {
@@ -39,7 +40,7 @@ test_acf <- function(x, series, lag.max, type, graph_type, ci,
 }
 
 #'@noRd
-setup_acf <- function(x, series, lag.max, type, na.action, demean, ...) {
+setup_acf <- function(x, series, lag.max, type, ...) {
   UseMethod("setup_acf")
 }
 
@@ -64,11 +65,7 @@ setup_acf <- function(x, series, lag.max, type, na.action, demean, ...) {
 #' @param ci The level of confidence for the ACF confidence interval. Set to
 #'  \code{FALSE} to omit the \link[ggplot2]{geom_ribbon}.
 #' @eval param_facet()
-#' @param na.action Function to be called to handle missing values.
-#'  \code{na.pass} can be used.Passed to \link[stats]{acf}.
-#' @param demean Logical. Should the covariances be about the sample means?
-#'  Passed to \link[stats]{acf}.
-#' @eval param_dots(c("setup_acf", "setup_ccf"))
+#' @eval param_dots(c("setup_acf", "setup_ccf"), "stats::acf")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -123,7 +120,7 @@ setup_acf.varest <- function(x, series, lag.max, type, na.action, demean,
   series <- series %||% colnames(x)
   title <- paste(acf_helpers$title_base(type), "Series")
 
-  data <- acf_helpers$format(x, series, lag.max, type, na.action, demean)
+  data <- acf_helpers$format(x, series, lag.max, type, na.action, demean, ...)
 
   list(data = data, title = title)
 }
@@ -136,7 +133,7 @@ setup_acf.default <- function(x, series, lag.max, type, na.action, demean,
   series <- series %||% colnames(x)
   title <- paste(acf_helpers$title_base(type), "VAR Residuals")
 
-  data <- acf_helpers$format(x, series, lag.max, type, na.action, demean)
+  data <- acf_helpers$format(x, series, lag.max, type, na.action, demean, ...)
 
   list(data = data, title = title)
 }

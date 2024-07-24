@@ -11,13 +11,14 @@ stability_helpers$format <- function(x, series) {
   })
 }
 
-stability_helpers$dist <- function(x, ci) {
+stability_helpers$dist <- function(x, ci, ...) {
   strucchange::boundary(x[[1]],
-      alpha = 1 - ci, alt.boundary = FALSE, functional = "max"
+      alpha = 1 - ci, alt.boundary = FALSE, functional = "max", ...
   )
 }
 
 
+# Initial tests and setup (methods at the end):
 #' @noRd
 test_stability <- function(series, ci, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -27,6 +28,7 @@ test_stability <- function(series, ci, env = caller_env()) {
 setup_stability <- function(x, series, ci, ...) {
   UseMethod("setup_stability")
 }
+
 
 #' Plot for Structural Stability of a VAR
 #'
@@ -38,7 +40,7 @@ setup_stability <- function(x, series, ci, ...) {
 #' @eval param_series()
 #' @param ci The level of confidence for the \link[strucchange]{boundary}.
 #' @eval param_args(c("geom_line", "args_hline", "facet_wrap"))
-#' @eval param_dots("setup_stability")
+#' @eval param_dots("stability", "vars::stability")
 #'
 #' @return An object of class \code{ggplot}.
 #'
@@ -79,12 +81,12 @@ ggvar_stability <- function(
 
 #' @noRd
 setup_stability.varest <- function(x, series, ci, ...) {
-  x <- vars::stability(x)$stability
+  x <- vars::stability(x, ...)$stability
 
   series <- series %||% names(x)
 
   data <- stability_helpers$format(x, series)
-  dist <- if (!is_false(ci)) stability_helpers$dist(x, ci)
+  dist <- if (!is_false(ci)) stability_helpers$dist(x, ci, ...)
 
   list(data = data, dist = dist)
 }
@@ -96,7 +98,7 @@ setup_stability.varstabil <- function(x, series, ci, ...) {
   series <- series %||% names(x)
 
   data <- stability_helpers$format(x, series)
-  dist <- if (!is_false(ci)) stability_helpers$dist(x, ci)
+  dist <- if (!is_false(ci)) stability_helpers$dist(x, ci, ...)
 
   list(data = data, dist = dist)
 }
