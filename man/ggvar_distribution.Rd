@@ -10,29 +10,32 @@ ggvar_distribution(
   plot_normal = TRUE,
   args_histogram = list(bins = 30),
   args_line = list(),
-  args_facet = list()
+  args_facet = list(),
+  ...
 )
 }
 \arguments{
 \item{x}{Either a "varest" object for plotting the residuals, or an dataset
 (object coercible to data.frame) with numeric variables.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{plot_normal}{Logical, whether or not the normal curve should be plotted.}
+\item{plot_normal}{Logical, whether or not a normal curve should be plotted.}
 
-\item{args_histogram}{Aditional arguments passed to \link[ggplot2]{geom_histogram}.}
+\item{args_histogram}{Additional arguments passed to \link[ggplot2:geom_histogram]{ggplot2::geom_histogram}.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
+
+\item{...}{Arguments passed to \code{varr:::distribution_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
 Plots the histogram of the residuals of a VAR model, or of the variables in a
- dataset, overlapped with a normal curve.
+dataset, possibly overlapped with a normal curve.
 }
 \examples{
 ggvar_distribution(vars::VAR(freeny[-2]))

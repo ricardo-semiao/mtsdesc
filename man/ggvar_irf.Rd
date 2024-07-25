@@ -6,55 +6,53 @@
 \usage{
 ggvar_irf(
   x,
-  n.ahead = NULL,
-  series_impulse = NULL,
-  series_response = NULL,
+  series_imp = NULL,
+  series_resp = NULL,
+  n.ahead = 10,
   ci = 0.95,
-  ...,
-  facet = "ggplot",
   args_line = list(),
   args_hline = list(),
   args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
-  args_facet = list()
+  args_facet = list(),
+  facet_type = "ggplot",
+  ...
 )
 }
 \arguments{
-\item{x}{A "varest" object to pass to \link[vars]{irf}, or, directly, a
+\item{x}{A "varest" object to pass to \link[vars:irf]{irf}, or, directly, a
 "varirf" object.}
 
-\item{n.ahead}{An integer. The size of the forecast horizon, passed to
-\link[vars]{irf}. Unused if \code{x} is "varirf".}
-
-\item{series_impulse}{A character vector with variables to consider for the
+\item{series_imp}{A character vector with variables to consider for the
 impulses. Defaults to all (\code{NULL}).}
 
-\item{series_response}{A character vector with variables to consider for the
+\item{series_resp}{A character vector with variables to consider for the
 responses. Defaults to all (\code{NULL}).}
 
-\item{ci}{The level of confidence for the \link[vars]{irf}. Set to
+\item{n.ahead}{An integer. The size of the forecast horizon, passed to
+\link[vars:irf]{irf}. Unused if \code{x} is "varirf".}
+
+\item{ci}{The level of confidence for the \link[vars:irf]{irf}. Set to
 \code{FALSE} to omit.}
 
-\item{...}{Additional arguments passed to \link[vars]{irf}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{facet}{The facet "engine" to be used. 'ggplot2' for \link[ggplot2]{facet_grid}, 'ggh4x' for \link[ggh4x]{facet_grid2}}
+\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{ggplot2::geom_hline}.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
+\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{ggplot2::geom_ribbon}.}
 
-\item{args_hline}{Aditional arguments passed to \link[ggplot2]{geom_hline}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{args_ribbon}{Aditional arguments passed to \link[ggplot2]{geom_ribbon}.}
+\item{facet_type}{The facet 'engine' to be used. \code{'ggplot2'} for \link[ggplot2:facet_grid]{ggplot2::facet_grid}, \code{'ggh4x'} for \link[ggh4x:facet_grid2]{ggh4x::facet_grid2}.}
 
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_grid}.}
+\item{...}{Arguments passed to \code{varr:::irf_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:irf]{vars::irf} here.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
-Plots the result of a \link[vars]{irf} call.
+Plots the result of a \link[vars:irf]{irf} call.
 }
 \examples{
-ggvar_irf(vars::VAR(freeny[-2]), n.ahead = 10,
- args_facet = list(scales = "free_y")
-)
+ggvar_irf(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))
 
 }

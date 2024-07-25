@@ -6,40 +6,43 @@
 \usage{
 ggvar_fevd(
   x,
-  n.ahead = NULL,
   series = NULL,
-  geom = "bar",
-  colors = NULL,
+  n.ahead = NULL,
+  graph_type = "bar",
   args_geom = list(),
   args_facet = list(),
+  args_point = list(),
+  colors = NULL,
   ...
 )
 }
 \arguments{
-\item{x}{A "varest" object to pass to \link[vars]{fevd}, or, directly, a
+\item{x}{A "varest" object to pass to \link[vars:fevd]{fevd}, or, directly, a
 "varfevd" object.}
 
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+
 \item{n.ahead}{An integer. The size of the forecast horizon, passed to
-\link[vars]{fevd}. Unused if `x` is a "varfevd" object.}
+\link[vars:fevd]{fevd}. Unused if \code{x} is a "varfevd" object.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{ggplot2::geom_segment}, \code{'area'}, for \link[ggplot2:geom_ribbon]{ggplot2::geom_area}, or \code{'line'}, for \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{geom}{The ggplot geom used to create the plot, 'segment' (the default) for \link[ggplot2]{geom_segment}, 'area' for \link[ggplot2]{geom_area}, 'line' for \link[ggplot2]{geom_line}.}
+\item{args_geom}{Arguments passed to the chosen 'geom'.}
 
-\item{colors}{A vector of colors for each variable. Passed to\link[ggplot2]{scale_color_manual}. See \code{vignette("colors")}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{args_geom}{Arguments passed to the chosen \code{geom}.}
+\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{ggplot2::geom_point}.}
 
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{colors}{A vector of colors for the 'geoms' and/or variables.
+See \link{vignette('colors')}.}
 
-\item{...}{If \code{geom="line"}, additional arguments to
-\link[ggplot2]{geom_point}}
+\item{...}{Arguments passed to \code{varr:::fevd_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:fevd]{vars::fevd} here.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
-Plots the result of a \link[vars]{fevd} call.
+Plots the result of a \link[vars:fevd]{fevd} call.
 }
 \examples{
 ggvar_fevd(vars::VAR(freeny[-2]), n.ahead = 10)

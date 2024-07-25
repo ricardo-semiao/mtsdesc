@@ -25,26 +25,26 @@ ggvar_history(
 
 \item{graph_type}{The type of the plot, \code{'faceted'} or \code{'colored'}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2]{geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{args_facet}{Additional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{colors}{A vector of colors for each variable. Passed to \link[ggplot2]{scale_color_manual}. See \codevignette 'colors' not found.}
+\item{colors}{A vector of colors for the 'geoms' and/or variables.
+See \link{vignette('colors')}.}
 
-\item{...}{Arguments passed to \code{var:::setup_history}, the generic function that formats \code{x} into a 'graphable' format. Use them if you create a method that needs extra arguments.}
+\item{...}{Arguments passed to \code{varr:::history_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
 Plots the historic values of variables in a dataset, or residuals of a VAR
- model. \code{ggvar_values} Plots each series in a facet.
- \code{ggvar_values_colored} plots all in the same graph, each with a
- different color.
+model. \code{ggvar_values} Plots each series in a facet.
+\code{ggvar_values_colored} plots all in the same graph, each with a
+different color.
 }
 \examples{
 ggvar_history(freeny[-2], args_facet = list(scales = "free_y"))
-ggvar_history_colored(freeny[-2])
 ggvar_history(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))
 
 }

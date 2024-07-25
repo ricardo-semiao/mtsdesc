@@ -9,26 +9,29 @@ ggvar_dispersion(
   series = NULL,
   args_point = list(),
   args_hline = list(),
-  args_facet = list()
+  args_facet = list(),
+  ...
 )
 }
 \arguments{
 \item{x}{A "varest" object to get residuals and fitted values from.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{args_point}{Aditional arguments passed to \link[ggplot2]{geom_point}.}
+\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{ggplot2::geom_point}.}
 
-\item{args_hline}{Aditional arguments passed to \link[ggplot2]{geom_hline}.}
+\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{ggplot2::geom_hline}.}
 
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
+
+\item{...}{Arguments passed to \code{varr:::dispersion_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
 Plots a scatterplot of the residuals versus fitted values of a VAR model,
- using ggplot2.
+using ggplot2.
 }
 \examples{
 ggvar_dispersion(vars::VAR(freeny[-2]), args_facet = list(scales = "free_x"))

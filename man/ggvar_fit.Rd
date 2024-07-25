@@ -2,57 +2,40 @@
 % Please edit documentation in R/ggvar_fit.R
 \name{ggvar_fit}
 \alias{ggvar_fit}
-\alias{ggvar_fit_colored}
 \title{Plot VAR Fitted Values}
 \usage{
 ggvar_fit(
   x,
-  compare = TRUE,
   series = NULL,
-  index = 1:x$totobs,
-  linetypes = c("solid", "dashed"),
+  index = NULL,
   args_line = list(),
-  args_facet = list()
-)
-
-ggvar_fit_colored(
-  x,
-  compare = TRUE,
-  series = NULL,
-  index = 1:x$totobs,
-  colors = NULL,
-  linetypes = c("solid", "dashed"),
-  args_line = list()
+  args_facet = list(),
+  ...
 )
 }
 \arguments{
 \item{x}{A "varest" object to get fitted values from.}
 
-\item{compare}{Logical, should the "original" values be plotted?}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to \code{x$obs}. Defaults to a integer sequence.}
 
-\item{index}{A vector of labels to the x-axis, normally dates. Must have  length equal to \code{x$obs}. Defaults to a numeric sequence.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{linetypes}{A vector of line types (original, predicted). Passed to\link[ggplot2]{scale_linetype_manual}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
-
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
-
-\item{colors}{A vector of colors for each variable. Passed to\link[ggplot2]{scale_color_manual}. See \code{vignette("colors")}.}
+\item{...}{Arguments passed to \code{varr:::fit_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
 Plots fitted values of a VAR model, versus the actual values.
- \code{ggvar_fit} Plots each serie in a facet. \code{ggvar_fit_colored}
- plots all in the same graph, each with a different color.
+\code{ggvar_fit} Plots each serie in a facet. \code{ggvar_fit_colored}
+plots all in the same graph, each with a different color.
 }
 \examples{
 x <- vars::VAR(freeny[-2])
 ggvar_fit(x, args_facet = list(scales = "free_y"))
-ggvar_fit_colored(x)
 
 }

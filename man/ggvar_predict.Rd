@@ -6,59 +6,49 @@
 \usage{
 ggvar_predict(
   x,
-  data_test = NULL,
-  n.ahead = NULL,
   series = NULL,
-  index = NULL,
+  index_ahead,
+  index_behind = NULL,
   ci = 0.95,
-  ...,
-  linetypes = c("solid", "dashed"),
   args_line = list(),
   args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
-  args_facet = list()
+  args_facet = list(),
+  ...
 )
 }
 \arguments{
-\item{x}{A "varest" object to get predictions from, or, directly, a
-"varprd" object.}
+\item{x}{A "varest" object to get predictions from.}
 
-\item{data_test}{A test data set (object coercible to data.frame), with the
-actual series values. If \code{NULL}, no comparison is made.}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{n.ahead}{An integer. The number of periods to predict, passed to
-\link[stats]{predict}. Defaults to \code{nrow(data_test)} or the horizon of
-the "varprd" object (\code{NULL}).}
+\item{index_ahead}{A vector of labels to the x-axis, normally dates. Applied
+to the predicted portion of the graph. Its length will define the
+prediction horizon.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
-
-\item{index}{A vector of labels to the x-axis, normally dates. Must have  length equal to \code{n.ahead}. Defaults to a numeric sequence.}
+\item{index_behind}{A vector of labels to the x-axis, normally dates. Applied
+to the original portion of the graph. Its length will define the 'past'
+horizon. Leave as \code{NULL} to only plot predicted values.}
 
 \item{ci}{The level of confidence for the prediction confidence interval. Set
-to \code{FALSE} to omit. Passed to \link[stats]{predict}.}
+to \code{FALSE} to omit. Passed to \link[stats:predict]{predict}.}
 
-\item{...}{Additional arguments passed to \link[stats]{predict}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{linetypes}{A vector of line types (original, predicted). Passed to\link[ggplot2]{scale_linetype_manual}.}
+\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{ggplot2::geom_ribbon}.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{args_ribbon}{Aditional arguments passed to \link[ggplot2]{geom_ribbon}.}
-
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{...}{Arguments passed to \code{varr:::predict_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[stats:predict]{stats::predict} here.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
-Plots the result of a \link[vars]{predict.varest} call. Has an option to
- overlay it with the true variables, if provided a test dataset.
+Plots the result of a \link[vars:predict]{predict.varest} call. Has an option to
+overlay it with the true variables, if provided a test dataset.
 }
 \examples{
-ggvar_predict(stats::predict(vars::VAR(freeny[-2])),
-  args_facet = list(scales = "free_y")
-)
-ggvar_predict(vars::VAR(freeny[-2][1:30, ]), freeny[-2][31:39, ],
-  args_facet = list(scales = "free_y")
-)
+x <- vars::VAR(freeny[-2])
+ggvar_predict(x, NULL, 1:10, 0:-10, args_facet = list(scales = "free_y"))
 
 }

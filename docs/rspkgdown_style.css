@@ -1,0 +1,103 @@
+/* Two columns content to fit new navbar */
+main#pkgdown-content {
+    display: flex;
+    flex-direction: row;
+}
+nav.navbar {
+    position: static;
+    width: calc(205px + 2rem);
+    align-items: flex-start;
+    padding: 0;
+}
+
+
+/* Navbar to column */
+nav.navbar div.container {
+    margin-top: 2rem;
+    padding: 0 1rem 0 1rem;
+    flex-direction: column;
+}
+nav.navbar div.container div#navbar {
+    flex-direction: column;
+    margin-left: 0 !important;
+    margin-top: 1rem;
+    display: flex !important; /* disable button */
+}
+nav.navbar div.container div#navbar ul.navbar-nav {
+    flex-direction: column;
+    padding-left: 1rem;
+}
+nav.navbar div.container div#navbar li.nav-item {
+    margin-top: 1rem;
+}
+nav.navbar div.container div#navbar ul.navbar-nav a.nav-link {
+    padding: 0;
+}
+nav.navbar div.container div#navbar > form {
+    margin-top: 2rem !important;
+}
+.navbar-toggler {
+    display: none;
+}
+/*nav.navbar div.container a.navbar-brand {
+}
+nav.navbar div.container small.nav-text {
+}*/
+
+.headroom--unpinned, .headroom--pinned {
+    transform: none;
+}
+
+@media (max-width: 992px) {
+    .navbar-form, .form-inline {
+        display: none;
+    }
+    nav.navbar {
+        width: 150px;
+    }
+}
+
+
+
+/* Adjust site constructs */
+header#site-header {
+    margin-bottom: 0;
+    min-width: calc(150px + 250px + 10px);
+}
+footer#site-footer {
+    margin: 0;
+    min-width: calc(150px + 250px + 10px);
+}
+.container.template-home {
+    margin-bottom: calc(21px + 16px + 8px);
+}
+/*.fixed-top {
+    z-index: initial;
+} unneeded with static approach*/
+
+
+/* General margins and paddings */
+main#main {
+    margin-top: 1rem;
+}
+main#main .page-header {
+    min-height: 0;
+}
+main#main h2 {
+    margin-top: 2rem;
+}
+
+
+/* Fix footer */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex: 1;
+}

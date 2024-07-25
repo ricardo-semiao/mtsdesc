@@ -6,13 +6,26 @@
 \usage{
 ggvar_select(
   x,
+  series = NULL,
+  lag.max = 10,
+  type = "const",
   criteria = c("AIC", "HQ", "SC", "FPE"),
   trans = "none",
-  args_line = list()
+  args_line = list(),
+  ...
 )
 }
 \arguments{
-\item{x}{The result of a \link[vars]{VARselect} call.}
+\item{x}{A dataset (object coercible to data.frame) to pass to
+\link[vars:VARselect]{VARselect}, or, directly, a result of such call.}
+
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+
+\item{lag.max}{Integer for the highest lag order. Passed to
+\link[vars:VARselect]{VARselect}.}
+
+\item{type}{Type of deterministic regressors to include. Passed to
+\link[vars:VARselect]{VARselect}.}
 
 \item{criteria}{The criteria to be considered. Any of "AIC", "HQ", "SC",
 and "FPE".}
@@ -20,13 +33,15 @@ and "FPE".}
 \item{trans}{A transformation to apply to each criteria result (vector). Can
 be a function, "none" (the default), or "index" to create index numbers.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+
+\item{...}{Arguments passed to \code{varr:::select_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:VARselect]{vars::VARselect} here.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
-Plots the result of a call to \link[vars]{VARselect}.
+Plots the result of a call to \link[vars:VARselect]{VARselect}.
 }
 \examples{
 ggvar_select(vars::VARselect(freeny[-2]))

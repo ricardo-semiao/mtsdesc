@@ -8,34 +8,34 @@ ggvar_stability(
   x,
   series = NULL,
   ci = 0.95,
-  ...,
   args_line = list(),
   args_hline = list(linetype = 2, color = "blue"),
-  args_facet = list()
+  args_facet = list(),
+  ...
 )
 }
 \arguments{
-\item{x}{A "varest" object to pass to \link[vars]{stability}, or, directly, a
+\item{x}{A "varest" object to pass to \link[vars:stability]{stability}, or, directly, a
 "varstabil" object.}
 
-\item{series}{A character vector with variables (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
 
-\item{ci}{The level of confidence for the \link[strucchange]{boundary}.}
+\item{ci}{The level of confidence for the \link[strucchange:boundary]{boundary}.}
 
-\item{...}{Further arguments passed to \link[strucchange]{boundary}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
 
-\item{args_line}{Aditional arguments passed to \link[ggplot2]{geom_line}.}
+\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{ggplot2::geom_hline}.}
 
-\item{args_hline}{Aditional arguments passed to \link[ggplot2]{geom_hline}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{args_facet}{Aditional arguments passed to \link[ggplot2]{facet_wrap}.}
+\item{...}{Arguments passed to \code{varr:::stability_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:stability]{vars::stability} here.}
 }
 \value{
-An object of class \code{ggplot}.
+An object of class \code{'ggplot'}.
 }
 \description{
-Plots the result of a \link[vars]{stability} call. Confidence intevals are
- calculated using \link[strucchange]{boundary}.
+Plots the result of a \link[vars:stability]{stability} call. Confidence intevals are
+calculated using \link[strucchange:boundary]{boundary}.
 }
 \examples{
 ggvar_stability(vars::VAR(freeny[-2]))
