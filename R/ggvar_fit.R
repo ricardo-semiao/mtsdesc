@@ -1,25 +1,34 @@
-#' @noRd
-setup_ggvar_fit <- function(x, compare, series, index) {
-  test$class_arg(x, c("varest"))
-  test$series(series, x)
-  test$index(index, n = x$totobs)
-  test$boolean_arg(compare)
+# Helper functions used between more than one method:
+fit_helpers <- env()
 
-  list(
-    series = series %||% get_names(x),
-    guide = if (compare) "legend" else "none", name = "Type"
+fit_helpers$format <- function(x, series, index) {
+  orig_and_fit <- dplyr::bind_cols(
+    tibble::tibble(index = index),
+    tibble::as_tibble( x$datamat[1:x$K]) %>%
+      dplyr::rename_with(~glue("original__{.x}")),
+    tibble::as_tibble(stats::fitted(x)) %>%
+      dplyr::rename_with(~glue("fitted__{.x}"))
   )
-}
 
-#' @noRd
-data_ggvar_fit <- function(x, compare, series, index) {
-  data.frame(index = index[(x$p + 1):x$totobs], Fitted.. = stats::fitted(x)) %>%
-    `if`(compare, cbind(., Original.. = x$datamat[1:x$K]), .) %>%
-    dplyr::select(c(index, dplyr::ends_with(series))) %>%
-    tidyr::pivot_longer(-index,
-      names_to = c("type", "serie"), names_sep = "\\.\\.\\.", values_to = "value"
+  orig_and_fit %>%
+    dplyr::select("index", dplyr::ends_with(series)) %>%
+    tidyr::pivot_longer(-"index",
+      names_sep = "__", names_to = c("type", "serie"), values_to = "value"
     )
 }
+
+
+#' @noRd
+fit_test <- function(series, index, env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$type(index, c("NULL", "integer", "double"), env)
+}
+
+#' @noRd
+fit_setup <- function(x, series, index, ..., env = caller_env()) {
+  UseMethod("fit_setup")
+}
+
 
 #' Plot VAR Fitted Values
 #'
@@ -28,69 +37,45 @@ data_ggvar_fit <- function(x, compare, series, index) {
 #'  plots all in the same graph, each with a different color.
 #'
 #' @param x A "varest" object to get fitted values from.
-#' @param compare Logical, should the "original" values be plotted?
 #' @eval roxy$series()
 #' @eval roxy$index("`x$obs`")
-#' @eval roxy$colors()
-#' @eval roxy$linetypes()
 #' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
+#' @eval roxy$dots("fit")
 #'
-#' @return An object of class `ggplot`.
+#' @eval roxy$return_gg()
 #'
 #' @examples
 #' x <- vars::VAR(freeny[-2])
 #' ggvar_fit(x, args_facet = list(scales = "free_y"))
-#' ggvar_fit_colored(x)
 #'
 #' @export
 ggvar_fit <- function(
-    x, compare = TRUE, series = NULL, index = 1:x$totobs,
-    linetypes = c("solid", "dashed"),
+    x, series = NULL, index = NULL,
     args_line = list(),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_fit(x, compare, series, index)
-  reassign <- c("series")
-  list2env(setup[reassign], envir = rlang::current_env())
+    args_facet = list(),
+    ...) {
+  fit_test(series, index)
 
-  # Data:
-  data <- data_ggvar_fit(x, compare, series, index)
+  setup <- fit_setup(x, series, index, ...)
+  
+  inject(
+    ggplot(setup$data, aes(.data$index, .data$value)) +
+      ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
+      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
+      ggplot2::labs(
+        title = "Fitted VAR Values", x = "Index", y = "Fitted"
+      )
+  )
 
-  # Graph:
-  ggplot(data, aes(.data$index, .data$value)) +
-    inject(ggplot2::geom_line(aes(linetype = .data$type), !!!args_line)) +
-    inject(ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)) +
-    ggplot2::scale_linetype_manual(values = linetypes, guide = setup$guide) +
-    ggplot2::labs(
-      title = "Fitted VAR Values", x = "Index", y = "Fitted",
-      color = "Serie", linetype = "Type"
-    )
 }
 
-#' @rdname ggvar_fit
-#' @export
-ggvar_fit_colored <- function(
-    x, compare = TRUE, series = NULL, index = 1:x$totobs,
-    colors = NULL, linetypes = c("solid", "dashed"),
-    args_line = list()) {
-  # Setup:
-  setup <- setup_ggvar_fit(x, compare, series, index)
-  reassign <- c("series", "colors")
-  list2env(setup[reassign], envir = rlang::current_env())
 
-  colors <- get_colors(colors, length(series))
+#' @noRd
+fit_setup.varest <- function(x, series, index, ..., env) {
+  series <- get_series(series, names(x$varresult), env)
+  index <- index %||% (x$p + 1):x$totobs
 
-  # Data:
-  data <- data_ggvar_fit(x, compare, series, index)
+  data <- fit_helpers$format(x, series, index)
 
-  # Graph:
-  ggplot(data, aes(.data$index, .data$value)) +
-    inject(ggplot2::geom_line(aes(color = .data$serie, linetype = .data$type),
-      !!!args_line
-    )) +
-    ggplot2::scale_color_manual(values = colors) +
-    ggplot2::scale_linetype_manual(values = linetypes, guide = setup$guide) +
-    ggplot2::labs(
-      title = "Fitted VAR Values", x = "Index", y = "Fitted", color = "Serie"
-    )
+  list(data = data)
 }
