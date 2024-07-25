@@ -16,7 +16,7 @@ fevd_helpers$format <- function(x, series) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-fevd_test <- function(series, n.ahead, graph_type) {
+fevd_test <- function(series, n.ahead, graph_type, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$interval(n.ahead, 1, Inf, env = env)
   test$category(graph_type, c("bar", "area", "line"), env)

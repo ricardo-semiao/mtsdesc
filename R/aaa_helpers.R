@@ -107,3 +107,21 @@ ignore_cols <- function(arg) {
     arg[, isnumeric_cols]
   }
 }
+
+get_series <- function(series, series_all, env) {
+  arg_name <- ensym(series)
+  if (is_null(series)) {
+    series_all
+  } else {
+    if (!all(series %in% series_all)) {
+      cli::cli_abort("
+      Not all elements of {.var {arg_name}} are present in {.var x}.
+      ",
+        call = env
+      )
+    }
+    series
+  }
+}
+
+

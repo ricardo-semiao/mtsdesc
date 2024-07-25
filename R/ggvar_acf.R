@@ -40,7 +40,7 @@ acf_test <- function(x, series, lag.max, type, graph_type, ci,
 }
 
 #'@noRd
-acf_setup <- function(x, series, lag.max, type, ...) {
+acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
   UseMethod("acf_setup")
 }
 
@@ -110,10 +110,10 @@ ggvar_acf <- function(
 
 
 #' @noRd
-acf_setup.varest <- function(x, series, lag.max, type, ...) {
+acf_setup.varest <- function(x, series, lag.max, type, ..., env) {
   x <- as.data.frame(stats::residuals(x))
 
-  series <- series %||% colnames(x)
+  series <- get_series(series, colnames(x), env)
   title <- paste(acf_helpers$title_base(type), "Series")
 
   data <- acf_helpers$format(x, series, lag.max, type, ...)
@@ -122,10 +122,10 @@ acf_setup.varest <- function(x, series, lag.max, type, ...) {
 }
 
 #' @noRd
-acf_setup.default <- function(x, series, lag.max, type, ...) {
+acf_setup.default <- function(x, series, lag.max, type, ..., env) {
   x <- as.data.frame(x) %>% ignore_cols()
 
-  series <- series %||% colnames(x)
+  series <- get_series(series, colnames(x), env)
   title <- paste(acf_helpers$title_base(type), "VAR Residuals")
 
   data <- acf_helpers$format(x, series, lag.max, type, ...)

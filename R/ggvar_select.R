@@ -13,8 +13,8 @@ select_helpers$format <- function(x, criteria, trans) {
 
 # Initial tests and setup (methods at the end):
 #' @noRd
-select_test <- function(series, lag.max, type, criteria, trans,
-    env = caller_env()) {
+select_test <- function(
+    series, lag.max, type, criteria, trans, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
   test$interval(lag.max, 1, Inf, env = env)
   test$category(type, c("const", "trend", "both", "none"), env)

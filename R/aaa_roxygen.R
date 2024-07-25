@@ -88,7 +88,7 @@ roxy$dots <- function(fun_names, special_method = NULL) {
   fun_names <- glue("varr:::{fun_names}_setup") %>% pluralize_or()
 
   special_text <- if (!is_null(special_method)) {
-    glue("Pass additional arguments to [special_method] here.")
+    glue("Pass additional arguments to [{special_method}] here.")
   } else {
     ""
   }

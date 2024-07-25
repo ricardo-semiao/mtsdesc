@@ -1,78 +1,13 @@
-#' @noRd
-setup_ggvar_irf <- function(
-    x, n.ahead, series_impulse, series_response, ci, facet) {
-  test$class_arg(x, c("varirf", "varest"))
-  test$series(series_impulse, x, "impulse")
-  test$series(series_response, x, "response")
-  test$categorical_arg(facet, c("ggplot", "ggh4x"))
-  test$interval_arg(ci, 0, 1, FALSE)
-  stopifnot(
-    "`n.ahead` must be supplied with `x` of class 'varest'" =
-      inherits(x, "varirf") || is.numeric(n.ahead)
-  )
+# Helper functions used between more than one method:
+irf_helpers <- env()
 
-  list(
-    series_impulse = series_impulse %||% get_names(x, "impulse"),
-    series_response = series_response %||% get_names(x, "response")
-  )
-}
-
-#' Plot Impulse Response Functions of a VAR
-#'
-#' Plots the result of a [irf][vars::irf] call.
-#'
-#' @param x A "varest" object to pass to [irf][vars::irf], or, directly, a
-#'  "varirf" object.
-#' @param n.ahead An integer. The size of the forecast horizon, passed to
-#'  [irf][vars::irf]. Unused if `x` is "varirf".
-#' @param series_impulse A character vector with variables to consider for the
-#'  impulses. Defaults to all (`NULL`).
-#' @param series_response A character vector with variables to consider for the
-#'  responses. Defaults to all (`NULL`).
-#' @param ci The level of confidence for the [irf][vars::irf]. Set to
-#'  `FALSE` to omit.
-#' @param ... Additional arguments passed to [irf][vars::irf].
-#' @eval roxy$facet_type()
-#' @eval roxy$args_gg(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
-#'
-#' @return An object of class `ggplot`.
-#'
-#' @examples
-#' ggvar_irf(vars::VAR(freeny[-2]), n.ahead = 10,
-#'  args_facet = list(scales = "free_y")
-#' )
-#'
-#' @export
-ggvar_irf <- function(
-    x, n.ahead = NULL, series_impulse = NULL, series_response = NULL,
-    ci = 0.95, ...,
-    facet = "ggplot",
-    args_line = list(),
-    args_hline = list(),
-    args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_irf(
-    x, n.ahead, series_impulse, series_response, ci, facet
-  )
-  reassign <- c("series_impulse", "series_impulse")
-  list2env(setup[reassign], envir = rlang::current_env())
-
-  # Data:
-  irf <- if (inherits(x, "varest")) {
-    vars::irf(x, series_impulse, series_response, n.ahead,
-      boot = !isFALSE(ci), ci = ci, ...
-    )
-  } else {
-    x
-  }
-
-  data <- irf %>%
-    magrittr::extract(if (!isFALSE(ci)) 1:3 else 1) %>%
-    purrr::imap_dfr(function(x, name) {
-      data.frame(
-        serie = name,
-        purrr::imap_dfr(x, ~ data.frame(
+irf_helpers$format <- function(x, ci) {
+  x %>%
+    `[`(if (!is_false(ci)) 1:3 else 1) %>%
+    purrr::imap_dfr(function(irf_item, item_name) {
+      data.frame( #change to tibble
+        serie = item_name,
+        purrr::imap_dfr(irf_item, ~ data.frame( #change to tibble
           effect_on = .y, lead = seq_len(nrow(.x)), .x
         ))
       )
@@ -81,71 +16,121 @@ ggvar_irf <- function(
       names_to = "effect_of", values_to = "value"
     ) %>%
     tidyr::pivot_wider(names_from = "serie", values_from = "value")
+}
 
-  # Graph:
-  ggplot_add <- list(
-    if (!isFALSE(ci)) {
-      inject(ggplot2::geom_ribbon(aes(ymin = .data$Lower, ymax = .data$Upper),
+irf_helpers$pluck_irf <- function(x, at) {
+  at_cur <- at[[1]]
+  if (length(at) == 1) {
+    as.matrix(x[,at_cur]) %>% `colnames<-`(at_cur)
+  } else {
+    purrr::map(x[at_cur], ~pluck_irf(.x, at[-1]))
+  }
+}
+
+
+#' @noRd
+irf_test <- function(
+    series_imp, series_resp, n.ahead, ci, facet, env = caller_env()) {
+  test$type(series_imp, c("NULL", "character"), env)
+  test$type(series_resp, c("NULL", "character"), env)
+  test$interval(n.ahead, 1, Inf, env = env)
+  test$interval(ci, 0, 1, FALSE, env = env)
+  test$category(facet, c("ggplot", "ggh4x"))
+}
+
+#' @noRd
+irf_setup <- function(
+    x, series_imp, series_resp, n.ahead, ci, ..., env = caller_env()) {
+  UseMethod("irf_setup")
+}
+
+
+#' Plot Impulse Response Functions of a VAR
+#'
+#' Plots the result of a [irf][vars::irf] call.
+#'
+#' @param x A "varest" object to pass to [irf][vars::irf], or, directly, a
+#'  "varirf" object.
+#' @param series_imp A character vector with variables to consider for the
+#'  impulses. Defaults to all (`NULL`).
+#' @param series_resp A character vector with variables to consider for the
+#'  responses. Defaults to all (`NULL`).
+#' @param n.ahead An integer. The size of the forecast horizon, passed to
+#'  [irf][vars::irf]. Unused if `x` is "varirf".
+#' @param ci The level of confidence for the [irf][vars::irf]. Set to
+#'  `FALSE` to omit.
+#' @eval roxy$args_gg(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
+#' @eval roxy$facet_type()
+#' @eval roxy$dots("irf", "vars::irf")
+#'
+#' @eval roxy$return_gg()
+#'
+#' @examples
+#' ggvar_irf(vars::VAR(freeny[-2]), n.ahead = 10,
+#'  args_facet = list(scales = "free_y")
+#' )
+#'
+#' @export
+ggvar_irf <- function(
+    x, series_imp = NULL, series_resp = NULL,
+    n.ahead = NULL, ci = 0.95,
+    args_line = list(),
+    args_hline = list(),
+    args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
+    args_facet = list(),
+    facet = "ggplot",
+    ...) {
+  irf_test(series_imp, series_resp, n.ahead, ci, facet)
+
+  setup <- irf_setup(x, series_imp, series_resp, n.ahead, ci, ...)
+
+  graph_add <- inject(list(
+    if (!is_false(ci)) {
+      ggplot2::geom_ribbon(aes(ymin = .data$Lower, ymax = .data$Upper),
         !!!args_ribbon
-      ))
+      )
     },
-    inject(define_facet(facet, "effect_of", "effect_on", !!!args_facet))
-  )
+    define_facet(facet, "effect_of", "effect_on", !!!args_facet)
+  ))
 
-  ggplot(data, aes(.data$lead, .data$irf)) +
-    ggplot_add +
-    inject(ggplot2::geom_line(!!!args_line)) +
-    inject(ggplot2::geom_hline(yintercept = 0, !!!args_hline)) +
+  inject(
+    ggplot(setup$data, aes(.data$lead, .data$irf)) +
+    graph_add +
+    ggplot2::geom_line(!!!args_line) +
+    ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
     create_sec_axis() +
     ggplot2::labs(
       title = "VAR Impulse Response Functions",
       x = "Forecast horizon", y = "Effect"
     )
+  )
+}
+
+
+#' @noRd
+irf_setup.varest <- function(
+    x, series_imp, series_resp, n.ahead, ci, ..., env) {
+  series_imp <- get_series(series_imp, names(x$varresult), env)
+  series_resp <- get_series(series_resp, names(x$varresult), env)
+  
+  x <- vars::irf(x, series_imp, series_resp, n.ahead,
+    boot = !is_false(ci), ci = ci, ...
+  )
+
+  data <- irf_helpers$format(x, ci)
+
+  list(data = data)
 }
 
 #' @noRd
-ggvar_irf_ind <- function(
-    x, series_impulse, series_response, n.ahead = NULL,
-    ci = 0.95, ...,
-    facet = "ggplot",
-    args_line = list(),
-    args_hline = list(),
-    args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_irf(
-    x, n.ahead, series_impulse, series_response, ci, facet
-  )
-  reassign <- c("series_impulse", "series_impulse")
-  list2env(setup[reassign], envir = rlang::current_env())
+irf_setup.varirf <- function(
+    x, series_imp, series_resp, n.ahead, ci, ..., env) {
+  series_imp <- get_series(series_imp, x$impulse, env)
+  series_resp <- get_series(series_resp, x$response, env)
 
-  # Data:
-  irf <- if (inherits(x, "varest")) {
-    vars::irf(x, series_impulse, series_response, n.ahead,
-              boot = !isFALSE(ci), ci = ci, ...
-    )
-  } else {
-    x
-  }
+  x <- pluck_irf(x, list(1:3, series_imp, series_resp))
 
-  data <- purrr::map_dfc(irf[1:3], ~ .x[[series_response]][,series_impulse]) %>%
-    dplyr::mutate(horizon = 1:nrow(.))
+  data <- irf_helpers$irf_helpers$format(x, ci)
 
-  # Graph:
-  ggplot_add <- list(
-    if (!isFALSE(ci)) {
-      inject(ggplot2::geom_ribbon(aes(ymin = .data$Lower, ymax = .data$Upper),
-                                  !!!args_ribbon
-      ))
-    }
-  )
-
-  ggplot(data, aes(.data$lead, .data$irf)) +
-    ggplot_add +
-    inject(ggplot2::geom_line(!!!args_line)) +
-    inject(ggplot2::geom_hline(yintercept = 0, !!!args_hline)) +
-    ggplot2::labs(
-      title = "VAR Impulse Response Functions",
-      x = "Forecast horizon", y = "Effect"
-    )
+  list(data = data)
 }
