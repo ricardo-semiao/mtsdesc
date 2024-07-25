@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-history_helpers <- env()
+history_helpers <- list()
 
 history_helpers$format <- function(x, series, index) {
   x %>%
@@ -43,7 +43,6 @@ history_setup <- function(x, series, index, ...) {
 #'
 #' @examples
 #' ggvar_history(freeny[-2], args_facet = list(scales = "free_y"))
-#' ggvar_history_colored(freeny[-2])
 #' ggvar_history(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))
 #'
 #' @export

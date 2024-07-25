@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-distribution_helpers <- env()
+distribution_helpers <- list()
 
 distribution_helpers$format_hist <- function(x, series) {
   x %>%

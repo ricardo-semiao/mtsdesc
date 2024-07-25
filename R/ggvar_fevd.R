@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-fevd_helpers <- env()
+fevd_helpers <- list()
 
 fevd_helpers$format <- function(x, series) {
   x %>%

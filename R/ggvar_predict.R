@@ -1,130 +1,110 @@
-#' @noRd
-setup_ggvar_predict <- function(x, n.ahead, data_test, series, index, ci) {
-  test$class_arg(x, c("varest", "varprd"))
-  test$class_arg(data_test, c("data.frame", "matrix", "NULL"))
-  data_test <- test$dataset_arg(data_test)
-  test$series(series, x)
-  test$interval_arg(ci, 0, 1, FALSE)
+# Helper functions used between more than one method:
+predict_helpers <- list()
 
-  if (inherits(x, "varprd")) {
-    if (!is.null(n.ahead)) warning("`x` of class 'varprd', ignoring `n.ahead`")
-    n.ahead <- nrow(x$fcst[[1]])
+predict_helpers$format <- function(x, series, index_ahead, index_behind, ci, ...) {
+  pred <- stats::predict(x, n.ahead = length(index_ahead), ci = ci, ...) %>%
+    `[[`("fcst") %>%
+    `[`(series) %>%
+    purrr::imap_dfr(function(prediction, name) {
+      tibble::as_tibble(prediction) %>%
+        dplyr::mutate(serie = name, index = index_ahead, type = "prediction")
+    })
+  
+  if (!is_null(index_behind)) {
+    orig <- x$datamat[(x$obs - length(index_behind) + 1):x$obs, 1:x$K] %>%
+      dplyr::mutate(index = index_behind, type = "original") %>%
+      tidyr::pivot_longer(-c("index", "type"),
+        names_to = "serie", values_to = "fcst"
+      )
+
+    dplyr::bind_rows(orig, pred)
   } else {
-    msg <- "`n.ahead` must be supplied with `x` of class 'varest' and `data_test = NULL`"
-    n.ahead <- n.ahead %||% nrow(data_test) %||% stop(msg)
+    pred
   }
-
-  if (!is.null(data_test) && nrow(data_test) != n.ahead) {
-    stop("`data_test` with incorrect number of rows")
-  }
-
-  index <- index %||% 1:n.ahead
-  test$index(index, n = n.ahead)
-
-  list(
-    n.ahead = n.ahead,
-    data_test = data_test,
-    series = series %||% get_names(x),
-    index = index,
-    guide = if (is.null(data_test)) "none" else "legend"
-  )
 }
+
+
+#' @noRd
+predict_test <- function(
+    series, index_ahead, index_behind, ci, env = caller_env()) {
+  test$type(series, c("NULL", "character"), env)
+  test$type(index_ahead, c("NULL", "integer", "double"), env)
+  test$type(index_behind, c("NULL", "integer", "double"), env)
+  test$interval(ci, 0, 1, FALSE, env)
+}
+
+#' @noRd
+predict_setup <- function(
+    x, series, index_ahead, index_behind, ci, ..., env = caller_env()) {
+  UseMethod("predict_setup")
+}
+
 
 #' Plot the Predicted Values of a VAR
 #'
 #' Plots the result of a [predict.varest][vars::predict.varest] call. Has an option to
 #'  overlay it with the true variables, if provided a test dataset.
 #'
-#' @param x A "varest" object to get predictions from, or, directly, a
-#'  "varprd" object.
-#' @param data_test A test data set (object coercible to data.frame), with the
-#'  actual series values. If `NULL`, no comparison is made.
-#' @param n.ahead An integer. The number of periods to predict, passed to
-#'  [predict][stats::predict]. Defaults to `nrow(data_test)` or the horizon of
-#'  the "varprd" object (`NULL`).
+#' @param x A "varest" object to get predictions from.
 #' @eval roxy$series()
-#' @eval roxy$index("`n.ahead`")
+#' @param index_ahead A vector of labels to the x-axis, normally dates. Applied
+#'  to the predicted portion of the graph. Its length will define the
+#'  prediction horizon.
+#' @param index_behind A vector of labels to the x-axis, normally dates. Applied
+#'  to the original portion of the graph. Its length will define the 'past'
+#'  horizon. Leave as `NULL` to only plot predicted values.
 #' @param ci The level of confidence for the prediction confidence interval. Set
 #'  to `FALSE` to omit. Passed to [predict][stats::predict].
-#' @param ... Additional arguments passed to [predict][stats::predict].
-#' @eval roxy$linetypes()
 #' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
+#' @eval roxy$dots("predict", "stats::predict")
 #'
-#' @return An object of class `ggplot`.
+#' @eval roxy$return_gg()
 #'
 #' @examples
-#' ggvar_predict(stats::predict(vars::VAR(freeny[-2])),
-#'   args_facet = list(scales = "free_y")
-#' )
-#' ggvar_predict(vars::VAR(freeny[-2][1:30, ]), freeny[-2][31:39, ],
-#'   args_facet = list(scales = "free_y")
-#' )
+#' x <- vars::VAR(freeny[-2])
+#' ggvar_predict(x, NULL, 1:10, 0:-10, args_facet = list(scales = "free_y"))
 #'
 #' @export
 ggvar_predict <- function(
-    x, data_test = NULL, n.ahead = NULL, series = NULL, index = NULL,
-    ci = 0.95, ...,
-    linetypes = c("solid", "dashed"),
+    x, series = NULL, index_ahead, index_behind = NULL,
+    ci = 0.95,
     args_line = list(),
     args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
-    args_facet = list()) {
-  # Setup:
-  setup <- setup_ggvar_predict(x, n.ahead, data_test, series, index, ci)
-  reassign <- c("n.ahead", "data_test", "series", "index")
-  list2env(setup[reassign], envir = rlang::current_env())
+    args_facet = list(),
+    ...) {
+  predict_test(series, index_ahead, index_behind, ci)
 
-  # Data:
-  pred <- if (inherits(x, "varest")) {
-    stats::predict(x, n.ahead = n.ahead, ci = ci, ...)
-  } else {
-    x
-  }
+  setup <- predict_setup(x, series, index_ahead, index_behind, ci, ...)
+  
+  #guide <- if (is_null(index_behind)) "none" else "legend"
 
-  data_pred <- pred$fcst[series] %>%
-    do.call(rbind, .) %>%
-    as.data.frame() %>%
-    dplyr::mutate(
-      serie = rep(series, each = n.ahead),
-      index = rep(index, length(series))
-    ) %>%
-    dplyr::rename(prediction = "fcst")
-
-  data_pred <- if (is.null(data_test)) {
-    data_pred %>%
-      tidyr::pivot_longer(c("prediction"),
-        values_to = "value", names_to = "type"
-      )
-  } else {
-    data_test %>%
-      as.data.frame() %>%
-      dplyr::select(dplyr::all_of(series)) %>%
-      dplyr::mutate(index = index) %>%
-      tidyr::pivot_longer(-c("index"),
-        values_to = "actual", names_to = "serie"
-      ) %>%
-      dplyr::full_join(data_pred, by = c("index", "serie")) %>%
-      tidyr::pivot_longer(c("prediction", "actual"),
-        values_to = "value",
-        names_to = "type"
-      )
-  }
-
-  # Graph:
-  ggplot_add <- list(
-    if (!isFALSE(ci)) {
-      inject(ggplot2::geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper),
+  graph_add <- inject(list(
+    if (!is_false(ci)) {
+      ggplot2::geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper),
         !!!args_ribbon
-      ))
+      )
     }
-  )
+  ))
 
-  ggplot(data_pred, aes(.data$index, .data$value)) +
-    ggplot_add +
-    inject(ggplot2::geom_line(aes(linetype = .data$type), !!!args_line)) +
-    inject(ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)) +
-    ggplot2::scale_linetype_manual(values = linetypes, guide = setup$guide) +
-    ggplot2::labs(
-      title = "VAR Predicted Values", x = "Index",
-      y = "Values", linetypes = "Type"
-    )
+  inject(
+    ggplot(setup$data, aes(.data$index, .data$fcst)) +
+      graph_add +
+      ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
+      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
+      ggplot2::labs(
+        title = "VAR Predicted Values", x = "Index",
+        y = "Values", linetypes = "Type"
+      )
+  )
+}
+
+
+#' @noRd
+predict_setup.varest <- function(
+    x, series, index_ahead, index_behind, ci, ..., env) {
+  series <- get_series(series, names(x$varresult), env)
+
+  data <- predict_helpers$format(x, series, index_ahead, index_behind, ci, ...)
+
+  list(data = data)
 }

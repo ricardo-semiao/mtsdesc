@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-stability_helpers <- env()
+stability_helpers <- list()
 
 stability_helpers$format <- function(x, series) {
   purrr::imap_dfr(x[series], function(stab_element, name) {

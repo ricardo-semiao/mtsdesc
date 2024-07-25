@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-fit_helpers <- env()
+fit_helpers <- list()
 
 fit_helpers$format <- function(x, series, index) {
   orig_and_fit <- dplyr::bind_cols(

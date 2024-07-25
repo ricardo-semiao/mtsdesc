@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-acf_helpers <- env()
+acf_helpers <- list()
 
 acf_helpers$format <- function(x, series, lag.max, type, ...) {
   lag.max <- lag.max %||% ceiling(10 * log(nrow(x) / ncol(x), base = 10))

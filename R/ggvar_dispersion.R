@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-dispersion_helpers <- env()
+dispersion_helpers <- list()
 
 dispersion_helpers$format <- function(x, series) {
   res_and_fit <- dplyr::bind_cols(

@@ -41,7 +41,7 @@ roxy$graph_type <- function(types, isgeoms = TRUE) {
 
 roxy$facet_type <- function() {
   glue("
-  @param facet The facet 'engine' to be used. `'ggplot2'` for \\
+  @param facet_type The facet 'engine' to be used. `'ggplot2'` for \\
   [ggplot2::facet_grid], `'ggh4x'` for [ggh4x::facet_grid2].
   ")
 }
@@ -74,14 +74,6 @@ roxy$args_gg <- function(fun_name) {
 roxy$args_geom <- function() {
   "@param args_geom Arguments passed to the chosen 'geom'."
 }
-
-
-#roxy$linetypes <- function() {
-#  glue("
-#  @param linetypes A vector of line types (original, predicted). Passed to \\
-#  \\link[ggplot2]{{scale_linetype_manual}}.
-#  ")
-#}
 
 
 roxy$dots <- function(fun_names, special_method = NULL) {

@@ -30,8 +30,10 @@ test$index <- function(index, n, required = NULL, env) {
 test$category <- function(arg, options, env) {
   arg_name <- rlang::ensym(arg)
 
-  if (!arg %in% options) {
-    cli::cli_abort("{.var {arg_name}} must be {.or {options}}", call = env)
+  if (!all(arg %in% options)) {
+    cli::cli_abort("{.var {arg_name}} must contain only {.or {options}}",
+      call = env
+    )
   }
 }
 

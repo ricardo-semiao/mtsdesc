@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-select_helpers <- env()
+select_helpers <- list()
 
 select_helpers$format <- function(x, criteria, trans) {
   x$criteria %>%

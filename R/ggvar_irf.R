@@ -1,5 +1,5 @@
 # Helper functions used between more than one method:
-irf_helpers <- env()
+irf_helpers <- list()
 
 irf_helpers$format <- function(x, ci) {
   x %>%
@@ -30,12 +30,12 @@ irf_helpers$pluck_irf <- function(x, at) {
 
 #' @noRd
 irf_test <- function(
-    series_imp, series_resp, n.ahead, ci, facet, env = caller_env()) {
+    series_imp, series_resp, n.ahead, ci, facet_type, env = caller_env()) {
   test$type(series_imp, c("NULL", "character"), env)
   test$type(series_resp, c("NULL", "character"), env)
   test$interval(n.ahead, 1, Inf, env = env)
   test$interval(ci, 0, 1, FALSE, env = env)
-  test$category(facet, c("ggplot", "ggh4x"))
+  test$category(facet_type, c("ggplot", "ggh4x"))
 }
 
 #' @noRd
@@ -66,21 +66,19 @@ irf_setup <- function(
 #' @eval roxy$return_gg()
 #'
 #' @examples
-#' ggvar_irf(vars::VAR(freeny[-2]), n.ahead = 10,
-#'  args_facet = list(scales = "free_y")
-#' )
+#' ggvar_irf(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))
 #'
 #' @export
 ggvar_irf <- function(
     x, series_imp = NULL, series_resp = NULL,
-    n.ahead = NULL, ci = 0.95,
+    n.ahead = 10, ci = 0.95,
     args_line = list(),
     args_hline = list(),
     args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
     args_facet = list(),
-    facet = "ggplot",
+    facet_type = "ggplot",
     ...) {
-  irf_test(series_imp, series_resp, n.ahead, ci, facet)
+  irf_test(series_imp, series_resp, n.ahead, ci, facet_type)
 
   setup <- irf_setup(x, series_imp, series_resp, n.ahead, ci, ...)
 
@@ -90,7 +88,7 @@ ggvar_irf <- function(
         !!!args_ribbon
       )
     },
-    define_facet(facet, "effect_of", "effect_on", !!!args_facet)
+    define_facet(facet_type, "effect_of", "effect_on", !!!args_facet)
   ))
 
   inject(
@@ -128,9 +126,9 @@ irf_setup.varirf <- function(
   series_imp <- get_series(series_imp, x$impulse, env)
   series_resp <- get_series(series_resp, x$response, env)
 
-  x <- pluck_irf(x, list(1:3, series_imp, series_resp))
+  x <- irf_helpers$pluck_irf(x, list(1:3, series_imp, series_resp))
 
-  data <- irf_helpers$irf_helpers$format(x, ci)
+  data <- irf_helpers$format(x, ci)
 
   list(data = data)
 }
