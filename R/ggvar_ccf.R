@@ -18,7 +18,7 @@ ccf_helpers$format <- function(x, series, lag.max, type, ...) {
 }
 
 
-# Initial tests and setup (methods at the end):
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 ccf_test <- function(
     x, series, lag.max, type, graph_type, ci, facet_type,
@@ -85,6 +85,7 @@ ggvar_ccf <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 ccf_setup.varest <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(stats::residuals(x))

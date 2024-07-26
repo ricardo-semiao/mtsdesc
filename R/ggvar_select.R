@@ -11,7 +11,8 @@ select_helpers$format <- function(x, criteria, trans) {
     tidyr::pivot_longer(-"lag")
 }
 
-# Initial tests and setup (methods at the end):
+
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 select_test <- function(
     series, lag.max, type, criteria, trans, env = caller_env()) {
@@ -35,15 +36,15 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #'  [VARselect][vars::VARselect], or, directly, a result of such call.
 #' @eval roxy$series()
 #' @param lag.max Integer for the highest lag order. Passed to
-#'  [VARselect][vars::VARselect].
+#'  [VARselect][vars::VARselect]. `r roxy$unused("list")`
 #' @param type Type of deterministic regressors to include. Passed to
-#'  [VARselect][vars::VARselect].
+#'  [VARselect][vars::VARselect]. `r roxy$unused("list")`
 #' @param criteria The criteria to be considered. Any of "AIC", "HQ", "SC",
 #'  and "FPE".
 #' @param trans A transformation to apply to each criteria result (vector). Can
 #'  be a function, "none" (the default), or "index" to create index numbers.
 #' @eval roxy$args_gg("geom_line")
-#' @eval roxy$dots("select", "vars::VARselect")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
@@ -77,6 +78,8 @@ ggvar_select <- function(
     )
 }
 
+
+# Setup methods:
 #' @noRd 
 select_setup.list <- function(x, series, lag.max, type, criteria, trans, ...) {
   data <- select_helpers$format(x, criteria, trans)
@@ -87,6 +90,8 @@ select_setup.list <- function(x, series, lag.max, type, criteria, trans, ...) {
 #' @noRd 
 select_setup.default <- function(x, series, lag.max, type, criteria, trans,
   ...) {
+  x <- as.data.frame(x)
+
   series <- series %||% colnames(x)
 
   x <- vars::VARselect(x[,series], lag.max, type, ...)

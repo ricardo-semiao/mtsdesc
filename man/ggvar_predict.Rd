@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggvar_predict.R
 \name{ggvar_predict}
 \alias{ggvar_predict}
-\title{Plot the Predicted Values of a VAR}
+\title{Plot VAR predictions}
 \usage{
 ggvar_predict(
   x,
@@ -19,7 +19,7 @@ ggvar_predict(
 \arguments{
 \item{x}{A "varest" object to get predictions from.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
 \item{index_ahead}{A vector of labels to the x-axis, normally dates. Applied
 to the predicted portion of the graph. Its length will define the
@@ -29,26 +29,49 @@ prediction horizon.}
 to the original portion of the graph. Its length will define the 'past'
 horizon. Leave as \code{NULL} to only plot predicted values.}
 
-\item{ci}{The level of confidence for the prediction confidence interval. Set
-to \code{FALSE} to omit. Passed to \link[stats:predict]{predict}.}
+\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Passed to \link[stats:predict]{predict}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
 
-\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{ggplot2::geom_ribbon}.}
+\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{...}{Arguments passed to \code{varr:::predict_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[stats:predict]{stats::predict} here.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
-Plots the result of a \link[vars:predict]{predict.varest} call. Has an option to
-overlay it with the true variables, if provided a test dataset.
+Gets predictions via \link[stats:predict]{stats::predict} and plots them. Can also plot the known
+values of the past.
+}
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::predict_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'varest'}: passed to \link[vars:predict]{vars::predict.varest}.
+}
+}
 }
 \examples{
 x <- vars::VAR(freeny[-2])
 ggvar_predict(x, NULL, 1:10, 0:-10, args_facet = list(scales = "free_y"))
 
 }
+\seealso{
+Other historic values plots: 
+\code{\link{ggvar_fit}()},
+\code{\link{ggvar_history}()}
+}
+\concept{historic values plots}

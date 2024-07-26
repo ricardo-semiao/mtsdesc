@@ -3,7 +3,7 @@
 \name{ggvar_acf}
 \alias{ggvar_acf}
 \alias{ggvar_ccf}
-\title{Plot autocorrelation (and similars) of dataset}
+\title{Plot autocorrelation and similar}
 \usage{
 ggvar_acf(
   x,
@@ -11,7 +11,7 @@ ggvar_acf(
   lag.max = NULL,
   type = "correlation",
   graph_type = "segment",
-  args_geom = list(),
+  args_type = list(),
   args_ribbon = list(linetype = 2, color = "blue", fill = NA),
   args_hline = list(),
   args_facet = list(),
@@ -25,7 +25,7 @@ ggvar_ccf(
   lag.max = NULL,
   type = "correlation",
   graph_type = "segment",
-  args_geom = list(),
+  args_type = list(),
   args_ribbon = list(linetype = 2, color = "blue", fill = NA),
   args_hline = list(),
   args_facet = list(),
@@ -38,7 +38,7 @@ ggvar_ccf(
 \item{x}{A dataset (object coercible to data.frame) or a "varest" object to
 get residuals from.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
 \item{lag.max}{The number of lags used to calculate the ACF, passed to
 \link[stats:acf]{acf}.}
@@ -46,30 +46,48 @@ get residuals from.}
 \item{type}{The type of ACF to be computed. Can be either "correlation",
 "covariance", or "partial". Passed to \link[stats:acf]{acf}.}
 
-\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{ggplot2::geom_segment} or \code{'area'}, for \link[ggplot2:geom_ribbon]{ggplot2::geom_area}.}
+\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{geom_segment} or \code{'area'}, for \link[ggplot2:geom_ribbon]{geom_area}.}
 
-\item{args_geom}{Arguments passed to the chosen 'geom'.}
+\item{args_type}{Arguments passed to the 'geom' chosen in \code{graph_type}.}
 
-\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{ggplot2::geom_ribbon}.}
+\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
 
-\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{ggplot2::geom_hline}.}
+\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{geom_hline}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{ci}{The level of confidence for the ACF confidence interval. Set to
-\code{FALSE} to omit the \link[ggplot2:geom_ribbon]{geom_ribbon}.}
+\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
 
-\item{...}{Arguments passed to \verb{varr:::setup_acf_setup or varr:::setup_ccf_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[stats:acf]{stats::acf} here.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 
 \item{facet_type}{The facet 'engine' to be used. \code{'ggplot2'} for \link[ggplot2:facet_grid]{ggplot2::facet_grid}, \code{'ggh4x'} for \link[ggh4x:facet_grid2]{ggh4x::facet_grid2}.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
-\code{ggvar_acf} plots the auto-correlations (and similars) call for every
-series, using \link[ggplot2:facet_wrap]{facet_wrap}. \code{ggvar_ccf} plots all the
-cross-correlations (and similars) between the series, in a grid.
+\code{ggvar_acf} plots the auto-correlations (and similar) call for every
+series. \code{ggvar_ccf} plots all the cross-correlations (and similar) between
+the series, in a grid.
+}
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::acf_setup or varr:::ccf_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'varest'}: passed to \link[stats:acf]{stats::acf}.
+\item Class \code{'default'}: passed to \link[stats:acf]{stats::acf}.
+}
+}
 }
 \examples{
 ggvar_acf(freeny[-2], args_facet = list(scales = "free_y"))
@@ -77,3 +95,17 @@ ggvar_ccf(freeny[-2], args_facet = list(scales = "free_y"))
 ggvar_acf(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))
 
 }
+\seealso{
+Other general time series plots: 
+\code{\link{ggvar_distribution}()},
+\code{\link{ggvar_history}()}
+
+Other model diagnostics plots: 
+\code{\link{ggvar_dispersion}()},
+\code{\link{ggvar_distribution}()},
+\code{\link{ggvar_history}()},
+\code{\link{ggvar_select}()},
+\code{\link{ggvar_stability}()}
+}
+\concept{general time series plots}
+\concept{model diagnostics plots}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggvar_dispersion.R
 \name{ggvar_dispersion}
 \alias{ggvar_dispersion}
-\title{Plot VAR Residuals Dispersion}
+\title{Plot VAR residuals dispersion}
 \usage{
 ggvar_dispersion(
   x,
@@ -16,24 +16,51 @@ ggvar_dispersion(
 \arguments{
 \item{x}{A "varest" object to get residuals and fitted values from.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
-\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{ggplot2::geom_point}.}
+\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{geom_point}.}
 
-\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{ggplot2::geom_hline}.}
+\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{geom_hline}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{...}{Arguments passed to \code{varr:::dispersion_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
 Plots a scatterplot of the residuals versus fitted values of a VAR model,
 using ggplot2.
 }
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::dispersion_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'default'}: passed to nothing.
+}
+}
+}
 \examples{
 ggvar_dispersion(vars::VAR(freeny[-2]), args_facet = list(scales = "free_x"))
 
 }
+\seealso{
+Other model diagnostics plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_distribution}()},
+\code{\link{ggvar_history}()},
+\code{\link{ggvar_select}()},
+\code{\link{ggvar_stability}()}
+}
+\concept{model diagnostics plots}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggvar_history.R
 \name{ggvar_history}
 \alias{ggvar_history}
-\title{Plot Values of Dataset or VAR Residuals}
+\title{Plot historic values of dataset or VAR residuals}
 \usage{
 ggvar_history(
   x,
@@ -19,32 +19,66 @@ ggvar_history(
 \item{x}{Either a "varest" object for plotting the residuals, or an dataset
 (object coercible to data.frame) with numeric variables.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
 \item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to \code{x$obs} or \code{nrow(x)}. Defaults to a integer sequence.}
 
-\item{graph_type}{The type of the plot, \code{'faceted'} or \code{'colored'}.}
+\item{graph_type}{The type of the plot: \code{'faceted'} or \code{'colored'}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{colors}{A vector of colors for the 'geoms' and/or variables.
-See \link{vignette('colors')}.}
-
-\item{...}{Arguments passed to \code{varr:::history_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
 Plots the historic values of variables in a dataset, or residuals of a VAR
-model. \code{ggvar_values} Plots each series in a facet.
-\code{ggvar_values_colored} plots all in the same graph, each with a
-different color.
+model. Can separate variables with facets or with a colors (see
+\code{graph_type}).
+}
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::history_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'varest'}: passed to nothing.
+\item Class \code{'default'}: passed to nothing.
+}
+}
 }
 \examples{
 ggvar_history(freeny[-2], args_facet = list(scales = "free_y"))
 ggvar_history(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))
 
 }
+\seealso{
+Other general time series plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_distribution}()}
+
+Other historic values plots: 
+\code{\link{ggvar_fit}()},
+\code{\link{ggvar_predict}()}
+
+Other model diagnostics plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_dispersion}()},
+\code{\link{ggvar_distribution}()},
+\code{\link{ggvar_select}()},
+\code{\link{ggvar_stability}()}
+}
+\concept{general time series plots}
+\concept{historic values plots}
+\concept{model diagnostics plots}

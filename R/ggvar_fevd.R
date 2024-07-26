@@ -14,7 +14,7 @@ fevd_helpers$format <- function(x, series) {
 }
 
 
-# Initial tests and setup (methods at the end):
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 fevd_test <- function(series, n.ahead, graph_type, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -35,13 +35,13 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 #' @param x A "varest" object to pass to [fevd][vars::fevd], or, directly, a
 #'  "varfevd" object.
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
-#'  [fevd][vars::fevd]. Unused if `x` is a "varfevd" object.
+#'  [fevd][vars::fevd]. `r roxy$unused("varfevd")`
 #' @eval roxy$series()
 #' @eval roxy$graph_type(c("segment", "area", "line"))
 #' @eval roxy$args_type()
 #' @eval roxy$args_gg(c("facet_wrap", "geom_point"))
 #' @eval roxy$colors()
-#' @eval roxy$dots("fevd", "vars::fevd")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
@@ -99,6 +99,7 @@ ggvar_fevd <- function(
 }
 
 
+# Setup methods:
 #' @noRd 
 fevd_setup.varest <- function(x, series, n.ahead, ...) {
   x <- vars::fevd(x, n.ahead, ...)
@@ -111,7 +112,7 @@ fevd_setup.varest <- function(x, series, n.ahead, ...) {
 }
 
 #' @noRd 
-fevd_setup.fevd <- function(x, series, n.ahead, ...) {
+fevd_setup.varfevd <- function(x, series, n.ahead, ...) {
   series <- series %||% names(x)
 
   data <- fevd_helpers$format(x, series)

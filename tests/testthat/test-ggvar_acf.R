@@ -40,7 +40,7 @@ test_that("'external' args combinations work", {
   expect_doppelganger("external", ggvar_acf(freeny[-2],
     args_facet = list(scales = "free_y"),
     args_hline = list(color = "red"),
-    args_geom = list(alpha = 0.5),
+    args_type = list(alpha = 0.5),
     ci = 0.5
   ))
 })

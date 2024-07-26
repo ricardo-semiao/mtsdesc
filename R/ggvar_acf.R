@@ -27,7 +27,7 @@ acf_helpers$title_base <- function(type) {
 }
 
 
-# Initial tests and setup (methods at the end):
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 acf_test <- function(x, series, lag.max, type, graph_type, ci,
   env = caller_env()) {
@@ -61,9 +61,8 @@ acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
 #' @eval roxy$graph_type(c("segment", "area"))
 #' @eval roxy$args_type()
 #' @eval roxy$args_gg(c("geom_ribbon", "geom_hline", "facet_wrap"))
-#' @param ci The level of confidence for the ACF confidence interval. Set to
-#'  `FALSE` to omit the [geom_ribbon][ggplot2::geom_ribbon].
-#' @eval roxy$dots(c("setup_acf", "setup_ccf"), "stats::acf")
+#' @eval roxy$ci("ggplot2::geom_ribbon")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
@@ -116,6 +115,7 @@ ggvar_acf <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 acf_setup.varest <- function(x, series, lag.max, type, ..., env) {
   x <- as.data.frame(stats::residuals(x))

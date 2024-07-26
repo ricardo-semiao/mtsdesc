@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggvar_stability.R
 \name{ggvar_stability}
 \alias{ggvar_stability}
-\title{Plot for Structural Stability of a VAR}
+\title{Plot VAR structural stability}
 \usage{
 ggvar_stability(
   x,
@@ -15,29 +15,57 @@ ggvar_stability(
 )
 }
 \arguments{
-\item{x}{A "varest" object to pass to \link[vars:stability]{stability}, or, directly, a
-"varstabil" object.}
+\item{x}{A "varest" object to pass to \link[vars:stability]{stability}, or,
+directly, a "varstabil" object.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
-\item{ci}{The level of confidence for the \link[strucchange:boundary]{boundary}.}
+\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Passed to \link[strucchange:boundary]{boundary}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
 
-\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{ggplot2::geom_hline}.}
+\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{geom_hline}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{...}{Arguments passed to \code{varr:::stability_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:stability]{vars::stability} here.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
-Plots the result of a \link[vars:stability]{stability} call. Confidence intevals are
-calculated using \link[strucchange:boundary]{boundary}.
+Plots the result of a \link[vars:stability]{stability} call. Confidence intervals
+are calculated using \link[strucchange:boundary]{boundary}.
+}
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::stability_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'varest'}: passed to \link[vars:stability]{vars::stability}.
+\item Class \code{'varstabil'}: passed to nothing.
+}
+}
 }
 \examples{
 ggvar_stability(vars::VAR(freeny[-2]))
 
 }
+\seealso{
+Other model diagnostics plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_dispersion}()},
+\code{\link{ggvar_distribution}()},
+\code{\link{ggvar_history}()},
+\code{\link{ggvar_select}()}
+}
+\concept{model diagnostics plots}

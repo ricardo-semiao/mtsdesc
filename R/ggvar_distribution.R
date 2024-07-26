@@ -22,7 +22,7 @@ distribution_helpers$format_dens <- function(x, series) {
 }
 
 
-# Initial tests and setup (methods at the end):
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 distribution_test <- function(series, plot_normal, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -45,14 +45,16 @@ distribution_setup <- function(x, series, plot_normal, ...) {
 #' @eval roxy$series()
 #' @param plot_normal Logical, whether or not a normal curve should be plotted.
 #' @eval roxy$args_gg(c("geom_histogram", "geom_line", "facet_wrap"))
-#' @eval roxy$dots("distribution")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
+#' `r roxy$details_methods()$distribution`
 #' 
 #' @eval roxy$return_gg()
 #' 
 #' @eval roxy$fam_diag()
+#' @eval roxy$fam_ts()
 #'
 #' @examples
 #' ggvar_distribution(vars::VAR(freeny[-2]))
@@ -89,6 +91,7 @@ ggvar_distribution <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 distribution_setup.varest <- function(x, series, plot_normal, ...) {
   x <- as.data.frame(stats::residuals(x))

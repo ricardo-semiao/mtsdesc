@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggvar_select.R
 \name{ggvar_select}
 \alias{ggvar_select}
-\title{Plot Information Criteria for VAR Lag Selection}
+\title{Plot VAR information criteria for lag selection}
 \usage{
 ggvar_select(
   x,
@@ -19,13 +19,13 @@ ggvar_select(
 \item{x}{A dataset (object coercible to data.frame) to pass to
 \link[vars:VARselect]{VARselect}, or, directly, a result of such call.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
 \item{lag.max}{Integer for the highest lag order. Passed to
-\link[vars:VARselect]{VARselect}.}
+\link[vars:VARselect]{VARselect}. Unused if \code{x} is of class list.}
 
 \item{type}{Type of deterministic regressors to include. Passed to
-\link[vars:VARselect]{VARselect}.}
+\link[vars:VARselect]{VARselect}. Unused if \code{x} is of class list.}
 
 \item{criteria}{The criteria to be considered. Any of "AIC", "HQ", "SC",
 and "FPE".}
@@ -33,17 +33,45 @@ and "FPE".}
 \item{trans}{A transformation to apply to each criteria result (vector). Can
 be a function, "none" (the default), or "index" to create index numbers.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
 
-\item{...}{Arguments passed to \code{varr:::select_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:VARselect]{vars::VARselect} here.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
 Plots the result of a call to \link[vars:VARselect]{VARselect}.
+}
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::select_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'list'}: passed to nothing.
+\item Class \code{'default'}: passed to \link[vars:VARselect]{vars::VARselect}.
+}
+}
 }
 \examples{
 ggvar_select(vars::VARselect(freeny[-2]))
 
 }
+\seealso{
+Other model diagnostics plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_dispersion}()},
+\code{\link{ggvar_distribution}()},
+\code{\link{ggvar_history}()},
+\code{\link{ggvar_stability}()}
+}
+\concept{model diagnostics plots}

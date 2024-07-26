@@ -9,7 +9,7 @@ predict_helpers$format <- function(x, series, index_ahead, index_behind, ci, ...
       tibble::as_tibble(prediction) %>%
         dplyr::mutate(serie = name, index = index_ahead, type = "prediction")
     })
-  
+
   if (!is_null(index_behind)) {
     orig <- x$datamat[(x$obs - length(index_behind) + 1):x$obs, 1:x$K] %>%
       dplyr::mutate(index = index_behind, type = "original") %>%
@@ -24,6 +24,7 @@ predict_helpers$format <- function(x, series, index_ahead, index_behind, ci, ...
 }
 
 
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 predict_test <- function(
     series, index_ahead, index_behind, ci, env = caller_env()) {
@@ -55,7 +56,7 @@ predict_setup <- function(
 #'  horizon. Leave as `NULL` to only plot predicted values.
 #' @eval roxy$ci("stats::predict")
 #' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
-#' @eval roxy$dots("predict", "stats::predict")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
@@ -105,6 +106,7 @@ ggvar_predict <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 predict_setup.varest <- function(
     x, series, index_ahead, index_behind, ci, ..., env) {

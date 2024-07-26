@@ -18,6 +18,7 @@ fit_helpers$format <- function(x, series, index) {
 }
 
 
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 fit_test <- function(series, index, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -40,10 +41,11 @@ fit_setup <- function(x, series, index, ..., env = caller_env()) {
 #' @eval roxy$series()
 #' @eval roxy$index("x$obs")
 #' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
-#' @eval roxy$dots("fit")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
+#' `r roxy$details_methods()$fit`
 #' 
 #' @eval roxy$return_gg()
 #' 
@@ -62,7 +64,7 @@ ggvar_fit <- function(
   fit_test(series, index)
 
   setup <- fit_setup(x, series, index, ...)
-  
+
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
       ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
@@ -75,6 +77,7 @@ ggvar_fit <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 fit_setup.varest <- function(x, series, index, ..., env) {
   series <- get_series(series, names(x$varresult), env)

@@ -28,6 +28,7 @@ irf_helpers$pluck_irf <- function(x, at) {
 }
 
 
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 irf_test <- function(
     series_imp, series_resp, n.ahead, ci, facet_type, env = caller_env()) {
@@ -56,12 +57,11 @@ irf_setup <- function(
 #' @param series_resp A character vector with variables to consider for the
 #'  responses. Defaults to all (`NULL`).
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
-#'  [irf][vars::irf]. Unused if `x` is "varirf".
-#' @param ci The level of confidence for the [irf][vars::irf]. Set to
-#'  `FALSE` to omit.
+#'  [irf][vars::irf]. `r roxy$unused("varirf")`
+#' @eval roxy$ci("vars::irf")
 #' @eval roxy$args_gg(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
 #' @eval roxy$facet_type()
-#' @eval roxy$dots("irf", "vars::irf")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
@@ -111,6 +111,7 @@ ggvar_irf <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 irf_setup.varest <- function(
     x, series_imp, series_resp, n.ahead, ci, ..., env) {

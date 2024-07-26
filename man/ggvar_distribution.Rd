@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggvar_distribution.R
 \name{ggvar_distribution}
 \alias{ggvar_distribution}
-\title{Plot VAR Residuals Distribution}
+\title{Plot VAR residuals distribution}
 \usage{
 ggvar_distribution(
   x,
@@ -18,26 +18,59 @@ ggvar_distribution(
 \item{x}{Either a "varest" object for plotting the residuals, or an dataset
 (object coercible to data.frame) with numeric variables.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
 \item{plot_normal}{Logical, whether or not a normal curve should be plotted.}
 
-\item{args_histogram}{Additional arguments passed to \link[ggplot2:geom_histogram]{ggplot2::geom_histogram}.}
+\item{args_histogram}{Additional arguments passed to \link[ggplot2:geom_histogram]{geom_histogram}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{...}{Arguments passed to \code{varr:::distribution_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
 Plots the histogram of the residuals of a VAR model, or of the variables in a
 dataset, possibly overlapped with a normal curve.
 }
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::distribution_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'varest'}: passed to nothing.
+\item Class \code{'default'}: passed to nothing.
+}
+}
+}
 \examples{
 ggvar_distribution(vars::VAR(freeny[-2]))
 
 }
+\seealso{
+Other model diagnostics plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_dispersion}()},
+\code{\link{ggvar_history}()},
+\code{\link{ggvar_select}()},
+\code{\link{ggvar_stability}()}
+
+Other general time series plots: 
+\code{\link{ggvar_acf}()},
+\code{\link{ggvar_history}()}
+}
+\concept{general time series plots}
+\concept{model diagnostics plots}

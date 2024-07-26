@@ -1,8 +1,8 @@
 ---
-title: "Colors in varr"
+title: "Customizing varr Graphs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{palettes}
+  %\VignetteIndexEntry{customizing-graphs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

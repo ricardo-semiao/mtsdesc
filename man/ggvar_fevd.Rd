@@ -2,14 +2,14 @@
 % Please edit documentation in R/ggvar_fevd.R
 \name{ggvar_fevd}
 \alias{ggvar_fevd}
-\title{Plot for Forecast Error Variance Decomposition of a VAR}
+\title{Plot VAR forecast error variance decomposition}
 \usage{
 ggvar_fevd(
   x,
   series = NULL,
   n.ahead = NULL,
   graph_type = "bar",
-  args_geom = list(),
+  args_type = list(),
   args_facet = list(),
   args_point = list(),
   colors = NULL,
@@ -20,31 +20,52 @@ ggvar_fevd(
 \item{x}{A "varest" object to pass to \link[vars:fevd]{fevd}, or, directly, a
 "varfevd" object.}
 
-\item{series}{A character vector with series (column names) to consider. Defaults to all (\code{NULL}).}
+\item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
 \item{n.ahead}{An integer. The size of the forecast horizon, passed to
-\link[vars:fevd]{fevd}. Unused if \code{x} is a "varfevd" object.}
+\link[vars:fevd]{fevd}. Unused if \code{x} is of class varfevd.}
 
-\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{ggplot2::geom_segment}, \code{'area'}, for \link[ggplot2:geom_ribbon]{ggplot2::geom_area}, or \code{'line'}, for \link[ggplot2:geom_path]{ggplot2::geom_line}.}
+\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{geom_segment}, \code{'area'}, for \link[ggplot2:geom_ribbon]{geom_area}, or \code{'line'}, for \link[ggplot2:geom_path]{geom_line}.}
 
-\item{args_geom}{Arguments passed to the chosen 'geom'.}
+\item{args_type}{Arguments passed to the 'geom' chosen in \code{graph_type}.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{ggplot2::geom_point}.}
+\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{geom_point}.}
 
-\item{colors}{A vector of colors for the 'geoms' and/or variables.
-See \link{vignette('colors')}.}
-
-\item{...}{Arguments passed to \code{varr:::fevd_setup}, the generic function that formats \code{x} into a 'graphable' format. Use them only if you have created a method for some unsupported class of \code{x}.Pass additional arguments to \link[vars:fevd]{vars::fevd} here.}
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
-An object of class \code{'ggplot'}.
+A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
 Plots the result of a \link[vars:fevd]{fevd} call.
+}
+\details{
+\subsection{Customization}{
+
+The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+
+See \link{vignette('customizing-graphs')} for more details.
+}
+
+\subsection{Methods}{
+
+The data from \code{x} is extracted with the generic function varr:::fevd_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+\itemize{
+\item Class \code{'varest'}: passed to \link[vars:fevd]{vars::fevd}.
+\item Class \code{'varfevd'}: passed to nothing.
+}
+}
 }
 \examples{
 ggvar_fevd(vars::VAR(freeny[-2]), n.ahead = 10)
 
 }
+\seealso{
+Other VAR output plots: 
+\code{\link{ggvar_irf}()}
+}
+\concept{VAR output plots}

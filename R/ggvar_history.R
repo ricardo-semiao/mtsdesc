@@ -9,7 +9,7 @@ history_helpers$format <- function(x, series, index) {
 }
 
 
-# Initial tests and setup (methods at the end):
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 history_test <- function(series, index, graph_type, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -36,10 +36,11 @@ history_setup <- function(x, series, index, ...) {
 #' @eval roxy$graph_type(c("faceted", "colored"), FALSE)
 #' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
 #' @eval roxy$colors()
-#' @eval roxy$dots("history")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
+#' `r roxy$details_methods()$history`
 #'
 #' @eval roxy$return_gg()
 #' 
@@ -90,6 +91,7 @@ ggvar_history <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 history_setup.varest <- function(x, series, index, ...) {
   x <- as.data.frame(stats::residuals(x))

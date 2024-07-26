@@ -18,7 +18,7 @@ stability_helpers$dist <- function(x, ci, ...) {
 }
 
 
-# Initial tests and setup (methods at the end):
+# Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 stability_test <- function(series, ci, env = caller_env()) {
   test$type(series, c("NULL", "character"), env)
@@ -38,9 +38,9 @@ stability_setup <- function(x, series, ci, ...) {
 #' @param x A "varest" object to pass to [stability][vars::stability], or,
 #'  directly, a "varstabil" object.
 #' @eval roxy$series()
-#' @param ci The level of confidence for the [boundary][strucchange::boundary].
+#' @eval roxy$ci("strucchange::boundary")
 #' @eval roxy$args_gg(c("geom_line", "geom_hline", "facet_wrap"))
-#' @eval roxy$dots("stability", "vars::stability")
+#' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
@@ -85,6 +85,7 @@ ggvar_stability <- function(
 }
 
 
+# Setup methods:
 #' @noRd
 stability_setup.varest <- function(x, series, ci, ...) {
   x <- vars::stability(x, ...)$stability

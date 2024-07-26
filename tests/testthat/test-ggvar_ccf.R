@@ -40,7 +40,7 @@
 #  expect_doppelganger("external", ggvar_ccf(freeny[-2],
 #    args_facet = list(scales = "free_y", independent = "y"),
 #    args_hline = list(color = "red"),
-#    args_geom = list(alpha = 0.5),
+#    args_type = list(alpha = 0.5),
 #    facet = "ggh4x", ci = 0.5
 #  ))
 #})

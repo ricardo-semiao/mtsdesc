@@ -28,7 +28,7 @@ roxy$index <- function(lengths_vec) {
 roxy$graph_type <- function(types_vec, isgeoms = TRUE) {
   if (isgeoms) {
     texts <- purrr::map_chr(types_vec,
-      ~glue("`'{.x}'`, for [ggplot2::geom_{.x}]")
+      ~glue("`'{.x}'`, for [geom_{.x}][ggplot2::geom_{.x}]")
     ) %>%
       pluralize_or()
     glue("
@@ -59,7 +59,7 @@ roxy$args_gg <- function(funs_vec) {
   text <- ifelse(
     grepl("facet", funs_vec),
     "the faceting engine used",
-    glue("[ggplot2::{funs_vec}]")
+    glue("[{funs_vec}][ggplot2::{funs_vec}]")
   )
 
   glue("
@@ -73,26 +73,23 @@ roxy$args_type <- function() {
 
 
 # Other arguments
-roxy$dots <- function(funs_vec, special_method = NULL) {
-  funs_text <- glue("varr:::{funs_vec}_setup") %>% pluralize_or()
-
-  special_text <- if (!is_null(special_method)) {
-    glue("Pass additional arguments to [{special_method}] here. ")
-  } else {
-    ""
-  }
-
+roxy$dots <- function() {
   glue("
-  @param ... Arguments passed to `{funs_text}`, the generic \\
-  function that formats `x` into a 'graphable' format. {special_text}Use them \\
-  if you have created a method for some unsupported class of `x`.
+  @param ... Arguments passed to methods, see the 'Methods' section.
   ")
 }
 
 roxy$ci <- function(fun) {
+  text_short <- strsplit(fun, "::")[[1]][2]
   glue("
-  @param ci The level of confidence for the prediction confidence interval. \\
-  Set to `FALSE` to omit. Passed to [{fun}].
+  @param ci The confidence level for the confidence interval. Set to `FALSE` \\
+  to omit. Passed to [{text_short}][{fun}].
+  ")
+}
+
+roxy$unused <- function(class) {
+  glue("
+  Unused if `x` is of class {class}.
   ")
 }
 
@@ -120,29 +117,39 @@ roxy$details_custom <- function() {
 }
 
 roxy$details_methods <- function() {
-  get_text <- function(class_vec, funs_vec) {
+  get_text <- function(topics_vec, class_vec, funs_vec) {
+    topic_text <- glue("varr:::{topics_vec}_setup") %>% pluralize_or()
+
     funs_text <- ifelse(funs_vec == "none", "nothing", glue("[{funs_vec}]"))
+
     methods_text <- glue("* Class `'{class_vec}'`: passed to {funs_text}.") %>%
-    glue::glue_collapse(sep = "\n")
+      glue::glue_collapse(sep = "\n")
 
     glue("
     ## Methods
-    Each class of `x` conditions a function to extract its data from, to \\
-    which the `...` arguments will be passed. Below there is a list with all \\
-    the currently implemented classes, and the relevant external documentations:
+    The data from `x` is extracted with the generic function {topic_text}. \\
+    Each class conditions an external function to pass the `...` arguments \\
+    to. Below there is a list with all the currently implemented classes:
     {methods_text}
     ")
   }
 
   list(
     acf = c("varest" = "stats::acf", "default" = "stats::acf"),
-    fevd = c("varest" = "vars::fevd"),
-    stability = c("varest" = "vars::stability"),
+    dispersion = c("default" = "none"),
+    distribution = c("varest" = "none", "default" = "none"),
+    fevd = c("varest" = "vars::fevd", "varfevd" = "none"),
+    stability = c("varest" = "vars::stability", "varstabil" = "none"),
     select = c("list" = "none", "default" = "vars::VARselect"),
     irf = c("varest" = "vars::irf", "varirf" = "none"),
+    history = c("varest" = "none", "default" = "none"),
     predict = c("varest" = "vars::predict.varest")
   ) %>%
-    purrr::map(~get_text(names(.x), .x))
+    purrr::imap(~get_text(
+      `if`(.y == "acf", c("acf", "ccf"), .y),
+      names(.x),
+      .x
+    ))
 }
 
 
