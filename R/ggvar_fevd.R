@@ -103,7 +103,7 @@ ggvar_fevd <- function(
 #' @noRd 
 fevd_setup.varest <- function(x, series, n.ahead, ...) {
   x <- vars::fevd(x, n.ahead, ...)
-  
+
   series <- series %||% names(x)
 
   data <- fevd_helpers$format(x, series)
@@ -116,6 +116,6 @@ fevd_setup.varfevd <- function(x, series, n.ahead, ...) {
   series <- series %||% names(x)
 
   data <- fevd_helpers$format(x, series)
-  
+
   list(data = data, series = series)
 }

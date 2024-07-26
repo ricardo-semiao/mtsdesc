@@ -95,9 +95,6 @@ ggvar_predict <- function(
       graph_add +
       ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
       ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::scale_linetype_manual(
-        guide = if (is_null(index_behind)) "none" else "legend"
-      ) +
       ggplot2::labs(
         title = "VAR Predicted Values", x = "Index",
         y = "Values", linetypes = "Type"

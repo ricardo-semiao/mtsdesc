@@ -22,7 +22,8 @@ To customize a plot made in a package, adding new layers, it is useful to
 see the data and mappings used. This function returns a list with both.
 }
 \examples{
-g <- ggplot(mtcars, aes(mpg, hp)) + geom_point(aes(color = gear))
+g <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, hp)) +
+   ggplot2::geom_point(ggplot2::aes(color = gear))
 find_gg_info(g)
 
 }

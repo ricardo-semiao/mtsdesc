@@ -113,7 +113,7 @@ get_series <- function(series, series_all, env) {
     series_all
   } else {
     if (!all(series %in% series_all)) {
-      cli::cli_abort("
+      cli::cli_warn("
       Not all elements of {.var {arg_name}} are present in {.var x}.
       ",
         call = env

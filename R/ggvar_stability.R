@@ -13,7 +13,7 @@ stability_helpers$format <- function(x, series) {
 
 stability_helpers$dist <- function(x, ci, ...) {
   strucchange::boundary(x[[1]],
-      alpha = 1 - ci, alt.boundary = FALSE, functional = "max", ...
+    alpha = 1 - ci, alt.boundary = FALSE, functional = "max", ...
   )
 }
 

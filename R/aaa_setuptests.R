@@ -1,10 +1,10 @@
 test <- list()
 
-test$type <- function(arg, types, env) {#, n = NULL
+test$type <- function(arg, types, env) {
   arg_name <- rlang::ensym(arg)
 
   notpass <- tolower(types) %>%
-    purrr::map_lgl(~get(glue("is_{.x}"))(arg)) %>% #, n
+    purrr::map_lgl(~get(glue("is_{.x}"))(arg)) %>%
     any() %>%
     `!`()
 
