@@ -35,10 +35,10 @@ distribution_setup <- function(x, series, plot_normal, ...) {
 }
 
 
-#' Plot VAR Residuals Distribution
+#' Plot VAR residuals distribution
 #'
 #' Plots the histogram of the residuals of a VAR model, or of the variables in a
-#'  dataset, possibly overlapped with a normal curve.
+#' dataset, possibly overlapped with a normal curve.
 #'
 #' @param x Either a "varest" object for plotting the residuals, or an dataset
 #'  (object coercible to data.frame) with numeric variables.
@@ -47,7 +47,12 @@ distribution_setup <- function(x, series, plot_normal, ...) {
 #' @eval roxy$args_gg(c("geom_histogram", "geom_line", "facet_wrap"))
 #' @eval roxy$dots("distribution")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_diag()
 #'
 #' @examples
 #' ggvar_distribution(vars::VAR(freeny[-2]))

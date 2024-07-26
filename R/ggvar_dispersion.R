@@ -30,17 +30,22 @@ dispersion_setup <- function(x, series, ...) {
 }
 
 
-#' Plot VAR Residuals Dispersion
+#' Plot VAR residuals dispersion
 #'
 #' Plots a scatterplot of the residuals versus fitted values of a VAR model,
-#'  using ggplot2.
+#' using ggplot2.
 #'
 #' @param x A "varest" object to get residuals and fitted values from.
 #' @eval roxy$series()
 #' @eval roxy$args_gg(c("geom_point", "geom_hline", "facet_wrap"))
 #' @eval roxy$dots("dispersion")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_diag()
 #'
 #' @examples
 #' ggvar_dispersion(vars::VAR(freeny[-2]), args_facet = list(scales = "free_x"))
@@ -71,7 +76,7 @@ ggvar_dispersion <- function(
 #' @noRd 
 dispersion_setup.varest <- function(x, series, ...) {
   series <- series %||% names(x$varresult)
-  
+
   data <- dispersion_helpers$format(x, series)
 
   list(data = data)

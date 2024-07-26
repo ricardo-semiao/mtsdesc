@@ -30,19 +30,25 @@ stability_setup <- function(x, series, ci, ...) {
 }
 
 
-#' Plot for Structural Stability of a VAR
+#' Plot VAR structural stability
 #'
-#' Plots the result of a [stability][vars::stability] call. Confidence intevals are
-#'  calculated using [boundary][strucchange::boundary].
+#' Plots the result of a [stability][vars::stability] call. Confidence intervals
+#' are calculated using [boundary][strucchange::boundary].
 #'
-#' @param x A "varest" object to pass to [stability][vars::stability], or, directly, a
-#'  "varstabil" object.
+#' @param x A "varest" object to pass to [stability][vars::stability], or,
+#'  directly, a "varstabil" object.
 #' @eval roxy$series()
 #' @param ci The level of confidence for the [boundary][strucchange::boundary].
 #' @eval roxy$args_gg(c("geom_line", "geom_hline", "facet_wrap"))
 #' @eval roxy$dots("stability", "vars::stability")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' `r roxy$details_methods()$stability`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_diag()
 #'
 #' @examples
 #' ggvar_stability(vars::VAR(freeny[-2]))
@@ -66,7 +72,7 @@ ggvar_stability <- function(
       )
     }
   ))
-  
+
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
     ggplot2::geom_line(!!!args_line) +

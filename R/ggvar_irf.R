@@ -45,7 +45,7 @@ irf_setup <- function(
 }
 
 
-#' Plot Impulse Response Functions of a VAR
+#' Plot VAR impulse response functions
 #'
 #' Plots the result of a [irf][vars::irf] call.
 #'
@@ -63,7 +63,13 @@ irf_setup <- function(
 #' @eval roxy$facet_type()
 #' @eval roxy$dots("irf", "vars::irf")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' `r roxy$details_methods()$irf`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_output()
 #'
 #' @examples
 #' ggvar_irf(vars::VAR(freeny[-2]), args_facet = list(scales = "free_y"))

@@ -28,7 +28,7 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 }
 
 
-#' Plot for Forecast Error Variance Decomposition of a VAR
+#' Plot VAR forecast error variance decomposition
 #'
 #' Plots the result of a [fevd][vars::fevd] call.
 #'
@@ -38,13 +38,19 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 #'  [fevd][vars::fevd]. Unused if `x` is a "varfevd" object.
 #' @eval roxy$series()
 #' @eval roxy$graph_type(c("segment", "area", "line"))
-#' @eval roxy$args_geom()
+#' @eval roxy$args_type()
 #' @eval roxy$args_gg(c("facet_wrap", "geom_point"))
 #' @eval roxy$colors()
 #' @eval roxy$dots("fevd", "vars::fevd")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' `r roxy$details_methods()$fevd`
+#' 
 #' @eval roxy$return_gg()
-#'
+#' 
+#' @eval roxy$fam_output()
+#' 
 #' @examples
 #' ggvar_fevd(vars::VAR(freeny[-2]), n.ahead = 10)
 #'
@@ -53,7 +59,7 @@ ggvar_fevd <- function(
     x, series = NULL,
     n.ahead = NULL,
     graph_type = "bar",
-    args_geom = list(),
+    args_type = list(),
     args_facet = list(),
     args_point = list(),
     colors = NULL,
@@ -67,13 +73,13 @@ ggvar_fevd <- function(
   graph_add <- inject(list(
     if (graph_type == "bar") {
       ggplot2::geom_bar(aes(fill = .data$serie),
-        stat = "identity", !!!args_geom
+        stat = "identity", !!!args_type
       )
     } else if ("area") {
-      ggplot2::geom_area(aes(fill = .data$serie), !!!args_geom)
+      ggplot2::geom_area(aes(fill = .data$serie), !!!args_type)
     } else if ("line") {
       list(
-        ggplot2::geom_line(aes(color = .data$serie), !!!args_geom),
+        ggplot2::geom_line(aes(color = .data$serie), !!!args_type),
         ggplot2::geom_point(aes(color = .data$serie), !!!args_point)
       )
     }

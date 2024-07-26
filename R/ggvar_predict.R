@@ -40,10 +40,10 @@ predict_setup <- function(
 }
 
 
-#' Plot the Predicted Values of a VAR
+#' Plot VAR predictions
 #'
-#' Plots the result of a [predict.varest][vars::predict.varest] call. Has an option to
-#'  overlay it with the true variables, if provided a test dataset.
+#' Gets predictions via [stats::predict] and plots them. Can also plot the known
+#'  values of the past.
 #'
 #' @param x A "varest" object to get predictions from.
 #' @eval roxy$series()
@@ -53,12 +53,17 @@ predict_setup <- function(
 #' @param index_behind A vector of labels to the x-axis, normally dates. Applied
 #'  to the original portion of the graph. Its length will define the 'past'
 #'  horizon. Leave as `NULL` to only plot predicted values.
-#' @param ci The level of confidence for the prediction confidence interval. Set
-#'  to `FALSE` to omit. Passed to [predict][stats::predict].
+#' @eval roxy$ci("stats::predict")
 #' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
 #' @eval roxy$dots("predict", "stats::predict")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' `r roxy$details_methods()$predict`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_hist()
 #'
 #' @examples
 #' x <- vars::VAR(freeny[-2])
@@ -75,8 +80,6 @@ ggvar_predict <- function(
   predict_test(series, index_ahead, index_behind, ci)
 
   setup <- predict_setup(x, series, index_ahead, index_behind, ci, ...)
-  
-  #guide <- if (is_null(index_behind)) "none" else "legend"
 
   graph_add <- inject(list(
     if (!is_false(ci)) {
@@ -91,6 +94,9 @@ ggvar_predict <- function(
       graph_add +
       ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
       ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
+      ggplot2::scale_linetype_manual(
+        guide = if (is_null(index_behind)) "none" else "legend"
+      ) +
       ggplot2::labs(
         title = "VAR Predicted Values", x = "Index",
         y = "Values", linetypes = "Type"

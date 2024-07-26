@@ -30,19 +30,24 @@ fit_setup <- function(x, series, index, ..., env = caller_env()) {
 }
 
 
-#' Plot VAR Fitted Values
+#' Plot VAR fitted values
 #'
 #' Plots fitted values of a VAR model, versus the actual values.
-#'  `ggvar_fit` Plots each serie in a facet. `ggvar_fit_colored`
-#'  plots all in the same graph, each with a different color.
+#' `ggvar_fit` Plots each serie in a facet. `ggvar_fit_colored`
+#' plots all in the same graph, each with a different color.
 #'
 #' @param x A "varest" object to get fitted values from.
 #' @eval roxy$series()
-#' @eval roxy$index("`x$obs`")
+#' @eval roxy$index("x$obs")
 #' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
 #' @eval roxy$dots("fit")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_hist()
 #'
 #' @examples
 #' x <- vars::VAR(freeny[-2])

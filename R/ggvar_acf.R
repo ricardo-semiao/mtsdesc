@@ -45,11 +45,11 @@ acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
 }
 
 
-#' Plot autocorrelation (and similars) of dataset
+#' Plot autocorrelation and similar
 #'
-#' `ggvar_acf` plots the auto-correlations (and similars) call for every
-#'  series, using [facet_wrap][ggplot2::facet_wrap]. `ggvar_ccf` plots all the
-#'  cross-correlations (and similars) between the series, in a grid.
+#' `ggvar_acf` plots the auto-correlations (and similar) call for every
+#' series. `ggvar_ccf` plots all the cross-correlations (and similar) between
+#' the series, in a grid.
 #'
 #' @param x A dataset (object coercible to data.frame) or a "varest" object to
 #'  get residuals from.
@@ -59,13 +59,20 @@ acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
 #' @param type The type of ACF to be computed. Can be either "correlation",
 #'  "covariance", or "partial". Passed to [acf][stats::acf].
 #' @eval roxy$graph_type(c("segment", "area"))
-#' @eval roxy$args_geom()
+#' @eval roxy$args_type()
 #' @eval roxy$args_gg(c("geom_ribbon", "geom_hline", "facet_wrap"))
 #' @param ci The level of confidence for the ACF confidence interval. Set to
 #'  `FALSE` to omit the [geom_ribbon][ggplot2::geom_ribbon].
 #' @eval roxy$dots(c("setup_acf", "setup_ccf"), "stats::acf")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' `r roxy$details_methods()$acf`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_ts()
+#' @eval roxy$fam_diag()
 #'
 #' @examples
 #' ggvar_acf(freeny[-2], args_facet = list(scales = "free_y"))
@@ -77,7 +84,7 @@ ggvar_acf <- function(
     x, series = NULL,
     lag.max = NULL, type = "correlation",
     graph_type = "segment",
-    args_geom = list(),
+    args_type = list(),
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
     args_hline = list(),
     args_facet = list(),
@@ -89,9 +96,9 @@ ggvar_acf <- function(
 
   graph_add <- inject(list(
     if (graph_type == "segment") {
-      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
+      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
     } else if (graph_type == "area") {
-      ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
+      ggplot2::geom_area(aes(y = .data$value), !!!args_type)
     },
     if (!is_false(ci)) {
       dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))

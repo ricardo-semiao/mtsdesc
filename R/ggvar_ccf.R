@@ -47,7 +47,7 @@ ggvar_ccf <- function(
     x, series = NULL,
     lag.max = NULL, type = "correlation",
     graph_type = "segment",
-    args_geom = list(),
+    args_type = list(),
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
     args_hline = list(),
     args_facet = list(),
@@ -65,9 +65,9 @@ ggvar_ccf <- function(
 
   graph_add <- inject(list(
     if (graph_type == "segment") {
-      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_geom)
+      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
     } else if (graph_type == "area") {
-      ggplot2::geom_area(aes(y = .data$value), !!!args_geom)
+      ggplot2::geom_area(aes(y = .data$value), !!!args_type)
     },
     if (!is_false(ci)) {
       dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))

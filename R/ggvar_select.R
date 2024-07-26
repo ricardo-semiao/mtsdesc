@@ -27,7 +27,7 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 }
 
 
-#' Plot Information Criteria for VAR Lag Selection
+#' Plot VAR information criteria for lag selection
 #'
 #' Plots the result of a call to [VARselect][vars::VARselect].
 #'
@@ -45,7 +45,13 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #' @eval roxy$args_gg("geom_line")
 #' @eval roxy$dots("select", "vars::VARselect")
 #'
+#' @details
+#' `r roxy$details_custom()`
+#' `r roxy$details_methods()$select`
+#' 
 #' @eval roxy$return_gg()
+#' 
+#' @eval roxy$fam_diag()
 #'
 #' @examples
 #' ggvar_select(vars::VARselect(freeny[-2]))

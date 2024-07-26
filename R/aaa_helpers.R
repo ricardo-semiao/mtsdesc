@@ -77,7 +77,6 @@ create_sec_axis <- function(xseclab = "Impulse", yseclab = "Response") {
   )
 }
 
-
 define_facet <- function(facet, facet_x, facet_y, ...) {
   if (facet == "ggplot") {
     ggplot2::facet_grid(stats::reformulate(facet_x, facet_y), ...)
@@ -123,5 +122,3 @@ get_series <- function(series, series_all, env) {
     series
   }
 }
-
-
