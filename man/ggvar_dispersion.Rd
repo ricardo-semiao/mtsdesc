@@ -39,8 +39,6 @@ using ggplot2.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
-
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 
 See \link{vignette('customizing-graphs')} for more details.

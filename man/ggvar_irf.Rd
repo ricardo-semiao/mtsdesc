@@ -11,8 +11,9 @@ ggvar_irf(
   n.ahead = 10,
   ci = 0.95,
   args_line = list(),
-  args_hline = list(),
+  args_hline = list(yintercept = 0),
   args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
+  args_labs = list(),
   args_facet = list(),
   facet_type = "ggplot",
   ...
@@ -35,13 +36,13 @@ responses. Defaults to all (\code{NULL}).}
 
 \item{args_line, args_hline, args_ribbon}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}, \link[ggplot2:geom_abline]{geom_hline}, and \link[ggplot2:geom_ribbon]{geom_ribbon} (respectively). See more in the 'Customization' section.}
 
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
+
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
 \item{facet_type}{The facet 'engine' to be used. \code{'ggplot2'} for \link[ggplot2:facet_grid]{ggplot2::facet_grid}, \code{'ggh4x'} for \link[ggh4x:facet_grid2]{ggh4x::facet_grid2}.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
-
-\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot}.
@@ -53,8 +54,6 @@ Plots the result of a \link[vars:irf]{irf} call.
 \subsection{Customization}{
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
-
-The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
 
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 

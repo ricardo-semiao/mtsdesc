@@ -17,11 +17,18 @@ ccf_helpers$format <- function(x, series, lag.max, type, ...) {
     )
 }
 
+ccf_helpers$title_base <- function(type) {
+  switch(type,
+    "correlation" = "Auto-correlation of",
+    "covariance" = "Auto-covariance of"
+  )
+}
+
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 ccf_test <- function(
-    series, lag.max, type, graph_type, ci, facet_type, env = caller_env()) {
+    series, lag.max, type, graph_type, ci, facet_type, env) {
   test$type(series, c("NULL", "character"), env = env)
   test$category(type, c("correlation", "covariance"), env)
   test$interval(lag.max, 1, Inf, NULL, env = env)
@@ -54,21 +61,17 @@ ggvar_ccf <- function(
     ci = 0.95,
     ...) {
   # Test and setup:
-  ccf_test(series, lag.max, type, graph_type, ci, facet_type)
+  env <- current_env()
 
-  setup <- ccf_setup(x, series, lag.max, type, ci, ...)
+  ccf_test(series, lag.max, type, graph_type, ci, facet_type, env = env)
+  setup <- ccf_setup(x, series, lag.max, type, ci, ..., env = env)
 
-  setup$title <- switch(type,
-    "correlation" = "Cross-correlation of Series",
-    "covariance" = "Cross-covariance of Series"
-  )
-
-
-  # Update arguments and create additions:
+  # Update arguments:
   args_labs <- update_labs(args_labs, list(
     title = setup$title, x = "Lags", y = "Values"
   ))
 
+  # Create additions:
   add_type <- inject(switch(graph_type,
     "segment" = list(
       geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
@@ -78,15 +81,12 @@ ggvar_ccf <- function(
     )
   ))
 
-  add_ribbon <- inject(list(
-    if (!is_false(ci)) {
-      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
-      geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
-    }
-  ))
+  add_ribbon <- inject(if (!is_false(ci)) {
+    dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
+    list(geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon))
+  })
 
-  add_facet <- inject(define_facet_grid(facet_type, !!!args_facet))
-
+  add_facet <- define_facet_grid(facet_type, args_facet, env = env)
 
   # Graph:
   inject(
@@ -106,10 +106,11 @@ ccf_setup.varest <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
+  title <- paste(ccf_helpers$title_base(type), "VAR Residuals")
 
   data <- ccf_helpers$format(x, series, lag.max, type, ...)
 
-  list(data = data)
+  list(data = data, title = title)
 }
 
 #' @noRd
@@ -117,8 +118,9 @@ ccf_setup.default <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(x) %>% ignore_cols(env)
 
   series <- series %||% colnames(x)
+  title <- paste(ccf_helpers$title_base(type), "Series")
 
   data <- ccf_helpers$format(x, series, lag.max, type, ...)
 
-  list(data = data)
+  list(data = data, title = title)
 }

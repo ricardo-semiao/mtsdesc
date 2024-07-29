@@ -29,7 +29,8 @@ roxy$index <- function(lengths_vec) {
 # Facet arguments:
 roxy$faceted <- function() {
   glue("
-  @param faceted Should the graph be divided in facets?.
+  @param faceted Should the graph be divided in facets?. If true, `args_aes` \\
+  is ignored.
   ")
 }
 
@@ -50,9 +51,9 @@ roxy$args_facet <- function() {
 # gg function arguments:
 roxy$args_aes <- function() {
   glue("
-  @param args_aes A named list defining aesthetics to differentiate the data \\
-  by, an the arguments passed to `ggplot2::scale_*_manual`. See more in the \\
-  'Customization' section.
+  @param args_aes Defines aesthetics to differentiate the data. A named list \\
+  of aesthetics names (`*`) -- arguments passed to `ggplot2::scale_*_manual`. \\
+  See more in the 'Customization' section.
   ")
 }
 
@@ -121,16 +122,23 @@ roxy$return_gg <- function() {
 
 }
 
-roxy$details_custom <- function() {
+roxy$details_custom <- function(has_args_aes = FALSE) {
+  text_aes <- if (has_args_aes) {
+    "
+    \n\nThe `args_aes` is a list with '* = arguments to `scale_*_manual` \\
+    elements, where '*' represents the name of an aesthetic to apply to the \\
+    data. View [vignette('ggplot2-specs', 'ggplot2')] to see the available \\
+    aesthetics.
+    "
+  } else {
+    ""
+  }
+
   glue("
   ## Customization
   The graph can be customized both with the 'static' arguments passed to each \\
   layer -- using the `args_*` arguments --, and, if applicable, the 'dynamic' \\
-  aesthetics -- using the `args_aes` argument.
-
-  The `args_aes` is a list with '* = arguments to `scale_*_manual` elements, \\
-  where '*' represents the name of an aesthetic to apply to the data. View \\
-  [vignette('ggplot2-specs', 'ggplot2')] to see the available aesthetics.
+  aesthetics -- using the `args_aes` argument.{text_aes}
 
   After built, the result can be further customized as any ggplot, adding or \\
   overwriting layers with the [ggplot's +][ggplot2::+.gg]. It is useful to \\

@@ -16,7 +16,7 @@ fevd_helpers$format <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-fevd_test <- function(series, n.ahead, graph_type, env = caller_env()) {
+fevd_test <- function(series, n.ahead, graph_type, env) {
   test$type(series, c("NULL", "character"), env = env)
   test$interval(n.ahead, 1, Inf, env = env)
   test$category(graph_type, c("bar", "area", "line"), env = env)
@@ -37,7 +37,7 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
 #'  [fevd][vars::fevd]. `r roxy$unused("varfevd")`
 #' @eval roxy$series()
-#' @eval roxy$graph_type(c("segment", "area", "line"))
+#' @eval roxy$graph_type(c("bar", "line"))
 #' @eval roxy$args_aes()
 #' @eval roxy$args_type()
 #' @eval roxy$args_labs()
@@ -45,7 +45,7 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 #' @eval roxy$dots()
 #'
 #' @details
-#' `r roxy$details_custom()`
+#' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$fevd`
 #'
 #' @eval roxy$return_gg()
@@ -66,12 +66,12 @@ ggvar_fevd <- function(
     args_facet = list(),
     ...) {
   # Test and setup:
-  fevd_test(series, n.ahead, graph_type)
+  env <- current_env()
 
-  setup <- fevd_setup(x, series, n.ahead, ...)
+  fevd_test(series, n.ahead, graph_type, env = env)
+  setup <- fevd_setup(x, series, n.ahead, ..., env = env)
 
-
-  # Update arguments and create additions:
+  # Update arguments:
   args_labs <- update_labs(args_labs, list(
     title = "VAR FEVD", x = "Forecast horizon", y = "Variance contribution"
   ))
@@ -79,40 +79,25 @@ ggvar_fevd <- function(
   if (graph_type == "bar" && length(args_type) == 0) {
     args_type$stat <- "identity"
   }
-  if (length(args_aes) == 0) {
-    if (graph_type == "bar") {
-      args_aes$fill$values <- "ggplot"
-    } else if (graph_type == "line") {
-      args_aes$color$values <- "ggplot"
-    }
-  }
 
-  for (i in c("color", "fill")) {
-    args_aes[[i]]$values <- update_palette(
-      args_aes[[i]]$values, length(setup$series)
-    )
-  }
+  args_aes <- update_values(args_aes, graph_type, "Series", env = env) %>%
+    process_values(length(setup$series), env = env)
 
+  # Create additions:
   add_type <- inject(switch(graph_type,
-    "bar" = list(
-      geom_bar(!!!args_type)
-    ),
-    "line" = list(
-      geom_line(!!!args_type),
-      geom_point(!!!args_type)
-    )
+    "bar" = list(geom_bar(!!!args_type)),
+    "line" = list(geom_line(!!!args_type), geom_point(!!!args_type))
   ))
 
   add_aes <- define_aes(args_aes, .data$serie)
-  define_scales(args_aes)
 
   # Graph:
   inject(
     ggplot(setup$data, aes(.data$lead, .data$value, !!!add_aes)) +
       add_type +
       facet_wrap(vars(.data$equation), !!!args_facet) +
-      labs() +
-      define_scales(args_aes)
+      define_scales(args_aes) +
+      labs(!!!args_labs)
   )
 }
 

@@ -11,7 +11,9 @@ ggvar_select(
   type = "const",
   criteria = c("AIC", "HQ", "SC", "FPE"),
   trans = "none",
+  args_aes = list(),
   args_line = list(),
+  args_labs = list(),
   ...
 )
 }
@@ -35,9 +37,9 @@ be a function, "none" (the default), or "index" to create index numbers.}
 
 \item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line} (respectively). See more in the 'Customization' section.}
 
-\item{...}{Arguments passed to methods, see the 'Methods' section.}
-
 \item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
+
+\item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot}.
@@ -50,7 +52,10 @@ Plots the result of a call to \link[vars:VARselect]{VARselect}.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
+The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} \
+elements, where '*' represents the name of an aesthetic to apply to the \
+data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available \
+aesthetics.
 
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 

@@ -2,7 +2,7 @@ utils::globalVariables(".") # Remove CRAN note towards the magrittr dot
 
 
 # Color Helpers:
-color_supported <- list(
+supported_palettes <- list(
   base = c(
     "rainbow", "heat.colors", "terrain.colors",
     "topo.colors", "cm.colors"

@@ -10,14 +10,14 @@ select_helpers$format <- function(x, criteria, trans) {
     tibble::as_tibble() %>%
     dplyr::select(dplyr::any_of(criteria)) %>%
     dplyr::mutate(lag = 1:nrow(.)) %>%
-    tidyr::pivot_longer(-"lag")
+    tidyr::pivot_longer(-"lag", names_to = "criteria")
 }
 
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 select_test <- function(
-    series, lag.max, type, criteria, trans, env = caller_env()) {
+    series, lag.max, type, criteria, trans, env) {
   test$type(series, c("NULL", "character"), env)
   test$interval(lag.max, 1, Inf, env = env)
   test$category(type, c("const", "trend", "both", "none"), env)
@@ -50,7 +50,7 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #' @eval roxy$dots()
 #'
 #' @details
-#' `r roxy$details_custom()`
+#' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$select`
 #' 
 #' @eval roxy$return_gg()
@@ -65,19 +65,33 @@ ggvar_select <- function(
     x, series = NULL,
     lag.max = 10, type = "const",
     criteria = c("AIC", "HQ", "SC", "FPE"), trans = "none",
+    args_aes = list(),
     args_line = list(),
+    args_labs = list(),
     ...) {
-  select_test(series, lag.max, type, criteria, trans)
+  # Test and setup:
+  env <- current_env()
 
-  setup <- select_setup(x, series, lag.max, type, criteria, trans, ...)
+  select_test(series, lag.max, type, criteria, trans, env = env)
+  setup <- select_setup(x, series, lag.max, type, criteria, trans, ..., env = env)
 
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = "Information Criteria for Each Lag", x = "Lag", y = "value"
+  ))
+
+  args_aes <- update_values(args_aes, "line", "Criteria", env = env) %>%
+    process_values(length(setup$series), env = env)
+
+  # Create additions:
+  add_aes <- define_aes(args_aes, .data$criteria)
+
+  # Graph:
   inject(
-    ggplot(setup$data, aes(.data$lag, .data$value, color = .data$name)) +
+    ggplot(setup$data, aes(.data$lag, .data$value, !!!add_aes)) +
       geom_line(!!!args_line) +
-      labs(
-        title = "Information Criteria for Each Lag", color = "Criteria",
-        x = "Lag", y = "value"
-      )
+      define_scales(args_aes) +
+      labs(!!!args_labs)
   )
 }
 
@@ -85,9 +99,11 @@ ggvar_select <- function(
 # Setup methods:
 #' @noRd 
 select_setup.list <- function(x, series, lag.max, type, criteria, trans, ...) {
+  series <- series %||% rownames(x$criteria)
+
   data <- select_helpers$format(x, criteria, trans)
 
-  list(data = data)
+  list(data = data, series = series)
 }
 
 #' @noRd 
@@ -101,5 +117,5 @@ select_setup.default <- function(x, series, lag.max, type, criteria, trans,
 
   data <- select_helpers$format(x, criteria, trans)
 
-  list(data = data)
+  list(data = data, series = series)
 }

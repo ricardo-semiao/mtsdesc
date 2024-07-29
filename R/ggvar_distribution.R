@@ -24,7 +24,7 @@ distribution_helpers$format_dens <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-distribution_test <- function(series, plot_normal, env = caller_env()) {
+distribution_test <- function(series, plot_normal, env) {
   test$type(series, c("NULL", "character"), env = env)
   test$type(plot_normal, c("TRUE", "FALSE"), env = env)
 }
@@ -71,24 +71,20 @@ ggvar_distribution <- function(
     args_facet = list(),
     ...) {
   # Test and setup:
-  distribution_test(series, plot_normal)
+  env <- current_env()
 
-  setup <- distribution_setup(x, series, plot_normal, ...)
+  distribution_test(series, plot_normal, env = env)
+  setup <- distribution_setup(x, series, plot_normal, ..., env = env)
 
-
-  # Update arguments and create additions:
+  # Update arguments:
   args_labs <- update_labs(args_labs, list(
     title = setup$title, x = "Values", y = "Density"
   ))
 
-  add_type <- inject(list(
-    if (plot_normal) {
-      geom_line(aes(y = .data$density),
-        !!!args_line, data = setup$data_dens
-      )
-    }
-  ))
-
+  # Create additions:
+  add_extra <- inject(if (plot_normal) {
+    list(geom_line(aes(y = .data$density), setup$data_dens, !!!args_line))
+  })
 
   # Graph:
   inject(
@@ -96,7 +92,7 @@ ggvar_distribution <- function(
       geom_histogram(aes(y = ggplot2::after_stat(.data$density)),
         !!!args_histogram
       ) +
-      add_type +
+      add_extra +
       facet_wrap(vars(.data$serie), !!!args_facet) +
       labs(!!!args_labs)
   )

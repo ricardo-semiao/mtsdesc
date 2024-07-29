@@ -20,7 +20,7 @@ dispersion_helpers$format <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-dispersion_test <- function(series, env = caller_env()) {
+dispersion_test <- function(series, env) {
   test$type(series, c("NULL", "character"), env = env)
 }
 
@@ -62,16 +62,15 @@ ggvar_dispersion <- function(
     args_facet = list(),
     ...) {
   # Test and setup:
-  dispersion_test(series)
+  env <- current_env()
 
-  setup <- dispersion_setup(x, series, ...)
+  dispersion_test(series, env = env)
+  setup <- dispersion_setup(x, series, ..., env = env)
 
-
-  # Update arguments and create additions:
+  # Update arguments:
   args_labs <- update_labs(args_labs, list(
     title = "VAR Residuals Dispersion", x = "Fitted", y = "Residuals"
   ))
-
 
   # Graphs:
   inject(

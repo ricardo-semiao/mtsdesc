@@ -10,6 +10,7 @@ ggvar_stability(
   ci = 0.95,
   args_line = list(),
   args_hline = list(linetype = 2, color = "blue"),
+  args_labs = list(),
   args_facet = list(),
   ...
 )
@@ -24,11 +25,11 @@ directly, a "varstabil" object.}
 
 \item{args_line, args_hline, facet_wrap}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}, \link[ggplot2:geom_abline]{geom_hline}, and \link[ggplot2:facet_wrap]{facet_wrap} (respectively). See more in the 'Customization' section.}
 
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
+
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
-
-\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot}.
@@ -41,8 +42,6 @@ are calculated using \link[strucchange:boundary]{boundary}.
 \subsection{Customization}{
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
-
-The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
 
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 

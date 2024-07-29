@@ -10,8 +10,10 @@ ggvar_predict(
   index_ahead,
   index_behind = NULL,
   ci = 0.95,
+  args_aes = list(),
   args_line = list(),
   args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
+  args_labs = list(),
   args_facet = list(),
   ...
 )
@@ -31,7 +33,13 @@ horizon. Leave as \code{NULL} to only plot predicted values.}
 
 \item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Used in \link[stats:predict]{predict}.}
 
-\item{args_line, args_ribbon, facet_wrap}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}, \link[ggplot2:geom_ribbon]{geom_ribbon}, and \link[ggplot2:facet_wrap]{facet_wrap} (respectively). See more in the 'Customization' section.}
+\item{args_aes}{Defines aesthetics to differentiate the data. A named list of aesthetics names (\code{*}) -- arguments passed to \verb{ggplot2::scale_*_manual}. See more in the 'Customization' section.}
+
+\item{args_line, args_ribbon}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line} and \link[ggplot2:geom_ribbon]{geom_ribbon} (respectively). See more in the 'Customization' section.}
+
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
+
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
@@ -47,7 +55,10 @@ values of the past.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
+The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} \
+elements, where '*' represents the name of an aesthetic to apply to the \
+data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available \
+aesthetics.
 
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 

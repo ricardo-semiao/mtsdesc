@@ -20,7 +20,7 @@ stability_helpers$dist <- function(x, ci, ...) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-stability_test <- function(series, ci, env = caller_env()) {
+stability_test <- function(series, ci, env) {
   test$type(series, c("NULL", "character"), env)
   test$interval(ci, 0, 1, FALSE, env)
 }
@@ -40,8 +40,8 @@ stability_setup <- function(x, series, ci, ...) {
 #' @eval roxy$series()
 #' @eval roxy$ci("strucchange::boundary")
 #' @eval roxy$args_geom(c("geom_line", "geom_hline", "facet_wrap"))
-#' @eval roxy$args_facet()
 #' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
@@ -61,28 +61,32 @@ ggvar_stability <- function(
     ci = 0.95,
     args_line = list(),
     args_hline = list(linetype = 2, color = "blue"),
+    args_labs = list(),
     args_facet = list(),
     ...) {
-  stability_test(series, ci)
+  # Test and setup:
+  env <- current_env()
 
-  setup <- stability_setup(x, series, ci, ...)
+  stability_test(series, ci, env = env)
+  setup <- stability_setup(x, series, ci, ..., env = env)
 
-  graph_add <- inject(list(
-    if (!is_false(ci)) {
-      geom_hline(yintercept = c(-setup$dist, setup$dist),
-        !!!args_hline
-      )
-    }
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = "VAR Structural Stability Analisys", x = "Index", y = "Values"
   ))
 
+  # Create additions:
+  add_extra <- inject(if (!is_false(ci)) {
+    list(geom_hline(yintercept = c(-setup$dist, setup$dist), !!!args_hline))
+  })
+
+  # Graph:
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
     geom_line(!!!args_line) +
-    graph_add +
+    add_extra +
     facet_wrap(vars(.data$equation), !!!args_facet) +
-    labs(
-      title = "VAR Structural Stability Analisys", x = "Index", y = "Values"
-    )
+    labs(!!!args_labs)
   )
 }
 

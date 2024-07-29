@@ -28,7 +28,7 @@ acf_helpers$title_base <- function(type) {
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 acf_test <- function(
-    series, lag.max, type, graph_type, ci, env = caller_env()) {
+    series, lag.max, type, graph_type, ci, env) {
   test$type(series, c("NULL", "character"), env = env)
   test$interval(lag.max, 1, Inf, NULL, env = env)
   test$category(type, c("correlation", "covariance", "partial"), env = env)
@@ -37,7 +37,7 @@ acf_test <- function(
 }
 
 #'@noRd
-acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
+acf_setup <- function(x, series, lag.max, type, ..., env) {
   UseMethod("acf_setup")
 }
 
@@ -90,16 +90,17 @@ ggvar_acf <- function(
     ci = 0.95,
     ...) {
   # Test and setup:
-  acf_test(series, lag.max, type, graph_type, ci)
+  env <- current_env()
 
-  setup <- acf_setup(x, series, lag.max, type, ...)
+  acf_test(series, lag.max, type, graph_type, ci, env = env)
+  setup <- acf_setup(x, series, lag.max, type, ..., env = env)
 
-
-  # Update arguments and create additions:
+  # Update arguments:
   args_labs <- update_labs(args_labs, list(
     title = setup$title, x = "Lags", y = "Values"
   ))
 
+  # Create additions:
   add_type <- inject(switch(graph_type,
     "segment" = list(
       geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
@@ -109,13 +110,10 @@ ggvar_acf <- function(
     )
   ))
 
-  add_ribbon <- inject(list(
-    if (!is_false(ci)) {
-      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
-      geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
-    }
-  ))
-
+  add_ribbon <- inject(if (!is_false(ci)) {
+    dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
+    list(geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon))
+  })
 
   # Graph:
   inject(
