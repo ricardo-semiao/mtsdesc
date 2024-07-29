@@ -71,12 +71,14 @@ ggvar_select <- function(
 
   setup <- select_setup(x, series, lag.max, type, criteria, trans, ...)
 
-  ggplot(setup$data, aes(.data$lag, .data$value, color = .data$name)) +
-    inject(ggplot2::geom_line(!!!args_line)) +
-    ggplot2::labs(
-      title = "Information Criteria for Each Lag", color = "Criteria",
-      x = "Lag", y = "value"
-    )
+  inject(
+    ggplot(setup$data, aes(.data$lag, .data$value, color = .data$name)) +
+      geom_line(!!!args_line) +
+      labs(
+        title = "Information Criteria for Each Lag", color = "Criteria",
+        x = "Lag", y = "value"
+      )
+  )
 }
 
 

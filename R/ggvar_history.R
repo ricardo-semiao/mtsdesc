@@ -90,9 +90,9 @@ ggvar_history <- function(
 
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
-      ggplot2::geom_line(add_aes, !!!args_line) +
+      geom_line(add_aes, !!!args_line) +
       add_facet +
-      ggplot2::labs(!!!args_labs)
+      labs(!!!args_labs)
   )
 }
 

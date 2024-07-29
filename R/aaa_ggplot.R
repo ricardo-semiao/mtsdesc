@@ -15,14 +15,14 @@ define_facet_grid <- function(facet_type, ..., env = caller_env()) {
   if (facet_type == "ggh4x") {
     ggh4x::facet_grid2(vars(.data$facet_x), vars(.data$facet_y), ...)
   } else if (facet_type == "ggplot") {
-    ggplot2::facet_grid(vars(.data$facet_x), vars(.data$facet_y), ...)
+    facet_grid(vars(.data$facet_x), vars(.data$facet_y), ...)
   }
 }
 
 define_facet_wrap <- function(faceted, ...) {
   inject(list(
     if (!is_false(faceted)) {
-      ggplot2::facet_wrap(vars(.data$serie), ...)
+      facet_wrap(vars(.data$serie), ...)
     }
   ))
 }

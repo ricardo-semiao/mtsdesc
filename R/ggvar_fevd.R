@@ -95,11 +95,11 @@ ggvar_fevd <- function(
 
   add_type <- inject(switch(graph_type,
     "bar" = list(
-      ggplot2::geom_bar(!!!args_type)
+      geom_bar(!!!args_type)
     ),
     "line" = list(
-      ggplot2::geom_line(!!!args_type),
-      ggplot2::geom_point(!!!args_type)
+      geom_line(!!!args_type),
+      geom_point(!!!args_type)
     )
   ))
 
@@ -110,8 +110,8 @@ ggvar_fevd <- function(
   inject(
     ggplot(setup$data, aes(.data$lead, .data$value, !!!add_aes)) +
       add_type +
-      ggplot2::facet_wrap(vars(.data$equation), !!!args_facet) +
-      ggplot2::labs() +
+      facet_wrap(vars(.data$equation), !!!args_facet) +
+      labs() +
       define_scales(args_aes)
   )
 }

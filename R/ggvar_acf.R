@@ -102,17 +102,17 @@ ggvar_acf <- function(
 
   add_type <- inject(switch(graph_type,
     "segment" = list(
-      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
+      geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
     ),
     "area" = list(
-      ggplot2::geom_area(aes(y = .data$value), !!!args_type)
+      geom_area(aes(y = .data$value), !!!args_type)
     )
   ))
 
   add_ribbon <- inject(list(
     if (!is_false(ci)) {
       dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
-      ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
+      geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
     }
   ))
 
@@ -122,9 +122,9 @@ ggvar_acf <- function(
     ggplot(setup$data, aes(.data$lag, .data$value)) +
       add_type +
       add_ribbon +
-      ggplot2::geom_hline(!!!args_hline) +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(!!!args_labs)
+      geom_hline(!!!args_hline) +
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 

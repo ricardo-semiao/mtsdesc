@@ -92,7 +92,7 @@ ggvar_irf <- function(
 
   graph_add <- inject(list(
     if (!is_false(ci)) {
-      ggplot2::geom_ribbon(aes(ymin = .data$Lower, ymax = .data$Upper),
+      geom_ribbon(aes(ymin = .data$Lower, ymax = .data$Upper),
         !!!args_ribbon
       )
     },
@@ -102,10 +102,10 @@ ggvar_irf <- function(
   inject(
     ggplot(setup$data, aes(.data$lead, .data$irf)) +
     graph_add +
-    ggplot2::geom_line(!!!args_line) +
-    ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
+    geom_line(!!!args_line) +
+    geom_hline(yintercept = 0, !!!args_hline) +
     create_sec_axis() +
-    ggplot2::labs(
+    labs(
       title = "VAR Impulse Response Functions",
       x = "Forecast horizon", y = "Effect"
     )

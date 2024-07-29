@@ -69,7 +69,7 @@ ggvar_stability <- function(
 
   graph_add <- inject(list(
     if (!is_false(ci)) {
-      ggplot2::geom_hline(yintercept = c(-setup$dist, setup$dist),
+      geom_hline(yintercept = c(-setup$dist, setup$dist),
         !!!args_hline
       )
     }
@@ -77,10 +77,10 @@ ggvar_stability <- function(
 
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
-    ggplot2::geom_line(!!!args_line) +
+    geom_line(!!!args_line) +
     graph_add +
-    ggplot2::facet_wrap(vars(.data$equation), !!!args_facet) +
-    ggplot2::labs(
+    facet_wrap(vars(.data$equation), !!!args_facet) +
+    labs(
       title = "VAR Structural Stability Analisys", x = "Index", y = "Values"
     )
   )

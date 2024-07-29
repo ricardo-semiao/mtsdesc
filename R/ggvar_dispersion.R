@@ -76,10 +76,10 @@ ggvar_dispersion <- function(
   # Graphs:
   inject(
     ggplot(setup$data, aes(.data$fitted, .data$residual)) +
-      ggplot2::geom_point(!!!args_point) +
-      ggplot2::geom_hline(!!!args_hline) +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(!!!args_labs)
+      geom_point(!!!args_point) +
+      geom_hline(!!!args_hline) +
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 

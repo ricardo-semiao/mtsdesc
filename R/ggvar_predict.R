@@ -84,7 +84,7 @@ ggvar_predict <- function(
 
   graph_add <- inject(list(
     if (!is_false(ci)) {
-      ggplot2::geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper),
+      geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper),
         !!!args_ribbon
       )
     }
@@ -93,9 +93,9 @@ ggvar_predict <- function(
   inject(
     ggplot(setup$data, aes(.data$index, .data$fcst)) +
       graph_add +
-      ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(
+      geom_line(aes(linetype = .data$type), !!!args_line) +
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(
         title = "VAR Predicted Values", x = "Index",
         y = "Values", linetypes = "Type"
       )

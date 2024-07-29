@@ -83,7 +83,7 @@ ggvar_distribution <- function(
 
   add_type <- inject(list(
     if (plot_normal) {
-      ggplot2::geom_line(aes(y = .data$density),
+      geom_line(aes(y = .data$density),
         !!!args_line, data = setup$data_dens
       )
     }
@@ -93,12 +93,12 @@ ggvar_distribution <- function(
   # Graph:
   inject(
     ggplot(setup$data_hist, aes(x = .data$residual)) +
-      ggplot2::geom_histogram(aes(y = ggplot2::after_stat(.data$density)),
+      geom_histogram(aes(y = ggplot2::after_stat(.data$density)),
         !!!args_histogram
       ) +
       add_type +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(!!!args_labs)
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 
