@@ -3,7 +3,10 @@ define_facet_grid <- function(facet_type, ..., env = caller_env()) {
   if (facet_type == "ggh4x") {
     tryCatch(check_installed("ggh4x"),
       error = function(e) {
-        cli::cli_warn("Coercing `facet` to `'ggplot'`.", call = env)
+        cli_warn(
+          "Coercing `facet` to `'ggplot'`.",
+          call = env
+        )
         facet_type <- "ggplot"
       }
     )
@@ -57,10 +60,13 @@ update_palette <- function(x, n, env = caller_env()) {
     supported <- color_supported[[pkg_pal[1]]]
 
     if (!pkg_pal[2] %in% supported) {
-      cli::cli_abort("
-      With package {.val {pkg_pal[1]}}, palette should be one of: \\
-      {.or {supported}}.
-      ", call = env)
+      cli_abort(
+        "
+        With package {.val {pkg_pal[1]}}, palette should be one of: \\
+        {.or {supported}}.
+        ",
+        call = env
+      )
     }
 
     if (pkg_pal[1] == "RColorBrewer") {
@@ -76,7 +82,10 @@ update_palette <- function(x, n, env = caller_env()) {
     return(colors)
   }
 
-  cli::cli_abort("Unrecognized {.val 'args_aes$colors'} argument", call = env)
+  cli_abort(
+    "Unrecognized {.val 'args_aes$colors'} argument",
+    call = env
+  )
 }
 
 

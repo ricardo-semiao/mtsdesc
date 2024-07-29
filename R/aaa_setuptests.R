@@ -9,7 +9,8 @@ test$type <- function(arg, types, env) {
     `!`()
 
   if (notpass) {
-    cli::cli_abort("{.var {arg_name}} is not one of {.or {types}}",
+    cli_abort(
+      "{.var {arg_name}} is not one of {.or {types}}",
       call = env
     )
   }
@@ -20,10 +21,16 @@ test$index <- function(index, n, required = NULL, env) {
   required <- required %||% deparse(rlang::enexpr(n))
 
   if (anyDuplicated(index)) {
-    cli::cli_abort("{.var index} musn't have duplicated entries.", call = env)
+    cli_abort(
+      "{.var index} musn't have duplicated entries.",
+      call = env
+    )
   }
   if (length(index) != n) {
-    cli::cli_abort("{.var index} must have a length of {required}.", call = env)
+    cli_abort(
+      "{.var index} must have a length of {required}.",
+      call = env
+    )
   }
 }
 
@@ -31,7 +38,8 @@ test$category <- function(arg, options, env) {
   arg_name <- rlang::ensym(arg)
 
   if (!all(arg %in% options)) {
-    cli::cli_abort("{.var {arg_name}} must contain only {.or {options}}",
+    cli_abort(
+      "{.var {arg_name}} must contain only {.or {options}}",
       call = env
     )
   }
@@ -50,7 +58,7 @@ test$interval <- function(arg, lower, upper, alt = ".no_alt", env) {
   }
 
   if (notpass) {
-    cli::cli_abort(
+    cli_abort(
       "
       {.var {arg_name}} must be {text_alt}numeric and '{lower} < {arg_name} \\
       < {upper}'.

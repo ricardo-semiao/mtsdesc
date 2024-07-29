@@ -68,7 +68,7 @@ ggvar_history <- function(
   setup <- history_setup(x, series, index, ...)
 
   if (is_false(faceted) && is_null(args_aes$color)) {
-    cli::cli_warn("
+    cli_warn("
     {.code faceted = FALSE}, changing and {.code args_aes$color} from \\
     {.val NULL} to {.val 'ggplot'}.
     ", call = env)
