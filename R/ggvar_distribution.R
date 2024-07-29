@@ -52,9 +52,9 @@ distribution_setup <- function(x, series, plot_normal, ...) {
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$distribution`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_diag()
 #' @eval roxy$fam_ts()
 #'
@@ -89,9 +89,7 @@ ggvar_distribution <- function(
   # Graph:
   inject(
     ggplot(setup$data_hist, aes(x = .data$residual)) +
-      geom_histogram(aes(y = ggplot2::after_stat(.data$density)),
-        !!!args_histogram
-      ) +
+      geom_histogram(aes(y = after_stat(.data$density)), !!!args_histogram) +
       add_extra +
       facet_wrap(vars(.data$serie), !!!args_facet) +
       labs(!!!args_labs)

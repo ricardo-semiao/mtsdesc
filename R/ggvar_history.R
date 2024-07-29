@@ -45,7 +45,7 @@ history_setup <- function(x, series, index, faceted, ..., env) {
 #' `r roxy$details_methods()$history`
 #'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_ts()
 #' @eval roxy$fam_hist()
 #' @eval roxy$fam_diag()
@@ -86,7 +86,9 @@ ggvar_history <- function(
   inject(
     ggplot(setup$data, aes(.data$index, .data$value, !!!add_aes)) +
       geom_line(!!!args_line) +
-      {if (faceted) facet_wrap(vars(.data$serie), !!!args_facet)} +
+      {
+        if (faceted) facet_wrap(vars(.data$serie), !!!args_facet)
+      } +
       define_scales(args_aes) +
       labs(!!!args_labs)
   )

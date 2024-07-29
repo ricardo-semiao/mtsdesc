@@ -31,7 +31,7 @@ gg_info_helpers$get_funnames <- function(layers) {
 #'
 #' @examples
 #' g <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, hp)) +
-#'    ggplot2::geom_point(ggplot2::aes(color = gear))
+#'   ggplot2::geom_point(ggplot2::aes(color = gear))
 #' find_gg_info(g)
 #'
 #' @export

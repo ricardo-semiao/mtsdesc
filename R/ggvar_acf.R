@@ -36,7 +36,7 @@ acf_test <- function(
   test$interval(ci, 0, 1, FALSE, env = env)
 }
 
-#'@noRd
+#' @noRd
 acf_setup <- function(x, series, lag.max, type, ..., env) {
   UseMethod("acf_setup")
 }
@@ -66,9 +66,9 @@ acf_setup <- function(x, series, lag.max, type, ..., env) {
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$acf`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_ts()
 #' @eval roxy$fam_diag()
 #'

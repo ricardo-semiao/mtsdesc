@@ -4,9 +4,9 @@ dispersion_helpers <- list()
 dispersion_helpers$format <- function(x, series) {
   res_and_fit <- dplyr::bind_cols(
     tibble::as_tibble(stats::residuals(x)) %>%
-      dplyr::rename_with(~glue("residual__{.x}")),
+      dplyr::rename_with(~ glue("residual__{.x}")),
     tibble::as_tibble(stats::fitted(x)) %>%
-      dplyr::rename_with(~glue("fitted__{.x}"))
+      dplyr::rename_with(~ glue("fitted__{.x}"))
   )
 
   res_and_fit %>%
@@ -24,7 +24,7 @@ dispersion_test <- function(series, env) {
   test$type(series, c("NULL", "character"), env = env)
 }
 
-#' @noRd 
+#' @noRd
 dispersion_setup <- function(x, series, ...) {
   UseMethod("dispersion_setup")
 }
@@ -45,9 +45,9 @@ dispersion_setup <- function(x, series, ...) {
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$dispersion`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_diag()
 #'
 #' @examples
@@ -84,7 +84,7 @@ ggvar_dispersion <- function(
 
 
 # Setup methods:
-#' @noRd 
+#' @noRd
 dispersion_setup.varest <- function(x, series, ...) {
   series <- series %||% names(x$varresult)
 

@@ -5,9 +5,9 @@ irf_helpers$format <- function(x, ci) {
   x %>%
     `[`(if (!is_false(ci)) 1:3 else 1) %>%
     purrr::imap_dfr(function(irf_item, item_name) {
-      data.frame( #change to tibble
+      data.frame(
         serie = item_name,
-        purrr::imap_dfr(irf_item, ~ data.frame( #change to tibble
+        purrr::imap_dfr(irf_item, ~ data.frame(
           facet_x = .y, lead = seq_len(nrow(.x)), .x
         ))
       )
@@ -21,9 +21,9 @@ irf_helpers$format <- function(x, ci) {
 irf_helpers$pluck_irf <- function(x, at) {
   at_cur <- at[[1]]
   if (length(at) == 1) {
-    as.matrix(x[,at_cur]) %>% `colnames<-`(at_cur)
+    as.matrix(x[, at_cur]) %>% `colnames<-`(at_cur)
   } else {
-    purrr::map(x[at_cur], ~pluck_irf(.x, at[-1]))
+    purrr::map(x[at_cur], ~ pluck_irf(.x, at[-1]))
   }
 }
 
@@ -68,9 +68,9 @@ irf_setup <- function(
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$irf`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_output()
 #'
 #' @examples
@@ -111,12 +111,12 @@ ggvar_irf <- function(
   # Graph:
   inject(
     ggplot(setup$data, aes(.data$lead, .data$irf)) +
-    add_ribbon +
-    geom_line(!!!args_line) +
-    geom_hline(!!!args_hline) +
-    add_facet +
-    define_sec_axis("Impulse", "Response") +
-    labs(!!!args_labs)
+      add_ribbon +
+      geom_line(!!!args_line) +
+      geom_hline(!!!args_hline) +
+      add_facet +
+      define_sec_axis("Impulse", "Response") +
+      labs(!!!args_labs)
   )
 }
 
@@ -127,7 +127,7 @@ irf_setup.varest <- function(
     x, series_imp, series_resp, n.ahead, ci, ..., env) {
   series_imp <- get_series(series_imp, names(x$varresult), env)
   series_resp <- get_series(series_resp, names(x$varresult), env)
-  
+
   x <- vars::irf(x, series_imp, series_resp, n.ahead,
     boot = !is_false(ci), ci = ci, ...
   )

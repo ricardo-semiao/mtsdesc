@@ -119,7 +119,6 @@ roxy$unused <- function(class) {
 # Other documentations
 roxy$return_gg <- function() {
   glue("@return A [ggplot][ggplot2::ggplot].")
-
 }
 
 roxy$details_custom <- function(has_args_aes = FALSE) {
@@ -178,7 +177,7 @@ roxy$details_methods <- function() {
     history = c("varest" = "none", "default" = "none"),
     predict = c("varest" = "vars::predict.varest")
   ) %>%
-    purrr::imap(~get_text(
+    purrr::imap(~ get_text(
       `if`(.y == "acf", c("acf", "ccf"), .y),
       names(.x),
       .x

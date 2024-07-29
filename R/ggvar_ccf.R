@@ -37,16 +37,16 @@ ccf_test <- function(
   test$interval(ci, 0, 1, FALSE, env = env)
 }
 
-#'@noRd
+#' @noRd
 ccf_setup <- function(x, series, lag.max, type, ci, ...) {
   UseMethod("ccf_setup")
 }
 
 
 #' @rdname ggvar_acf
-#' 
+#'
 #' @eval roxy$facet_type()
-#' 
+#'
 #' @export
 ggvar_ccf <- function(
     x, series = NULL,

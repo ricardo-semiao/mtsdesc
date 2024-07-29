@@ -13,8 +13,8 @@ define_facet_grid <- function(facet_type, args_facet, env) {
   }
 
   inject(if (facet_type == "ggh4x") {
-    list(ggh4x::facet_grid2(vars(.data$facet_x), vars(.data$facet_y),
-      !!!args_facet
+    list(ggh4x::facet_grid2(
+      vars(.data$facet_x), vars(.data$facet_y), !!!args_facet
     ))
   } else if (facet_type == "ggplot") {
     list(facet_grid(vars(.data$facet_x), vars(.data$facet_y), !!!args_facet))
@@ -24,11 +24,11 @@ define_facet_grid <- function(facet_type, args_facet, env) {
 
 # Define aesthetics:
 define_aes <- function(args_aes, mapto) {
-  purrr::map(args_aes, ~enexpr(mapto))
+  purrr::map(args_aes, ~ enexpr(mapto))
 }
 
 define_scales <- function(args_aes) {
-  purrr::imap(args_aes, ~do_call(glue("ggplot2::scale_{.y}_manual"), .x))
+  purrr::imap(args_aes, ~ do_call(glue("ggplot2::scale_{.y}_manual"), .x))
 }
 
 
@@ -51,7 +51,7 @@ define_sec_axis <- function(x_lab, y_lab) {
 
 # Updating labs and palette:
 update_labs <- function(args_labs, new_labs) {
-  args_labs[names(new_labs)] <- purrr::imap(new_labs, ~args_labs[[.y]] %||% .x)
+  args_labs[names(new_labs)] <- purrr::imap(new_labs, ~ args_labs[[.y]] %||% .x)
 }
 
 update_values <- function(args_aes, graph_type, name, env) {
@@ -62,7 +62,7 @@ update_values <- function(args_aes, graph_type, name, env) {
     segment = c("color", "linetype", "linewidth", "alpha")
   )[[graph_type]]
 
-  if (purrr::none(args_aes, ~"values" %in% names(.x))) {
+  if (purrr::none(args_aes, ~ "values" %in% names(.x))) {
     cli_warn(
       "
       Some aesthetic must have its 'values' defined in {.var args_aes}. \\
@@ -71,7 +71,7 @@ update_values <- function(args_aes, graph_type, name, env) {
       call = env
     )
     args_aes[[suggested_aes[1]]]$values <- "ggplot"
-  } else if (purrr::none(args_aes, ~"values" %in% suggested_aes)) {
+  } else if (purrr::none(args_aes, ~ "values" %in% suggested_aes)) {
     cli_warn(
       "
       This type of graph works best with the aesthetics {.or suggested_aes}, \\

@@ -64,9 +64,9 @@ predict_setup <- function(
 #' @details
 #' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$predict`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_hist()
 #'
 #' @examples
@@ -98,7 +98,7 @@ ggvar_predict <- function(
     process_values(2, env = env)
 
   # Create additions:
-  add_ribbon <- inject( if (!is_false(ci)) {
+  add_ribbon <- inject(if (!is_false(ci)) {
     list(
       geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper), !!!args_ribbon)
     )

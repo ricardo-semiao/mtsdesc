@@ -7,6 +7,7 @@
 #' @importFrom cli cli_inform
 #' @importFrom cli cli_warn
 #' @importFrom ggplot2 aes
+#' @importFrom ggplot2 after_stat
 #' @importFrom ggplot2 facet_grid
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom ggplot2 geom_area

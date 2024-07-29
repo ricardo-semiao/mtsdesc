@@ -4,10 +4,10 @@ fit_helpers <- list()
 fit_helpers$format <- function(x, series, index) {
   orig_and_fit <- dplyr::bind_cols(
     tibble::tibble(index = index),
-    tibble::as_tibble( x$datamat[1:x$K]) %>%
-      dplyr::rename_with(~glue("original__{.x}")),
+    tibble::as_tibble(x$datamat[1:x$K]) %>%
+      dplyr::rename_with(~ glue("original__{.x}")),
     tibble::as_tibble(stats::fitted(x)) %>%
-      dplyr::rename_with(~glue("fitted__{.x}"))
+      dplyr::rename_with(~ glue("fitted__{.x}"))
   )
 
   orig_and_fit %>%
@@ -49,9 +49,9 @@ fit_setup <- function(x, series, index, ..., env) {
 #' @details
 #' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$fit`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_hist()
 #'
 #' @examples
@@ -91,7 +91,6 @@ ggvar_fit <- function(
       define_scales(args_aes) +
       labs(!!!args_labs)
   )
-
 }
 
 

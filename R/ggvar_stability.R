@@ -47,9 +47,9 @@ stability_setup <- function(x, series, ci, ...) {
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$stability`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_diag()
 #'
 #' @examples
@@ -83,10 +83,10 @@ ggvar_stability <- function(
   # Graph:
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
-    geom_line(!!!args_line) +
-    add_extra +
-    facet_wrap(vars(.data$equation), !!!args_facet) +
-    labs(!!!args_labs)
+      geom_line(!!!args_line) +
+      add_extra +
+      facet_wrap(vars(.data$equation), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 

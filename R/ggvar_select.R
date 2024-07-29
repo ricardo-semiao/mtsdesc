@@ -6,7 +6,7 @@ select_helpers$format <- function(x, criteria, trans) {
 
   x$criteria %>%
     t() %>%
-    apply(., 2, \(x) if (trans == "index") {x/x[1]} else {x}) %>%
+    apply(., 2, \(x) if (trans == "index") x / x[1] else x) %>%
     tibble::as_tibble() %>%
     dplyr::select(dplyr::any_of(criteria)) %>%
     dplyr::mutate(lag = 1:nrow(.)) %>%
@@ -52,9 +52,9 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #' @details
 #' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$select`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_diag()
 #'
 #' @examples
@@ -97,7 +97,7 @@ ggvar_select <- function(
 
 
 # Setup methods:
-#' @noRd 
+#' @noRd
 select_setup.list <- function(x, series, lag.max, type, criteria, trans, ...) {
   series <- series %||% rownames(x$criteria)
 
@@ -106,14 +106,14 @@ select_setup.list <- function(x, series, lag.max, type, criteria, trans, ...) {
   list(data = data, series = series)
 }
 
-#' @noRd 
-select_setup.default <- function(x, series, lag.max, type, criteria, trans,
-  ...) {
+#' @noRd
+select_setup.default <- function(
+    x, series, lag.max, type, criteria, trans, ...) {
   x <- as.data.frame(x)
 
   series <- series %||% colnames(x)
 
-  x <- vars::VARselect(x[,series], lag.max, type, ...)
+  x <- vars::VARselect(x[, series], lag.max, type, ...)
 
   data <- select_helpers$format(x, criteria, trans)
 

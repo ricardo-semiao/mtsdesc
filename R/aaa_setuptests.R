@@ -4,7 +4,7 @@ test$type <- function(arg, types, env) {
   arg_name <- rlang::ensym(arg)
 
   notpass <- tolower(types) %>%
-    purrr::map_lgl(~do.call(glue("is_{.x}"), list(arg))) %>%
+    purrr::map_lgl(~ do.call(glue("is_{.x}"), list(arg))) %>%
     any() %>%
     `!`()
 
