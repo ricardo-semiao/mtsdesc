@@ -29,13 +29,9 @@ prediction horizon.}
 to the original portion of the graph. Its length will define the 'past'
 horizon. Leave as \code{NULL} to only plot predicted values.}
 
-\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Passed to \link[stats:predict]{predict}.}
+\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Used in \link[stats:predict]{predict}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
-
-\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
-
-\item{args_facet}{Additional arguments passed to the faceting engine used.}
+\item{args_line, args_ribbon, facet_wrap}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}, \link[ggplot2:geom_ribbon]{geom_ribbon}, and \link[ggplot2:facet_wrap]{facet_wrap} (respectively). See more in the 'Customization' section.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
@@ -51,6 +47,8 @@ values of the past.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
+The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
+
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 
 See \link{vignette('customizing-graphs')} for more details.
@@ -58,7 +56,7 @@ See \link{vignette('customizing-graphs')} for more details.
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function varr:::predict_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to \link[vars:predict]{vars::predict.varest}.
 }

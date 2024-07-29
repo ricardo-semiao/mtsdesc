@@ -55,7 +55,7 @@ predict_setup <- function(
 #'  to the original portion of the graph. Its length will define the 'past'
 #'  horizon. Leave as `NULL` to only plot predicted values.
 #' @eval roxy$ci("stats::predict")
-#' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_line", "geom_ribbon", "facet_wrap"))
 #' @eval roxy$dots()
 #'
 #' @details

@@ -21,7 +21,7 @@ dispersion_helpers$format <- function(x, series) {
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
 dispersion_test <- function(series, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
+  test$type(series, c("NULL", "character"), env = env)
 }
 
 #' @noRd 
@@ -37,7 +37,9 @@ dispersion_setup <- function(x, series, ...) {
 #'
 #' @param x A "varest" object to get residuals and fitted values from.
 #' @eval roxy$series()
-#' @eval roxy$args_gg(c("geom_point", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_point", "geom_hline"))
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
@@ -55,21 +57,29 @@ dispersion_setup <- function(x, series, ...) {
 ggvar_dispersion <- function(
     x, series = NULL,
     args_point = list(),
-    args_hline = list(),
+    args_hline = list(yintercept = 0),
+    args_labs = list(),
     args_facet = list(),
     ...) {
+  # Test and setup:
   dispersion_test(series)
 
   setup <- dispersion_setup(x, series, ...)
 
+
+  # Update arguments and create additions:
+  args_labs <- update_labs(args_labs, list(
+    title = "VAR Residuals Dispersion", x = "Fitted", y = "Residuals"
+  ))
+
+
+  # Graphs:
   inject(
     ggplot(setup$data, aes(.data$fitted, .data$residual)) +
       ggplot2::geom_point(!!!args_point) +
-      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
+      ggplot2::geom_hline(!!!args_hline) +
       ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(
-        title = "VAR Residuals Dispersion", x = "Fitted", y = "Residuals"
-      )
+      ggplot2::labs(!!!args_labs)
   )
 }
 

@@ -39,7 +39,9 @@ stability_setup <- function(x, series, ci, ...) {
 #'  directly, a "varstabil" object.
 #' @eval roxy$series()
 #' @eval roxy$ci("strucchange::boundary")
-#' @eval roxy$args_gg(c("geom_line", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_line", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_facet()
+#' @eval roxy$args_labs()
 #' @eval roxy$dots()
 #'
 #' @details

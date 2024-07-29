@@ -40,7 +40,7 @@ fit_setup <- function(x, series, index, ..., env = caller_env()) {
 #' @param x A "varest" object to get fitted values from.
 #' @eval roxy$series()
 #' @eval roxy$index("x$obs")
-#' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_line", "facet_wrap"))
 #' @eval roxy$dots()
 #'
 #' @details

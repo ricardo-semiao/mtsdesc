@@ -2,6 +2,8 @@
 select_helpers <- list()
 
 select_helpers$format <- function(x, criteria, trans) {
+  criteria <- paste0(criteria, "(n)")
+
   x$criteria %>%
     t() %>%
     apply(., 2, \(x) if (trans == "index") {x/x[1]} else {x}) %>%
@@ -43,7 +45,8 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #'  and "FPE".
 #' @param trans A transformation to apply to each criteria result (vector). Can
 #'  be a function, "none" (the default), or "index" to create index numbers.
-#' @eval roxy$args_gg("geom_line")
+#' @eval roxy$args_geom("geom_line")
+#' @eval roxy$args_labs()
 #' @eval roxy$dots()
 #'
 #' @details
@@ -65,8 +68,6 @@ ggvar_select <- function(
     args_line = list(),
     ...) {
   select_test(series, lag.max, type, criteria, trans)
-
-  criteria <- paste0(criteria, "(n)")
 
   setup <- select_setup(x, series, lag.max, type, criteria, trans, ...)
 

@@ -4,7 +4,7 @@ test$type <- function(arg, types, env) {
   arg_name <- rlang::ensym(arg)
 
   notpass <- tolower(types) %>%
-    purrr::map_lgl(~get(glue("is_{.x}"))(arg)) %>%
+    purrr::map_lgl(~do.call(glue("is_{.x}"), list(arg))) %>%
     any() %>%
     `!`()
 
@@ -37,21 +37,24 @@ test$category <- function(arg, options, env) {
   }
 }
 
-test$interval <- function(arg, lower, upper, alt = NULL, env) {
+test$interval <- function(arg, lower, upper, alt = ".no_alt", env) {
   arg_name <- ensym(arg)
-  text_add <- ""
+  text_alt <- ""
 
   notpass <- !(is_integer(arg) || is_double(arg)) ||
     (arg < lower || upper < arg)
-  if (!is_null(alt)) {
+
+  if (!identical(alt, ".no_alt")) {
     notpass <- !identical(arg, alt) && notpass
-    text_add <- glue(", or equal `{alt}`")
+    text_alt <- glue("equal to `{alt}`, or ")
   }
 
   if (notpass) {
-    cli::cli_abort("
-    {.var {arg_name}} must be '{lower} < {arg_name} < {upper}'{text_add}.
-    ",
+    cli::cli_abort(
+      "
+      {.var {arg_name}} must be {text_alt}numeric and '{lower} < {arg_name} \\
+      < {upper}'.
+      ",
       call = env
     )
   }

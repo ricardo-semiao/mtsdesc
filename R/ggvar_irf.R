@@ -59,7 +59,9 @@ irf_setup <- function(
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
 #'  [irf][vars::irf]. `r roxy$unused("varirf")`
 #' @eval roxy$ci("vars::irf")
-#' @eval roxy$args_gg(c("geom_line", "geom_hline", "geom_ribbon", "facet_grid"))
+#' @eval roxy$args_geom(c("geom_line", "geom_hline", "geom_ribbon"))
+#' @eval roxy$args_facet()
+#' @eval roxy$args_labs()
 #' @eval roxy$facet_type()
 #' @eval roxy$dots()
 #'
@@ -94,7 +96,7 @@ ggvar_irf <- function(
         !!!args_ribbon
       )
     },
-    define_facet(facet_type, "effect_of", "effect_on", !!!args_facet)
+    define_facet_grid(facet_type, "effect_of", "effect_on", !!!args_facet)
   ))
 
   inject(

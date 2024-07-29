@@ -33,9 +33,11 @@ history_setup <- function(x, series, index, ...) {
 #'  (object coercible to data.frame) with numeric variables.
 #' @eval roxy$series()
 #' @eval roxy$index(c("x$obs", "nrow(x)"))
-#' @eval roxy$graph_type(c("faceted", "colored"), FALSE)
-#' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
-#' @eval roxy$colors()
+#' @eval roxy$faceted()
+#' @eval roxy$args_aes()
+#' @eval roxy$args_geom(c("geom_line", "facet_wrap"))
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
@@ -55,38 +57,42 @@ history_setup <- function(x, series, index, ...) {
 #' @export
 ggvar_history <- function(
     x, series = NULL, index = NULL,
-    graph_type = "faceted",
+    faceted = TRUE,
+    args_aes = list(),
     args_line = list(),
+    args_labs = list(),
     args_facet = list(),
-    colors = NULL,
     ...) {
   history_test(series, index, graph_type)
 
   setup <- history_setup(x, series, index, ...)
 
-  if (graph_type == "colored") {
-    colors <- get_colors(colors, length(setup$series))
+  if (is_false(faceted) && is_null(args_aes$color)) {
+    cli::cli_warn("
+    {.code faceted = FALSE}, changing and {.code args_aes$color} from \\
+    {.val NULL} to {.val 'ggplot'}.
+    ", call = env)
+    args_aes$color <- "ggplot"
   }
 
-  graph_add <- inject(list(
-    if (graph_type == "faceted") {
-      list(
-        ggplot2::geom_line(!!!args_line),
-        ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)
-      )
-    } else if (graph_type == "colored") {
-      list(
-        ggplot2::geom_line(aes(color = .data$serie), !!!args_line),
-        ggplot2::scale_color_manual(values = colors)
-      )
-    }
-  )) %>%
-  purrr::list_flatten()
+  for (i in c("color", "fill")) {
+    args_aes[[i]]$values <- update_palette(
+      args_aes[[i]]$values, length(setup$series)
+    )
+  }
+
+  args_labs <- update_labs(args_labs,
+    list(title = setup$title, x = "Index", y = "Values")
+  )
+
+  add_facet <- define_facet_wrap(faceted, !!!args_facet)
+  add_aes <- define_aes(.data$serie)
 
   inject(
     ggplot(setup$data, aes(.data$index, .data$value)) +
-      graph_add +
-      ggplot2::labs(title = setup$title, x = "Index", y = "Values")
+      ggplot2::geom_line(add_aes, !!!args_line) +
+      add_facet +
+      ggplot2::labs(!!!args_labs)
   )
 }
 
@@ -107,7 +113,7 @@ history_setup.varest <- function(x, series, index, ...) {
 
 #' @noRd
 history_setup.default <- function(x, series, index, ...) {
-  x <- as.data.frame(x) %>% ignore_cols()
+  x <- as.data.frame(x) %>% ignore_cols(env)
 
   series <- series %||% colnames(x)
   index <- index %||% seq_len(nrow(x))

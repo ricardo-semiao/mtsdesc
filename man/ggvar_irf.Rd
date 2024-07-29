@@ -31,19 +31,17 @@ responses. Defaults to all (\code{NULL}).}
 \item{n.ahead}{An integer. The size of the forecast horizon, passed to
 \link[vars:irf]{irf}. Unused if \code{x} is of class varirf.}
 
-\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Passed to \link[vars:irf]{irf}.}
+\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Used in \link[vars:irf]{irf}.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
-
-\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{geom_hline}.}
-
-\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
+\item{args_line, args_hline, args_ribbon}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}, \link[ggplot2:geom_abline]{geom_hline}, and \link[ggplot2:geom_ribbon]{geom_ribbon} (respectively). See more in the 'Customization' section.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
 \item{facet_type}{The facet 'engine' to be used. \code{'ggplot2'} for \link[ggplot2:facet_grid]{ggplot2::facet_grid}, \code{'ggh4x'} for \link[ggh4x:facet_grid2]{ggh4x::facet_grid2}.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
+
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot}.
@@ -56,6 +54,8 @@ Plots the result of a \link[vars:irf]{irf} call.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
+The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
+
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 
 See \link{vignette('customizing-graphs')} for more details.
@@ -63,7 +63,7 @@ See \link{vignette('customizing-graphs')} for more details.
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function varr:::irf_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to \link[vars:irf]{vars::irf}.
 \item Class \code{'varirf'}: passed to nothing.

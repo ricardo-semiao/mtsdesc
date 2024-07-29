@@ -18,11 +18,9 @@ ggvar_fit(
 
 \item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
-\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to \code{x$obs}. Defaults to a integer sequence.}
+\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to {texts_vec}. Defaults to a integer sequence.}
 
-\item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}.}
-
-\item{args_facet}{Additional arguments passed to the faceting engine used.}
+\item{args_line, facet_wrap}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line} and \link[ggplot2:facet_wrap]{facet_wrap} (respectively). See more in the 'Customization' section.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
@@ -38,6 +36,8 @@ plots all in the same graph, each with a different color.
 \subsection{Customization}{
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
+
+The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} elements, where '*' represents the name of an aesthetic to apply to the data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available aesthetics.
 
 After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
 
