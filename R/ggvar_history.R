@@ -11,10 +11,15 @@ history_helpers$format <- function(x, series, index) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-history_test <- function(series, index, faceted, env = env) {
-  test$type(series, c("NULL", "character"), env = env)
-  test$type(index, c("NULL", "integer", "double"), env = env)
-  test$category(faceted, c("TRUE", "FALSE"), env = env)
+history_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(index, c("NULL", "integer", "double"), env = env)
+    test$category(faceted, c("TRUE", "FALSE"), env = env)
+    test$args(
+      args_aes, args_line, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
@@ -35,7 +40,7 @@ history_setup <- function(x, series, index, faceted, ..., env) {
 #' @eval roxy$index(c("x$obs", "nrow(x)"))
 #' @eval roxy$faceted()
 #' @eval roxy$args_aes()
-#' @eval roxy$args_geom(c("geom_line", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_line"))
 #' @eval roxy$args_labs()
 #' @eval roxy$args_facet()
 #' @eval roxy$dots()
@@ -65,8 +70,7 @@ ggvar_history <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  history_test(series, index, faceted, env = env)
+  history_test(env)
   setup <- history_setup(x, series, index, faceted, ..., env = env)
 
   # Update arguments:
@@ -98,6 +102,8 @@ ggvar_history <- function(
 # Setup methods:
 #' @noRd
 history_setup.varest <- function(x, series, index, faceted, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
@@ -111,6 +117,8 @@ history_setup.varest <- function(x, series, index, faceted, ..., env) {
 
 #' @noRd
 history_setup.default <- function(x, series, index, faceted, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   x <- as.data.frame(x) %>% ignore_cols(env)
 
   series <- series %||% colnames(x)

@@ -35,6 +35,8 @@ and "FPE".}
 \item{trans}{A transformation to apply to each criteria result (vector). Can
 be a function, "none" (the default), or "index" to create index numbers.}
 
+\item{args_aes}{Defines aesthetics to differentiate the data. A named list of aesthetics names (\code{*}) -- arguments passed to \verb{ggplot2::scale_*_manual}. See more in the 'Customization' section.}
+
 \item{args_line}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line} (respectively). See more in the 'Customization' section.}
 
 \item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
@@ -54,12 +56,12 @@ The graph can be customized both with the 'static' arguments passed to each laye
 
 The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} \
 elements, where '*' represents the name of an aesthetic to apply to the \
-data. View \link{vignette('ggplot2-specs', 'ggplot2')} to see the available \
+data. View \code{vignette('ggplot2-specs', 'ggplot2')} to see the available \
 aesthetics.
 
-After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{get_gg_info}.
 
-See \link{vignette('customizing-graphs')} for more details.
+See \code{vignette('customizing-graphs')} for more details.
 }
 
 \subsection{Methods}{

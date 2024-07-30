@@ -2,7 +2,7 @@
 define_facet_grid <- function(facet_type, args_facet, env) {
   if (facet_type == "ggh4x") {
     tryCatch(check_installed("ggh4x"),
-      error = function(e) {
+      error = function(cnd) {
         cli_warn(
           "Coercing `facet` to `'ggplot'`.",
           call = env
@@ -17,7 +17,9 @@ define_facet_grid <- function(facet_type, args_facet, env) {
       vars(.data$facet_x), vars(.data$facet_y), !!!args_facet
     ))
   } else if (facet_type == "ggplot") {
-    list(facet_grid(vars(.data$facet_x), vars(.data$facet_y), !!!args_facet))
+    list(facet_grid(
+      vars(.data$facet_x), vars(.data$facet_y), !!!args_facet
+    ))
   })
 }
 
@@ -90,12 +92,14 @@ update_values <- function(args_aes, graph_type, name, env) {
 
 process_values <- function(args_aes, n, env) {
   for (i in c("color", "fill")) {
-    args_aes[[i]]$values <- get_palette(args_aes[[i]]$values, n, env)
+    args_aes[[i]]$values <- get_palette(args_aes, i, n, env)
   }
   args_aes
 }
 
-get_palette <- function(x, n, env) {
+get_palette <- function(args_aes, i, n, env) {
+  x <- args_aes[[i]]$values
+
   if (is_null(x)) {
     return(NULL)
   }
@@ -131,12 +135,12 @@ get_palette <- function(x, n, env) {
     return(values)
   }
 
-  if (is_bare_character(colors)) {
-    return(colors)
+  if (is_bare_character(x)) {
+    return(x)
   }
 
   cli_abort(
-    "Unrecognized {.val 'args_aes$colors'} argument",
+    "Unrecognized {.code args_aes${i}$values} argument.",
     call = env
   )
 }

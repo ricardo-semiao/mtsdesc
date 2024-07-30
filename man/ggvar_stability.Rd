@@ -23,7 +23,7 @@ directly, a "varstabil" object.}
 
 \item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Used in \link[strucchange:boundary]{boundary}.}
 
-\item{args_line, args_hline, facet_wrap}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line}, \link[ggplot2:geom_abline]{geom_hline}, and \link[ggplot2:facet_wrap]{facet_wrap} (respectively). See more in the 'Customization' section.}
+\item{args_line, args_hline}{Additional arguments passed to \link[ggplot2:geom_path]{geom_line} and \link[ggplot2:geom_abline]{geom_hline} (respectively). See more in the 'Customization' section.}
 
 \item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 
@@ -43,9 +43,9 @@ are calculated using \link[strucchange:boundary]{boundary}.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{get_gg_info}.
 
-See \link{vignette('customizing-graphs')} for more details.
+See \code{vignette('customizing-graphs')} for more details.
 }
 
 \subsection{Methods}{

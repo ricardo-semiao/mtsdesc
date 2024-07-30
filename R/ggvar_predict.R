@@ -26,17 +26,20 @@ predict_helpers$format <- function(x, series, index_ahead, index_behind, ci, ...
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-predict_test <- function(
-    series, index_ahead, index_behind, ci, env) {
-  test$type(series, c("NULL", "character"), env)
-  test$type(index_ahead, c("NULL", "integer", "double"), env)
-  test$type(index_behind, c("NULL", "integer", "double"), env)
-  test$interval(ci, 0, 1, FALSE, env)
+predict_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(index_ahead, c("NULL", "integer", "double"), env = env)
+    test$type(index_behind, c("NULL", "integer", "double"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_aes, args_line , args_ribbon, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
-predict_setup <- function(
-    x, series, index_ahead, index_behind, ci, ..., env) {
+predict_setup <- function(x, series, index_ahead, index_behind, ci, ..., env) {
   UseMethod("predict_setup")
 }
 
@@ -85,8 +88,7 @@ ggvar_predict <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  predict_test(series, index_ahead, index_behind, ci, env = env)
+  predict_test(env)
   setup <- predict_setup(x, series, index_ahead, index_behind, ci, ..., env = env)
 
   # Update arguments:

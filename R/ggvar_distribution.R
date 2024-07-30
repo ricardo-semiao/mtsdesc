@@ -24,13 +24,18 @@ distribution_helpers$format_dens <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-distribution_test <- function(series, plot_normal, env) {
-  test$type(series, c("NULL", "character"), env = env)
-  test$type(plot_normal, c("TRUE", "FALSE"), env = env)
+distribution_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(plot_normal, c("TRUE", "FALSE"), env = env)
+    test$args(
+      args_histogram, args_line, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
-distribution_setup <- function(x, series, plot_normal, ...) {
+distribution_setup <- function(x, series, ...) {
   UseMethod("distribution_setup")
 }
 
@@ -72,8 +77,7 @@ ggvar_distribution <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  distribution_test(series, plot_normal, env = env)
+  distribution_test(env)
   setup <- distribution_setup(x, series, plot_normal, ..., env = env)
 
   # Update arguments:
@@ -99,7 +103,9 @@ ggvar_distribution <- function(
 
 # Setup methods:
 #' @noRd
-distribution_setup.varest <- function(x, series, plot_normal, ...) {
+distribution_setup.varest <- function(x, series, plot_normal, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   x <- as.data.frame(stats::residuals(x))
 
   title <- "VAR Residuals Distribution"
@@ -112,7 +118,9 @@ distribution_setup.varest <- function(x, series, plot_normal, ...) {
 }
 
 #' @noRd
-distribution_setup.default <- function(x, series, plot_normal, ...) {
+distribution_setup.default <- function(x, series, plot_normal, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   x <- as.data.frame(x) %>% ignore_cols(env)
 
   title <- "Time Series Distribution"

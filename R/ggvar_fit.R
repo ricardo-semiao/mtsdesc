@@ -20,9 +20,14 @@ fit_helpers$format <- function(x, series, index) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-fit_test <- function(series, index, env) {
-  test$type(series, c("NULL", "character"), env = env)
-  test$type(index, c("NULL", "integer", "double"), env = env)
+fit_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(index, c("NULL", "integer", "double"), env = env)
+    test$args(
+      args_aes, args_line, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
@@ -68,8 +73,7 @@ ggvar_fit <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  fit_test(series, index, env = env)
+  fit_test(env)
   setup <- fit_setup(x, series, index, ..., env = env)
 
   # Update arguments:
@@ -97,6 +101,8 @@ ggvar_fit <- function(
 # Setup methods:
 #' @noRd
 fit_setup.varest <- function(x, series, index, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   series <- get_series(series, names(x$varresult), env)
   index <- index %||% (x$p + 1):x$totobs
 

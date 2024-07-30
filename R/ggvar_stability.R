@@ -20,9 +20,14 @@ stability_helpers$dist <- function(x, ci, ...) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-stability_test <- function(series, ci, env) {
-  test$type(series, c("NULL", "character"), env)
-  test$interval(ci, 0, 1, FALSE, env)
+stability_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_line, args_hline, args_labs, args_facet, env = env
+    )
+  })
 }
 
 stability_setup <- function(x, series, ci, ...) {
@@ -39,7 +44,7 @@ stability_setup <- function(x, series, ci, ...) {
 #'  directly, a "varstabil" object.
 #' @eval roxy$series()
 #' @eval roxy$ci("strucchange::boundary")
-#' @eval roxy$args_geom(c("geom_line", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_line", "geom_hline"))
 #' @eval roxy$args_labs()
 #' @eval roxy$args_facet()
 #' @eval roxy$dots()
@@ -66,8 +71,7 @@ ggvar_stability <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  stability_test(series, ci, env = env)
+  stability_test(env)
   setup <- stability_setup(x, series, ci, ..., env = env)
 
   # Update arguments:

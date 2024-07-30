@@ -16,10 +16,16 @@ fevd_helpers$format <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-fevd_test <- function(series, n.ahead, graph_type, env) {
-  test$type(series, c("NULL", "character"), env = env)
-  test$interval(n.ahead, 1, Inf, env = env)
-  test$category(graph_type, c("bar", "area", "line"), env = env)
+fevd_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$interval(n.ahead, 1, Inf, env = env)
+    test$category(graph_type, c("bar", "area", "line"), env = env)
+    test$args(
+      args_aes, args_type, args_labs, args_facet, env = env
+    )
+    test$unused(n.ahead, x, "varfevd")
+  })
 }
 
 #' @noRd
@@ -67,8 +73,7 @@ ggvar_fevd <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  fevd_test(series, n.ahead, graph_type, env = env)
+  fevd_test(env)
   setup <- fevd_setup(x, series, n.ahead, ..., env = env)
 
   # Update arguments:
@@ -116,6 +121,8 @@ fevd_setup.varest <- function(x, series, n.ahead, ...) {
 
 #' @noRd
 fevd_setup.varfevd <- function(x, series, n.ahead, ...) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   series <- series %||% names(x)
 
   data <- fevd_helpers$format(x, series)

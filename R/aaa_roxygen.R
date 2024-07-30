@@ -126,7 +126,7 @@ roxy$details_custom <- function(has_args_aes = FALSE) {
     "
     \n\nThe `args_aes` is a list with '* = arguments to `scale_*_manual` \\
     elements, where '*' represents the name of an aesthetic to apply to the \\
-    data. View [vignette('ggplot2-specs', 'ggplot2')] to see the available \\
+    data. View `vignette('ggplot2-specs', 'ggplot2')` to see the available \\
     aesthetics.
     "
   } else {
@@ -142,9 +142,9 @@ roxy$details_custom <- function(has_args_aes = FALSE) {
   After built, the result can be further customized as any ggplot, adding or \\
   overwriting layers with the [ggplot's +][ggplot2::+.gg]. It is useful to \\
   understand the data and the mappings coded by the package, using the \\
-  function [find_gg_info].
+  function [get_gg_info].
 
-  See [vignette('customizing-graphs')] for more details.
+  See `vignette('customizing-graphs')` for more details.
   ")
 }
 
@@ -171,11 +171,12 @@ roxy$details_methods <- function() {
     dispersion = c("default" = "none"),
     distribution = c("varest" = "none", "default" = "none"),
     fevd = c("varest" = "vars::fevd", "varfevd" = "none"),
-    stability = c("varest" = "vars::stability", "varstabil" = "none"),
-    select = c("list" = "none", "default" = "vars::VARselect"),
-    irf = c("varest" = "vars::irf", "varirf" = "none"),
+    fit = c("varest" = "none"),
     history = c("varest" = "none", "default" = "none"),
-    predict = c("varest" = "vars::predict.varest")
+    irf = c("varest" = "vars::irf", "varirf" = "none"),
+    predict = c("varest" = "vars::predict.varest"),
+    select = c("list" = "none", "default" = "vars::VARselect"),
+    stability = c("varest" = "vars::stability", "varstabil" = "none")
   ) %>%
     purrr::imap(~ get_text(
       `if`(.y == "acf", c("acf", "ccf"), .y),

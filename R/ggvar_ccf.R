@@ -27,14 +27,18 @@ ccf_helpers$title_base <- function(type) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-ccf_test <- function(
-    series, lag.max, type, graph_type, ci, facet_type, env) {
-  test$type(series, c("NULL", "character"), env = env)
-  test$category(type, c("correlation", "covariance"), env)
-  test$interval(lag.max, 1, Inf, NULL, env = env)
-  test$category(graph_type, c("segment", "area"), env = env)
-  test$category(facet_type, c("ggplot", "ggh4x"), env = env)
-  test$interval(ci, 0, 1, FALSE, env = env)
+ccf_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$category(type, c("correlation", "covariance"), env = env)
+    test$interval(lag.max, 1, Inf, NULL, env = env)
+    test$category(graph_type, c("segment", "area"), env = env)
+    test$category(facet_type, c("ggplot", "ggh4x"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_type, args_ribbon, args_hline, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
@@ -62,8 +66,7 @@ ggvar_ccf <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  ccf_test(series, lag.max, type, graph_type, ci, facet_type, env = env)
+  ccf_test(env)
   setup <- ccf_setup(x, series, lag.max, type, ci, ..., env = env)
 
   # Update arguments:

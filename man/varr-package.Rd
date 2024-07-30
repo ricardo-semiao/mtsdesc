@@ -4,9 +4,9 @@
 \name{varr-package}
 \alias{varr}
 \alias{varr-package}
-\title{varr: Utility Functions for VAR Analisys}
+\title{varr: Utility Functions for VAR Models}
 \description{
-Functions for commonly needed ggplot graphs for Vector Auto-Regressive models, like IRF's, FEVD's, predict graphs, and VAR residual analysis. Soon to contain functions for common tests and statistics, and other VAR-like objects.
+Utility functions for VAR models. Currently, ggplots for objects like like IRF's, FEVD's, predict graphs, and residual analysis. Soon to contain functions for common tests and statistics, support for other VAR-like objects, and unified builders for vector regression models.
 }
 \seealso{
 Useful links:

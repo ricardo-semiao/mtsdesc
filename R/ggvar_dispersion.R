@@ -20,8 +20,13 @@ dispersion_helpers$format <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-dispersion_test <- function(series, env) {
-  test$type(series, c("NULL", "character"), env = env)
+dispersion_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$args(
+      args_point, args_hline, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
@@ -63,8 +68,7 @@ ggvar_dispersion <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  dispersion_test(series, env = env)
+  dispersion_test(env)
   setup <- dispersion_setup(x, series, ..., env = env)
 
   # Update arguments:
@@ -85,7 +89,9 @@ ggvar_dispersion <- function(
 
 # Setup methods:
 #' @noRd
-dispersion_setup.varest <- function(x, series, ...) {
+dispersion_setup.varest <- function(x, series, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   series <- series %||% names(x$varresult)
 
   data <- dispersion_helpers$format(x, series)

@@ -1,14 +1,15 @@
 Type: Package
 Package: varr
-Title: Utility Functions for VAR Analisys
+Title: Utility Functions for VAR Models
 Version: 0.0.0.9000
 Authors@R: 
     person("Ricardo", "Semião", , "ricardo.semiao@outlook.com", role = c("aut", "cre"))
 Maintainer: Ricardo Semião e Castro <ricardo.semiao@outlook.com>
-Description: Functions for commonly needed ggplot graphs for Vector
-    Auto-Regressive models, like IRF's, FEVD's, predict graphs, and VAR
-    residual analysis. Soon to contain functions for common tests and
-    statistics, and other VAR-like objects.
+Description: Utility functions for VAR models. Currently, ggplots for 
+    objects like like IRF's, FEVD's, predict graphs, and residual 
+    analysis. Soon to contain functions for common tests and statistics,
+    support for other VAR-like objects, and unified builders for vector
+    regression models.
 License: MIT + file LICENSE
 URL: https://https://github.com/ricardo-semiao/varr,
     https://ricardo-semiao.github.io/varr/
@@ -38,6 +39,7 @@ VignetteBuilder:
     knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
+Language: en-US
 LazyData: true
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)

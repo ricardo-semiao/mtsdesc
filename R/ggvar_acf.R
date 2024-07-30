@@ -27,13 +27,17 @@ acf_helpers$title_base <- function(type) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-acf_test <- function(
-    series, lag.max, type, graph_type, ci, env) {
-  test$type(series, c("NULL", "character"), env = env)
-  test$interval(lag.max, 1, Inf, NULL, env = env)
-  test$category(type, c("correlation", "covariance", "partial"), env = env)
-  test$category(graph_type, c("segment", "area"), env = env)
-  test$interval(ci, 0, 1, FALSE, env = env)
+acf_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$interval(lag.max, 1, Inf, NULL, env = env)
+    test$category(type, c("correlation", "covariance", "partial"), env = env)
+    test$category(graph_type, c("segment", "area"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_type, args_ribbon, args_hline, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
@@ -91,8 +95,7 @@ ggvar_acf <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  acf_test(series, lag.max, type, graph_type, ci, env = env)
+  acf_test(env)
   setup <- acf_setup(x, series, lag.max, type, ..., env = env)
 
   # Update arguments:

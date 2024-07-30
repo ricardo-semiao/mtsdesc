@@ -7,6 +7,12 @@
     <loc>https://ricardo-semiao.github.io/varr/articles/colors.html</loc>
   </url>
   <url>
+    <loc>https://ricardo-semiao.github.io/varr/articles/customizing-graphs.html</loc>
+  </url>
+  <url>
+    <loc>https://ricardo-semiao.github.io/varr/articles/dev-comments.html</loc>
+  </url>
+  <url>
     <loc>https://ricardo-semiao.github.io/varr/articles/index.html</loc>
   </url>
   <url>
@@ -26,6 +32,9 @@
   </url>
   <url>
     <loc>https://ricardo-semiao.github.io/varr/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://ricardo-semiao.github.io/varr/reference/get_gg_info.html</loc>
   </url>
   <url>
     <loc>https://ricardo-semiao.github.io/varr/reference/ggvar_acf.html</loc>

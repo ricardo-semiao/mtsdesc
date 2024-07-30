@@ -1,4 +1,10 @@
-utils::globalVariables(".") # Remove CRAN note towards the magrittr dot
+# Removing CRAN notes:
+utils::globalVariables(".") # Check the magrittr dot
+
+.dummy <- function() { # Check packages only used inside `*_helpers`
+  dplyr::.data
+  tidyr::all_of
+}
 
 
 # Color Helpers:
@@ -35,7 +41,7 @@ ignore_cols <- function(arg, env) {
   if (all(isnumeric_cols)) {
     arg
   } else {
-    cli_warn(
+    cli_inform(
       "Ignoring non numeric columns (or equivalent) in {.var x}.",
       call = env
     )
@@ -61,4 +67,12 @@ get_series <- function(series, series_all, env) {
 do_call <- function(fun_name, args) {
   x <- strsplit(fun_name, "::|:::")[[1]]
   do.call(get(x[2], envir = loadNamespace(x[1])), args)
+}
+
+warn_unempty_dots <- function(x) {
+  function(cnd) {
+    cli_warn(
+      "{.var ...} should be empty with {.var x} of class {.val {class(x)}}."
+    )
+  }
 }

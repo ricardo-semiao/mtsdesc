@@ -16,13 +16,19 @@ select_helpers$format <- function(x, criteria, trans) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-select_test <- function(
-    series, lag.max, type, criteria, trans, env) {
-  test$type(series, c("NULL", "character"), env)
-  test$interval(lag.max, 1, Inf, env = env)
-  test$category(type, c("const", "trend", "both", "none"), env)
-  test$category(criteria, c("AIC", "HQ", "SC", "FPE"), env)
-  test$category(trans, c("none", "index"), env)
+select_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$interval(lag.max, 1, Inf, env = env)
+    test$category(type, c("const", "trend", "both", "none"), env = env)
+    test$category(criteria, c("AIC", "HQ", "SC", "FPE"), env = env)
+    test$category(trans, c("none", "index"), env = env)
+    test$args(
+      args_aes, args_line, args_labs, env = env
+    )
+    test$unused(lag.max, x, "list", env = env)
+    test$unused(type, x, "list", env = env)
+  })
 }
 
 select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
@@ -45,6 +51,7 @@ select_setup <- function(x, series, lag.max, type, criteria, trans, ...) {
 #'  and "FPE".
 #' @param trans A transformation to apply to each criteria result (vector). Can
 #'  be a function, "none" (the default), or "index" to create index numbers.
+#' @eval roxy$args_aes()
 #' @eval roxy$args_geom("geom_line")
 #' @eval roxy$args_labs()
 #' @eval roxy$dots()
@@ -71,8 +78,7 @@ ggvar_select <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  select_test(series, lag.max, type, criteria, trans, env = env)
+  select_test(env)
   setup <- select_setup(x, series, lag.max, type, criteria, trans, ..., env = env)
 
   # Update arguments:

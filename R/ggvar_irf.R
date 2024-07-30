@@ -30,18 +30,22 @@ irf_helpers$pluck_irf <- function(x, at) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-irf_test <- function(
-    series_imp, series_resp, n.ahead, ci, facet_type, env) {
-  test$type(series_imp, c("NULL", "character"), env)
-  test$type(series_resp, c("NULL", "character"), env)
-  test$interval(n.ahead, 1, Inf, env = env)
-  test$interval(ci, 0, 1, FALSE, env = env)
-  test$category(facet_type, c("ggplot", "ggh4x"))
+irf_test <- function(env) {
+  with(env, {
+    test$type(series_imp, c("NULL", "character"), env = env)
+    test$type(series_resp, c("NULL", "character"), env = env)
+    test$interval(n.ahead, 1, Inf, env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$category(facet_type, c("ggplot", "ggh4x"), env = env)
+    test$args(
+      args_line, args_hline, args_ribbon, args_labs, args_facet 
+    )
+    test$unused(n.ahead, x, "varirf")
+  })
 }
 
 #' @noRd
-irf_setup <- function(
-    x, series_imp, series_resp, n.ahead, ci, ..., env) {
+irf_setup <- function(x, series_imp, series_resp, n.ahead, ci, ..., env) {
   UseMethod("irf_setup")
 }
 
@@ -89,8 +93,7 @@ ggvar_irf <- function(
     ...) {
   # Test and setup:
   env <- current_env()
-
-  irf_test(series_imp, series_resp, n.ahead, ci, facet_type, env = env)
+  irf_test(env)
   setup <- irf_setup(x, series_imp, series_resp, n.ahead, ci, ..., env = env)
 
   # Update arguments:
@@ -140,6 +143,8 @@ irf_setup.varest <- function(
 #' @noRd
 irf_setup.varirf <- function(
     x, series_imp, series_resp, n.ahead, ci, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   series_imp <- get_series(series_imp, x$impulse, env)
   series_resp <- get_series(series_resp, x$response, env)
 

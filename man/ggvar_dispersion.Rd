@@ -39,9 +39,9 @@ using ggplot2.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{get_gg_info}.
 
-See \link{vignette('customizing-graphs')} for more details.
+See \code{vignette('customizing-graphs')} for more details.
 }
 
 \subsection{Methods}{
