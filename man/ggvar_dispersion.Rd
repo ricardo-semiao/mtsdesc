@@ -8,7 +8,8 @@ ggvar_dispersion(
   x,
   series = NULL,
   args_point = list(),
-  args_hline = list(),
+  args_hline = list(yintercept = 0),
+  args_labs = list(),
   args_facet = list(),
   ...
 )
@@ -18,9 +19,9 @@ ggvar_dispersion(
 
 \item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
-\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{geom_point}.}
+\item{args_point, args_hline}{Additional arguments passed to \link[ggplot2:geom_point]{geom_point} and \link[ggplot2:geom_abline]{geom_hline} (respectively). See more in the 'Customization' section.}
 
-\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{geom_hline}.}
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
@@ -38,14 +39,14 @@ using ggplot2.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{get_gg_info}.
 
-See \link{vignette('customizing-graphs')} for more details.
+See \code{vignette('customizing-graphs')} for more details.
 }
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function varr:::dispersion_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'default'}: passed to nothing.
 }

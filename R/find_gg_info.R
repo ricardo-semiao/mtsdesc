@@ -8,7 +8,7 @@ gg_info_helpers$get_mappings <- function(layer) {
   )
 }
 
-gg_info_helpers$get_funnames <- function(layers) {
+gg_info_helpers$get_fun_names <- function(layers) {
   purrr::map(layers, function(layer) {
     class(layer$geom)[1] %>%
       gsub("^([A-Z][a-z]+)([A-Z][a-z]+)$", "\\1_\\2", .) %>%
@@ -31,19 +31,19 @@ gg_info_helpers$get_funnames <- function(layers) {
 #'
 #' @examples
 #' g <- ggplot2::ggplot(mtcars, ggplot2::aes(mpg, hp)) +
-#'    ggplot2::geom_point(ggplot2::aes(color = gear))
-#' find_gg_info(g)
+#'   ggplot2::geom_point(ggplot2::aes(color = gear))
+#' get_gg_info(g)
 #'
 #' @export
-find_gg_info <- function(graph) {
+get_gg_info <- function(graph) {
   info <- list()
 
-  info$main_data = tibble::as_tibble(graph$data)
+  info$main_data <- tibble::as_tibble(graph$data)
 
-  info$layers = purrr::map(graph$layers, gg_info_helpers$get_mappings) %>%
-    stats::setNames(gg_info_helpers$get_funnames(graph$layers))
+  info$layers <- purrr::map(graph$layers, gg_info_helpers$get_mappings) %>%
+    stats::setNames(gg_info_helpers$get_fun_names(graph$layers))
 
-  info$facets = names(graph$facet$params$facets)
+  info$facets <- names(graph$facet$params$facets)
 
   info
 }

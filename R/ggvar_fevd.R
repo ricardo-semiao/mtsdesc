@@ -16,10 +16,16 @@ fevd_helpers$format <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-fevd_test <- function(series, n.ahead, graph_type, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$interval(n.ahead, 1, Inf, env = env)
-  test$category(graph_type, c("bar", "area", "line"), env)
+fevd_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$interval(n.ahead, 1, Inf, env = env)
+    test$category(graph_type, c("bar", "area", "line"), env = env)
+    test$args(
+      args_aes, args_type, args_labs, args_facet, env = env
+    )
+    test$unused(n.ahead, x, "varfevd")
+  })
 }
 
 #' @noRd
@@ -37,70 +43,72 @@ fevd_setup <- function(x, series, n.ahead, ...) {
 #' @param n.ahead An integer. The size of the forecast horizon, passed to
 #'  [fevd][vars::fevd]. `r roxy$unused("varfevd")`
 #' @eval roxy$series()
-#' @eval roxy$graph_type(c("segment", "area", "line"))
+#' @eval roxy$graph_type(c("bar", "line"))
+#' @eval roxy$args_aes()
 #' @eval roxy$args_type()
-#' @eval roxy$args_gg(c("facet_wrap", "geom_point"))
-#' @eval roxy$colors()
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
-#' `r roxy$details_custom()`
+#' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$fevd`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_output()
-#' 
+#'
 #' @examples
 #' ggvar_fevd(vars::VAR(freeny[-2]), n.ahead = 10)
 #'
 #' @export
 ggvar_fevd <- function(
     x, series = NULL,
-    n.ahead = NULL,
+    n.ahead = 10,
     graph_type = "bar",
+    args_aes = list(),
     args_type = list(),
+    args_labs = list(),
     args_facet = list(),
-    args_point = list(),
-    colors = NULL,
     ...) {
-  fevd_test(series, n.ahead, graph_type)
+  # Test and setup:
+  env <- current_env()
+  fevd_test(env)
+  setup <- fevd_setup(x, series, n.ahead, ..., env = env)
 
-  setup <- fevd_setup(x, series, n.ahead, ...)
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = "VAR FEVD", x = "Forecast horizon", y = "Variance contribution"
+  ))
 
-  colors <- get_colors(colors, length(setup$series))
+  if (graph_type == "bar" && length(args_type) == 0) {
+    args_type$stat <- "identity"
+  }
 
-  graph_add <- inject(list(
-    if (graph_type == "bar") {
-      ggplot2::geom_bar(aes(fill = .data$serie),
-        stat = "identity", !!!args_type
-      )
-    } else if ("area") {
-      ggplot2::geom_area(aes(fill = .data$serie), !!!args_type)
-    } else if ("line") {
-      list(
-        ggplot2::geom_line(aes(color = .data$serie), !!!args_type),
-        ggplot2::geom_point(aes(color = .data$serie), !!!args_point)
-      )
-    }
-  )) %>%
-  purrr::list_flatten()
+  args_aes <- update_values(args_aes, graph_type, "Series", env = env) %>%
+    process_values(length(setup$series), env = env)
 
+  # Create additions:
+  add_type <- inject(switch(graph_type,
+    "bar" = list(geom_bar(!!!args_type)),
+    "line" = list(geom_line(!!!args_type), geom_point(!!!args_type))
+  ))
+
+  add_aes <- define_aes(args_aes, .data$serie)
+
+  # Graph:
   inject(
-    ggplot(setup$data, aes(.data$lead, .data$value)) +
-      graph_add +
-      ggplot2::facet_wrap(vars(.data$equation), !!!args_facet) +
-      ggplot2::scale_fill_manual(values = colors) +
-      ggplot2::labs(
-        title = "VAR FEVD", x = "Forecast horizon",
-        y = "Variance contribution", fill = "Serie"
-      )
+    ggplot(setup$data, aes(.data$lead, .data$value, !!!add_aes)) +
+      add_type +
+      facet_wrap(vars(.data$equation), !!!args_facet) +
+      define_scales(args_aes) +
+      labs(!!!args_labs)
   )
 }
 
 
 # Setup methods:
-#' @noRd 
+#' @noRd
 fevd_setup.varest <- function(x, series, n.ahead, ...) {
   x <- vars::fevd(x, n.ahead, ...)
 
@@ -111,8 +119,10 @@ fevd_setup.varest <- function(x, series, n.ahead, ...) {
   list(data = data, series = series)
 }
 
-#' @noRd 
+#' @noRd
 fevd_setup.varfevd <- function(x, series, n.ahead, ...) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   series <- series %||% names(x)
 
   data <- fevd_helpers$format(x, series)

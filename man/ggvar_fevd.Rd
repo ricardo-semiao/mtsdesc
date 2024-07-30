@@ -7,12 +7,12 @@
 ggvar_fevd(
   x,
   series = NULL,
-  n.ahead = NULL,
+  n.ahead = 10,
   graph_type = "bar",
+  args_aes = list(),
   args_type = list(),
+  args_labs = list(),
   args_facet = list(),
-  args_point = list(),
-  colors = NULL,
   ...
 )
 }
@@ -25,13 +25,15 @@ ggvar_fevd(
 \item{n.ahead}{An integer. The size of the forecast horizon, passed to
 \link[vars:fevd]{fevd}. Unused if \code{x} is of class varfevd.}
 
-\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{geom_segment}, \code{'area'}, for \link[ggplot2:geom_ribbon]{geom_area}, or \code{'line'}, for \link[ggplot2:geom_path]{geom_line}.}
+\item{graph_type}{The ggplot geom used to create the plot: {texts_vec}.}
+
+\item{args_aes}{Defines aesthetics to differentiate the data. A named list of aesthetics names (\code{*}) -- arguments passed to \verb{ggplot2::scale_*_manual}. See more in the 'Customization' section.}
 
 \item{args_type}{Arguments passed to the 'geom' chosen in \code{graph_type}.}
 
-\item{args_facet}{Additional arguments passed to the faceting engine used.}
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 
-\item{args_point}{Additional arguments passed to \link[ggplot2:geom_point]{geom_point}.}
+\item{args_facet}{Additional arguments passed to the faceting engine used.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
 }
@@ -46,14 +48,19 @@ Plots the result of a \link[vars:fevd]{fevd} call.
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+The \code{args_aes} is a list with '* = arguments to \verb{scale_*_manual} \
+elements, where '*' represents the name of an aesthetic to apply to the \
+data. View \code{vignette('ggplot2-specs', 'ggplot2')} to see the available \
+aesthetics.
 
-See \link{vignette('customizing-graphs')} for more details.
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{get_gg_info}.
+
+See \code{vignette('customizing-graphs')} for more details.
 }
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function varr:::fevd_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to \link[vars:fevd]{vars::fevd}.
 \item Class \code{'varfevd'}: passed to nothing.

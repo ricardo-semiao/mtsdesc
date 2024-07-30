@@ -10,9 +10,7 @@ acf_helpers$format <- function(x, series, lag.max, type, ...) {
     purrr::imap_dfr(function(col, colname) {
       tibble::tibble(
         serie = colname,
-        value = stats::acf(col, lag.max, type,
-          plot = FALSE, ...
-        )$acf[, , 1],
+        value = stats::acf(col, lag.max, type, plot = FALSE, ...)$acf[, , 1],
         lag = lag.min:lag.max
       )
     })
@@ -29,29 +27,32 @@ acf_helpers$title_base <- function(type) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-acf_test <- function(x, series, lag.max, type, graph_type, ci,
-  env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$category(graph_type, c("segment", "area"), env)
-  test$interval(ci, 0, 1, FALSE, env)
-  
-  test$category(type, c("correlation", "covariance", "partial"), env)
-  test$type(lag.max, c("NULL", "integer", "double"), env)
+acf_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$interval(lag.max, 1, Inf, NULL, env = env)
+    test$category(type, c("correlation", "covariance", "partial"), env = env)
+    test$category(graph_type, c("segment", "area"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_type, args_ribbon, args_hline, args_labs, args_facet, env = env
+    )
+  })
 }
 
-#'@noRd
-acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
+#' @noRd
+acf_setup <- function(x, series, lag.max, type, ..., env) {
   UseMethod("acf_setup")
 }
 
 
 #' Plot autocorrelation and similar
 #'
-#' `ggvar_acf` plots the auto-correlations (and similar) call for every
-#' series. `ggvar_ccf` plots all the cross-correlations (and similar) between
-#' the series, in a grid.
+#' Given a dataset or VAR model to get residuals from, `ggvar_acf` plots the
+#' auto-correlations (and similar) call for every series. `ggvar_ccf` plots all
+#' the cross-correlations (and similar) between the series, in a grid.
 #'
-#' @param x A dataset (object coercible to data.frame) or a "varest" object to
+#' @param x A dataset (object coercible to "data.frame") or a "varest" object to
 #'  get residuals from.
 #' @eval roxy$series()
 #' @param lag.max The number of lags used to calculate the ACF, passed to
@@ -60,16 +61,18 @@ acf_setup <- function(x, series, lag.max, type, ..., env = caller_env()) {
 #'  "covariance", or "partial". Passed to [acf][stats::acf].
 #' @eval roxy$graph_type(c("segment", "area"))
 #' @eval roxy$args_type()
-#' @eval roxy$args_gg(c("geom_ribbon", "geom_hline", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_ribbon", "geom_hline"))
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$ci("ggplot2::geom_ribbon")
 #' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$acf`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_ts()
 #' @eval roxy$fam_diag()
 #'
@@ -85,32 +88,44 @@ ggvar_acf <- function(
     graph_type = "segment",
     args_type = list(),
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
-    args_hline = list(),
+    args_hline = list(yintercept = 0),
+    args_labs = list(),
     args_facet = list(),
     ci = 0.95,
     ...) {
-  acf_test(x, series, lag.max, type, graph_type, ci)
+  # Test and setup:
+  env <- current_env()
+  acf_test(env)
+  setup <- acf_setup(x, series, lag.max, type, ..., env = env)
 
-  setup <- acf_setup(x, series, lag.max, type, ...)
-
-  graph_add <- inject(list(
-    if (graph_type == "segment") {
-      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
-    } else if (graph_type == "area") {
-      ggplot2::geom_area(aes(y = .data$value), !!!args_type)
-    },
-    if (!is_false(ci)) {
-      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
-      ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
-    }
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = setup$title, x = "Lags", y = "Values"
   ))
 
+  # Create additions:
+  add_type <- inject(switch(graph_type,
+    "segment" = list(
+      geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
+    ),
+    "area" = list(
+      geom_area(aes(y = .data$value), !!!args_type)
+    )
+  ))
+
+  add_ribbon <- inject(if (!is_false(ci)) {
+    dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
+    list(geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon))
+  })
+
+  # Graph:
   inject(
     ggplot(setup$data, aes(.data$lag, .data$value)) +
-      graph_add +
-      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(title = setup$title, x = "Lags", y = "Values")
+      add_type +
+      add_ribbon +
+      geom_hline(!!!args_hline) +
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 
@@ -130,7 +145,7 @@ acf_setup.varest <- function(x, series, lag.max, type, ..., env) {
 
 #' @noRd
 acf_setup.default <- function(x, series, lag.max, type, ..., env) {
-  x <- as.data.frame(x) %>% ignore_cols()
+  x <- as.data.frame(x) %>% ignore_cols(env)
 
   series <- get_series(series, colnames(x), env)
   title <- paste(acf_helpers$title_base(type), "VAR Residuals")

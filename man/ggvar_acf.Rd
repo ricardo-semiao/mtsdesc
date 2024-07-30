@@ -13,7 +13,8 @@ ggvar_acf(
   graph_type = "segment",
   args_type = list(),
   args_ribbon = list(linetype = 2, color = "blue", fill = NA),
-  args_hline = list(),
+  args_hline = list(yintercept = 0),
+  args_labs = list(),
   args_facet = list(),
   ci = 0.95,
   ...
@@ -27,7 +28,8 @@ ggvar_ccf(
   graph_type = "segment",
   args_type = list(),
   args_ribbon = list(linetype = 2, color = "blue", fill = NA),
-  args_hline = list(),
+  args_hline = list(yintercept = 0),
+  args_labs = list(),
   args_facet = list(),
   facet_type = "ggplot",
   ci = 0.95,
@@ -35,7 +37,7 @@ ggvar_ccf(
 )
 }
 \arguments{
-\item{x}{A dataset (object coercible to data.frame) or a "varest" object to
+\item{x}{A dataset (object coercible to "data.frame") or a "varest" object to
 get residuals from.}
 
 \item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
@@ -46,17 +48,17 @@ get residuals from.}
 \item{type}{The type of ACF to be computed. Can be either "correlation",
 "covariance", or "partial". Passed to \link[stats:acf]{acf}.}
 
-\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{geom_segment} or \code{'area'}, for \link[ggplot2:geom_ribbon]{geom_area}.}
+\item{graph_type}{The ggplot geom used to create the plot: {texts_vec}.}
 
 \item{args_type}{Arguments passed to the 'geom' chosen in \code{graph_type}.}
 
-\item{args_ribbon}{Additional arguments passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
+\item{args_ribbon, args_hline}{Additional arguments passed to \link[ggplot2:geom_ribbon]{geom_ribbon} and \link[ggplot2:geom_abline]{geom_hline} (respectively). See more in the 'Customization' section.}
 
-\item{args_hline}{Additional arguments passed to \link[ggplot2:geom_abline]{geom_hline}.}
+\item{args_labs}{Additional arguments passed to \link[ggplot2:labs]{labs}. If an empty list, will be changed to default values.}
 
 \item{args_facet}{Additional arguments passed to the faceting engine used.}
 
-\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Passed to \link[ggplot2:geom_ribbon]{geom_ribbon}.}
+\item{ci}{The confidence level for the confidence interval. Set to \code{FALSE} to omit. Used in \link[ggplot2:geom_ribbon]{geom_ribbon}.}
 
 \item{...}{Arguments passed to methods, see the 'Methods' section.}
 
@@ -66,23 +68,23 @@ get residuals from.}
 A \link[ggplot2:ggplot]{ggplot}.
 }
 \description{
-\code{ggvar_acf} plots the auto-correlations (and similar) call for every
-series. \code{ggvar_ccf} plots all the cross-correlations (and similar) between
-the series, in a grid.
+Given a dataset or VAR model to get residuals from, \code{ggvar_acf} plots the
+auto-correlations (and similar) call for every series. \code{ggvar_ccf} plots all
+the cross-correlations (and similar) between the series, in a grid.
 }
 \details{
 \subsection{Customization}{
 
 The graph can be customized both with the 'static' arguments passed to each layer -- using the \verb{args_*} arguments --, and, if applicable, the 'dynamic' aesthetics -- using the \code{args_aes} argument.
 
-After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{find_gg_info}.
+After built, the result can be further customized as any ggplot, adding or overwriting layers with the \link[ggplot2:gg-add]{ggplot's +}. It is useful to understand the data and the mappings coded by the package, using the function \link{get_gg_info}.
 
-See \link{vignette('customizing-graphs')} for more details.
+See \code{vignette('customizing-graphs')} for more details.
 }
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function varr:::acf_setup or varr:::ccf_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to \link[stats:acf]{stats::acf}.
 \item Class \code{'default'}: passed to \link[stats:acf]{stats::acf}.

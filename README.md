@@ -73,7 +73,7 @@ Additional:
 - Solve some less important lintr notes.
 - Study importing whole rlang and ggplot2.
 
-## Aditional informations
+## Additional information
 
 This package:
 

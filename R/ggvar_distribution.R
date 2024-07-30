@@ -24,13 +24,18 @@ distribution_helpers$format_dens <- function(x, series) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-distribution_test <- function(series, plot_normal, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$type(plot_normal, c("TRUE", "FALSE"), env)
+distribution_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(plot_normal, c("TRUE", "FALSE"), env = env)
+    test$args(
+      args_histogram, args_line, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
-distribution_setup <- function(x, series, plot_normal, ...) {
+distribution_setup <- function(x, series, ...) {
   UseMethod("distribution_setup")
 }
 
@@ -44,15 +49,17 @@ distribution_setup <- function(x, series, plot_normal, ...) {
 #'  (object coercible to data.frame) with numeric variables.
 #' @eval roxy$series()
 #' @param plot_normal Logical, whether or not a normal curve should be plotted.
-#' @eval roxy$args_gg(c("geom_histogram", "geom_line", "facet_wrap"))
+#' @eval roxy$args_geom(c("geom_histogram", "geom_line"))
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
 #' `r roxy$details_custom()`
 #' `r roxy$details_methods()$distribution`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_diag()
 #' @eval roxy$fam_ts()
 #'
@@ -65,35 +72,40 @@ ggvar_distribution <- function(
     plot_normal = TRUE,
     args_histogram = list(bins = 30),
     args_line = list(),
+    args_labs = list(),
     args_facet = list(),
     ...) {
-  distribution_test(series, plot_normal)
+  # Test and setup:
+  env <- current_env()
+  distribution_test(env)
+  setup <- distribution_setup(x, series, plot_normal, ..., env = env)
 
-  setup <- distribution_setup(x, series, plot_normal, ...)
-
-  graph_add <- inject(list(
-    if (plot_normal) {
-      ggplot_add <- ggplot2::geom_line(aes(y = .data$density),
-        !!!args_line, data = setup$data_dens
-      )
-    }
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = setup$title, x = "Values", y = "Density"
   ))
 
+  # Create additions:
+  add_extra <- inject(if (plot_normal) {
+    list(geom_line(aes(y = .data$density), setup$data_dens, !!!args_line))
+  })
+
+  # Graph:
   inject(
     ggplot(setup$data_hist, aes(x = .data$residual)) +
-      ggplot2::geom_histogram(aes(y = ggplot2::after_stat(.data$density)),
-        !!!args_histogram
-      ) +
-      graph_add +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(title = setup$title, x = "Values", y = "Density")
+      geom_histogram(aes(y = after_stat(.data$density)), !!!args_histogram) +
+      add_extra +
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 
 
 # Setup methods:
 #' @noRd
-distribution_setup.varest <- function(x, series, plot_normal, ...) {
+distribution_setup.varest <- function(x, series, plot_normal, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   x <- as.data.frame(stats::residuals(x))
 
   title <- "VAR Residuals Distribution"
@@ -106,8 +118,10 @@ distribution_setup.varest <- function(x, series, plot_normal, ...) {
 }
 
 #' @noRd
-distribution_setup.default <- function(x, series, plot_normal, ...) {
-  x <- as.data.frame(x) %>% ignore_cols()
+distribution_setup.default <- function(x, series, plot_normal, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
+  x <- as.data.frame(x) %>% ignore_cols(env)
 
   title <- "Time Series Distribution"
   series <- series %||% colnames(x)

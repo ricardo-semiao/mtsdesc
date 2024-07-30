@@ -1,8 +1,10 @@
-pluralize_or <- function(texts_vec) {
-  pluralize_and <- utils::capture.output(cli::pluralize("{texts_vec}"))
-  gsub("and", "or", pluralize_and)
+pluralize_and <- function(texts_vec) {
+  utils::capture.output(cli::pluralize("{texts_vec}"))
 }
 
+pluralize_or <- function(texts_vec) {
+  gsub("and", "or", pluralize_and("{texts_vec}"))
+}
 
 roxy <- list()
 
@@ -24,22 +26,12 @@ roxy$index <- function(lengths_vec) {
 }
 
 
-# ggplot-related arguments:
-roxy$graph_type <- function(types_vec, isgeoms = TRUE) {
-  if (isgeoms) {
-    texts <- purrr::map_chr(types_vec,
-      ~glue("`'{.x}'`, for [geom_{.x}][ggplot2::geom_{.x}]")
-    ) %>%
-      pluralize_or()
-    glue("
-    @param graph_type The ggplot geom used to create the plot: {texts}.
-    ")
-  } else {
-    texts <- glue({"`'{types_vec}'`"}) %>% pluralize_or()
-    glue("
-    @param graph_type The type of the plot: {texts}.
-    ")
-  }
+# Facet arguments:
+roxy$faceted <- function() {
+  glue("
+  @param faceted Should the graph be divided in facets?. If true, `args_aes` \\
+  is ignored.
+  ")
 }
 
 roxy$facet_type <- function() {
@@ -49,21 +41,51 @@ roxy$facet_type <- function() {
   ")
 }
 
-roxy$args_gg <- function(funs_vec) {
-  param_name <- ifelse(
-    grepl("facet", funs_vec),
-    "args_facet",
-    gsub("geom_(.+)", "args_\\1", funs_vec)
-  )
+roxy$args_facet <- function() {
+  glue("
+  @param args_facet Additional arguments passed to the faceting engine used.
+  ")
+}
 
-  text <- ifelse(
-    grepl("facet", funs_vec),
-    "the faceting engine used",
-    glue("[{funs_vec}][ggplot2::{funs_vec}]")
-  )
+
+# gg function arguments:
+roxy$args_aes <- function() {
+  glue("
+  @param args_aes Defines aesthetics to differentiate the data. A named list \\
+  of aesthetics names (`*`) -- arguments passed to `ggplot2::scale_*_manual`. \\
+  See more in the 'Customization' section.
+  ")
+}
+
+roxy$args_labs <- function() {
+  glue("
+  @param args_labs Additional arguments passed to [labs][ggplot2::labs]. If \\
+  an empty list, will be changed to default values.
+  ")
+}
+
+roxy$args_geom <- function(funs_vec) {
+  param_name <- gsub("geom_(.+)", "args_\\1", funs_vec) %>%
+    paste0(collapse = ",")
+  text <- glue("[{funs_vec}][ggplot2::{funs_vec}]") %>%
+    pluralize_and()
 
   glue("
-  @param {param_name} Additional arguments passed to {text}.
+  @param {param_name} Additional arguments passed to {text} (respectively). \\
+  See more in the 'Customization' section.
+  ")
+}
+
+
+# Graph type and its geom arguments
+roxy$graph_type <- function(types_vec, isgeoms = TRUE) {
+  texts <- purrr::map_chr(types_vec, \(x) {
+    glue("`'{.x}'`, for [geom_{.x}][ggplot2::geom_{.x}]")
+  }) %>%
+    pluralize_or()
+
+  glue("
+  @param graph_type The ggplot geom used to create the plot: {texts}.
   ")
 }
 
@@ -83,7 +105,7 @@ roxy$ci <- function(fun) {
   text_short <- strsplit(fun, "::")[[1]][2]
   glue("
   @param ci The confidence level for the confidence interval. Set to `FALSE` \\
-  to omit. Passed to [{text_short}][{fun}].
+  to omit. Used in [{text_short}][{fun}].
   ")
 }
 
@@ -97,22 +119,32 @@ roxy$unused <- function(class) {
 # Other documentations
 roxy$return_gg <- function() {
   glue("@return A [ggplot][ggplot2::ggplot].")
-
 }
 
-roxy$details_custom <- function() {
+roxy$details_custom <- function(has_args_aes = FALSE) {
+  text_aes <- if (has_args_aes) {
+    "
+    \n\nThe `args_aes` is a list with '* = arguments to `scale_*_manual` \\
+    elements, where '*' represents the name of an aesthetic to apply to the \\
+    data. View `vignette('ggplot2-specs', 'ggplot2')` to see the available \\
+    aesthetics.
+    "
+  } else {
+    ""
+  }
+
   glue("
   ## Customization
   The graph can be customized both with the 'static' arguments passed to each \\
   layer -- using the `args_*` arguments --, and, if applicable, the 'dynamic' \\
-  aesthetics -- using the `args_aes` argument.
+  aesthetics -- using the `args_aes` argument.{text_aes}
 
   After built, the result can be further customized as any ggplot, adding or \\
   overwriting layers with the [ggplot's +][ggplot2::+.gg]. It is useful to \\
   understand the data and the mappings coded by the package, using the \\
-  function [find_gg_info].
+  function [get_gg_info].
 
-  See [vignette('customizing-graphs')] for more details.
+  See `vignette('customizing-graphs')` for more details.
   ")
 }
 
@@ -139,13 +171,14 @@ roxy$details_methods <- function() {
     dispersion = c("default" = "none"),
     distribution = c("varest" = "none", "default" = "none"),
     fevd = c("varest" = "vars::fevd", "varfevd" = "none"),
-    stability = c("varest" = "vars::stability", "varstabil" = "none"),
-    select = c("list" = "none", "default" = "vars::VARselect"),
-    irf = c("varest" = "vars::irf", "varirf" = "none"),
+    fit = c("varest" = "none"),
     history = c("varest" = "none", "default" = "none"),
-    predict = c("varest" = "vars::predict.varest")
+    irf = c("varest" = "vars::irf", "varirf" = "none"),
+    predict = c("varest" = "vars::predict.varest"),
+    select = c("list" = "none", "default" = "vars::VARselect"),
+    stability = c("varest" = "vars::stability", "varstabil" = "none")
   ) %>%
-    purrr::imap(~get_text(
+    purrr::imap(~ get_text(
       `if`(.y == "acf", c("acf", "ccf"), .y),
       names(.x),
       .x

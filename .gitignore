@@ -5,6 +5,7 @@
 .DS_Store
 .quarto
 inst/doc
-/doc/
-/Meta/
-personal/
+/doc
+/Meta
+personal
+site_assets

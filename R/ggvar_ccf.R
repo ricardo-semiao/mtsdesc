@@ -17,31 +17,40 @@ ccf_helpers$format <- function(x, series, lag.max, type, ...) {
     )
 }
 
+ccf_helpers$title_base <- function(type) {
+  switch(type,
+    "correlation" = "Auto-correlation of",
+    "covariance" = "Auto-covariance of"
+  )
+}
+
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-ccf_test <- function(
-    x, series, lag.max, type, graph_type, ci, facet_type,
-    env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$category(graph_type, c("segment", "area"), env)
-  test$interval(ci, 0, 1, FALSE, env)
-  test$category(facet_type, c("ggplot", "ggh4x"), env)
-
-  test$category(type, c("correlation", "covariance"), env)
-  test$type(lag.max, c("NULL", "integer", "double"), env)
+ccf_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$category(type, c("correlation", "covariance"), env = env)
+    test$interval(lag.max, 1, Inf, NULL, env = env)
+    test$category(graph_type, c("segment", "area"), env = env)
+    test$category(facet_type, c("ggplot", "ggh4x"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_type, args_ribbon, args_hline, args_labs, args_facet, env = env
+    )
+  })
 }
 
-#'@noRd
+#' @noRd
 ccf_setup <- function(x, series, lag.max, type, ci, ...) {
   UseMethod("ccf_setup")
 }
 
 
 #' @rdname ggvar_acf
-#' 
+#'
 #' @eval roxy$facet_type()
-#' 
+#'
 #' @export
 ggvar_ccf <- function(
     x, series = NULL,
@@ -49,38 +58,47 @@ ggvar_ccf <- function(
     graph_type = "segment",
     args_type = list(),
     args_ribbon = list(linetype = 2, color = "blue", fill = NA),
-    args_hline = list(),
+    args_hline = list(yintercept = 0),
+    args_labs = list(),
     args_facet = list(),
     facet_type = "ggplot",
     ci = 0.95,
     ...) {
-  ccf_test(x, series, lag.max, type, graph_type, ci, facet_type)
+  # Test and setup:
+  env <- current_env()
+  ccf_test(env)
+  setup <- ccf_setup(x, series, lag.max, type, ci, ..., env = env)
 
-  title <- switch(type,
-    "correlation" = "Cross-correlation of Series",
-    "covariance" = "Cross-covariance of Series"
-  )
-
-  setup <- ccf_setup(x, series, lag.max, type, ci, ...)
-
-  graph_add <- inject(list(
-    if (graph_type == "segment") {
-      ggplot2::geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
-    } else if (graph_type == "area") {
-      ggplot2::geom_area(aes(y = .data$value), !!!args_type)
-    },
-    if (!is_false(ci)) {
-      dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
-      ggplot2::geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon)
-    },
-    define_facet(facet_type, "facet_x", "facet_y", !!!args_facet)
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = setup$title, x = "Lags", y = "Values"
   ))
 
+  # Create additions:
+  add_type <- inject(switch(graph_type,
+    "segment" = list(
+      geom_segment(aes(xend = .data$lag, yend = 0), !!!args_type)
+    ),
+    "area" = list(
+      geom_area(aes(y = .data$value), !!!args_type)
+    )
+  ))
+
+  add_ribbon <- inject(if (!is_false(ci)) {
+    dist <- stats::qnorm((1 - ci) / 2) / sqrt(nrow(setup$data))
+    list(geom_ribbon(aes(ymin = -dist, ymax = dist), !!!args_ribbon))
+  })
+
+  add_facet <- define_facet_grid(facet_type, args_facet, env = env)
+
+  # Graph:
   inject(
     ggplot(setup$data, aes(.data$lag, .data$value)) +
-      graph_add +
-      ggplot2::geom_hline(yintercept = 0, !!!args_hline) +
-      ggplot2::labs(title = title, x = "Lags", y = "Values")
+      add_type +
+      add_ribbon +
+      geom_hline(!!!args_hline) +
+      add_facet +
+      labs(!!!args_labs)
   )
 }
 
@@ -91,19 +109,21 @@ ccf_setup.varest <- function(x, series, lag.max, type, ci, ...) {
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
+  title <- paste(ccf_helpers$title_base(type), "VAR Residuals")
 
   data <- ccf_helpers$format(x, series, lag.max, type, ...)
 
-  list(data = data)
+  list(data = data, title = title)
 }
 
 #' @noRd
 ccf_setup.default <- function(x, series, lag.max, type, ci, ...) {
-  x <- as.data.frame(x) %>% ignore_cols()
+  x <- as.data.frame(x) %>% ignore_cols(env)
 
   series <- series %||% colnames(x)
+  title <- paste(ccf_helpers$title_base(type), "Series")
 
   data <- ccf_helpers$format(x, series, lag.max, type, ...)
 
-  list(data = data)
+  list(data = data, title = title)
 }

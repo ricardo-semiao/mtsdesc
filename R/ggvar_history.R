@@ -11,14 +11,19 @@ history_helpers$format <- function(x, series, index) {
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-history_test <- function(series, index, graph_type, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$type(index, c("NULL", "integer", "double"), env)
-  test$category(graph_type, c("faceted", "colored"), env)
+history_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(index, c("NULL", "integer", "double"), env = env)
+    test$category(faceted, c("TRUE", "FALSE"), env = env)
+    test$args(
+      args_aes, args_line, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
-history_setup <- function(x, series, index, ...) {
+history_setup <- function(x, series, index, faceted, ..., env) {
   UseMethod("history_setup")
 }
 
@@ -33,17 +38,19 @@ history_setup <- function(x, series, index, ...) {
 #'  (object coercible to data.frame) with numeric variables.
 #' @eval roxy$series()
 #' @eval roxy$index(c("x$obs", "nrow(x)"))
-#' @eval roxy$graph_type(c("faceted", "colored"), FALSE)
-#' @eval roxy$args_gg(c("geom_line", "facet_wrap"))
-#' @eval roxy$colors()
+#' @eval roxy$faceted()
+#' @eval roxy$args_aes()
+#' @eval roxy$args_geom(c("geom_line"))
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
-#' `r roxy$details_custom()`
+#' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$history`
 #'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_ts()
 #' @eval roxy$fam_hist()
 #' @eval roxy$fam_diag()
@@ -55,45 +62,48 @@ history_setup <- function(x, series, index, ...) {
 #' @export
 ggvar_history <- function(
     x, series = NULL, index = NULL,
-    graph_type = "faceted",
+    faceted = TRUE,
+    args_aes = list(),
     args_line = list(),
+    args_labs = list(),
     args_facet = list(),
-    colors = NULL,
     ...) {
-  history_test(series, index, graph_type)
+  # Test and setup:
+  env <- current_env()
+  history_test(env)
+  setup <- history_setup(x, series, index, faceted, ..., env = env)
 
-  setup <- history_setup(x, series, index, ...)
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = setup$title, x = "Index", y = "Values"
+  ))
 
-  if (graph_type == "colored") {
-    colors <- get_colors(colors, length(setup$series))
+  if (!faceted) {
+    args_aes <- update_values(args_aes, "line", "Series", env = env) %>%
+      process_values(length(setup$series), env = env)
   }
 
-  graph_add <- inject(list(
-    if (graph_type == "faceted") {
-      list(
-        ggplot2::geom_line(!!!args_line),
-        ggplot2::facet_wrap(vars(.data$serie), !!!args_facet)
-      )
-    } else if (graph_type == "colored") {
-      list(
-        ggplot2::geom_line(aes(color = .data$serie), !!!args_line),
-        ggplot2::scale_color_manual(values = colors)
-      )
-    }
-  )) %>%
-  purrr::list_flatten()
+  # Create additions:
+  add_aes <- if (!faceted) define_aes(args_aes, .data$serie)
 
+  # Graph:
   inject(
-    ggplot(setup$data, aes(.data$index, .data$value)) +
-      graph_add +
-      ggplot2::labs(title = setup$title, x = "Index", y = "Values")
+    ggplot(setup$data, aes(.data$index, .data$value, !!!add_aes)) +
+      geom_line(!!!args_line) +
+      {
+        if (faceted) facet_wrap(vars(.data$serie), !!!args_facet)
+      } +
+      define_scales(args_aes) +
+      labs(!!!args_labs)
   )
 }
 
 
 # Setup methods:
 #' @noRd
-history_setup.varest <- function(x, series, index, ...) {
+history_setup.varest <- function(x, series, index, faceted, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
   x <- as.data.frame(stats::residuals(x))
 
   series <- series %||% colnames(x)
@@ -106,8 +116,10 @@ history_setup.varest <- function(x, series, index, ...) {
 }
 
 #' @noRd
-history_setup.default <- function(x, series, index, ...) {
-  x <- as.data.frame(x) %>% ignore_cols()
+history_setup.default <- function(x, series, index, faceted, ..., env) {
+  check_dots_empty(error = warn_unempty_dots(x))
+
+  x <- as.data.frame(x) %>% ignore_cols(env)
 
   series <- series %||% colnames(x)
   index <- index %||% seq_len(nrow(x))

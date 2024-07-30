@@ -26,17 +26,20 @@ predict_helpers$format <- function(x, series, index_ahead, index_behind, ci, ...
 
 # Startup tests and setup function to get data from `x` (methods at the end):
 #' @noRd
-predict_test <- function(
-    series, index_ahead, index_behind, ci, env = caller_env()) {
-  test$type(series, c("NULL", "character"), env)
-  test$type(index_ahead, c("NULL", "integer", "double"), env)
-  test$type(index_behind, c("NULL", "integer", "double"), env)
-  test$interval(ci, 0, 1, FALSE, env)
+predict_test <- function(env) {
+  with(env, {
+    test$type(series, c("NULL", "character"), env = env)
+    test$type(index_ahead, c("NULL", "integer", "double"), env = env)
+    test$type(index_behind, c("NULL", "integer", "double"), env = env)
+    test$interval(ci, 0, 1, FALSE, env = env)
+    test$args(
+      args_aes, args_line , args_ribbon, args_labs, args_facet, env = env
+    )
+  })
 }
 
 #' @noRd
-predict_setup <- function(
-    x, series, index_ahead, index_behind, ci, ..., env = caller_env()) {
+predict_setup <- function(x, series, index_ahead, index_behind, ci, ..., env) {
   UseMethod("predict_setup")
 }
 
@@ -55,15 +58,18 @@ predict_setup <- function(
 #'  to the original portion of the graph. Its length will define the 'past'
 #'  horizon. Leave as `NULL` to only plot predicted values.
 #' @eval roxy$ci("stats::predict")
-#' @eval roxy$args_gg(c("geom_line", "geom_ribbon", "facet_wrap"))
+#' @eval roxy$args_aes()
+#' @eval roxy$args_geom(c("geom_line", "geom_ribbon"))
+#' @eval roxy$args_labs()
+#' @eval roxy$args_facet()
 #' @eval roxy$dots()
 #'
 #' @details
-#' `r roxy$details_custom()`
+#' `r roxy$details_custom(TRUE)`
 #' `r roxy$details_methods()$predict`
-#' 
+#'
 #' @eval roxy$return_gg()
-#' 
+#'
 #' @eval roxy$fam_hist()
 #'
 #' @examples
@@ -74,31 +80,41 @@ predict_setup <- function(
 ggvar_predict <- function(
     x, series = NULL, index_ahead, index_behind = NULL,
     ci = 0.95,
+    args_aes = list(),
     args_line = list(),
     args_ribbon = list(fill = NA, linetype = 2, color = "blue"),
+    args_labs = list(),
     args_facet = list(),
     ...) {
-  predict_test(series, index_ahead, index_behind, ci)
+  # Test and setup:
+  env <- current_env()
+  predict_test(env)
+  setup <- predict_setup(x, series, index_ahead, index_behind, ci, ..., env = env)
 
-  setup <- predict_setup(x, series, index_ahead, index_behind, ci, ...)
-
-  graph_add <- inject(list(
-    if (!is_false(ci)) {
-      ggplot2::geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper),
-        !!!args_ribbon
-      )
-    }
+  # Update arguments:
+  args_labs <- update_labs(args_labs, list(
+    title = "VAR Predicted Values", x = "Index", y = "Values"
   ))
 
+  args_aes <- update_values(args_aes, "line", "Type", env = env) %>%
+    process_values(2, env = env)
+
+  # Create additions:
+  add_ribbon <- inject(if (!is_false(ci)) {
+    list(
+      geom_ribbon(aes(ymin = .data$lower, ymax = .data$upper), !!!args_ribbon)
+    )
+  })
+
+  add_aes <- define_aes(args_aes, .data$serie)
+
+  # Graph:
   inject(
-    ggplot(setup$data, aes(.data$index, .data$fcst)) +
-      graph_add +
-      ggplot2::geom_line(aes(linetype = .data$type), !!!args_line) +
-      ggplot2::facet_wrap(vars(.data$serie), !!!args_facet) +
-      ggplot2::labs(
-        title = "VAR Predicted Values", x = "Index",
-        y = "Values", linetypes = "Type"
-      )
+    ggplot(setup$data, aes(.data$index, .data$fcst, !!!add_aes)) +
+      add_ribbon +
+      geom_line(!!!args_line) +
+      facet_wrap(vars(.data$serie), !!!args_facet) +
+      labs(!!!args_labs)
   )
 }
 
