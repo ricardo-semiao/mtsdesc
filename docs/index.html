@@ -21,27 +21,34 @@
 <body>
   <header id="site-header"><div class="header-block"></div>
       <nav><ul>
-<li>
-                  <a class="site-nav-link" href="/">Home</a>
+<li class="nav-li">
+                  <a href="/">Home</a>
               </li>
-              <li>
-                  <a class="site-nav-link" href="/cv.html">CV</a>
+              <li class="nav-li">
+                  <a href="/cv.html">CV</a>
               </li>
-              <li>
-                  <a class="site-nav-link" href="/rfcd/">RFCD</a>
-              </li>
-              <li>
-                  <a class="site-nav-link" href="/varutils/">Varutils</a>
-              </li>
-              <li>
-                  <a class="site-nav-link" href="/morphdown/">Morphdown</a>
-              </li>
+              <li class="nav-drop">
+                  <button></button>
+                  <ul>
+<li class="nav-li">
+                          <a href="/rfcd/">RFCD</a>
+                      </li>
+                      <li class="nav-li">
+                          <a href="/varr/">Varr</a>
+                      </li>
+                      <li class="nav-li">
+                          <a href="/morphdown/">Morphdown</a>
+                      </li>
+                  </ul>
+</li>
           </ul></nav><div class="header-block"></div>
-  </header><a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-  
+  </header><div id="site-main">
+
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
+    
 
 
-  <main id="pkgdown-content"><nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
+    <main id="pkgdown-content"><nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="index.html">varr</a>
 
@@ -85,7 +92,7 @@
     
   </div>
 </nav><div class="container template-home">
-      <div class="row">
+        <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="varr">varr<a class="anchor" aria-label="anchor" href="#varr"></a>
 </h1></div>
@@ -206,8 +213,11 @@
   </aside>
 </div>
 
-    </div>
-  </main><footer id="site-footer"><div>
+      </div>
+    </main>
+</div>
+
+  <footer id="site-footer"><div>
           <p>Esta página foi feita com <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>.</p>
       </div>
   </footer><script src="/site_assets/site_structure.js"></script>
