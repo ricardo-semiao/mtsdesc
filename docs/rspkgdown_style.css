@@ -6,6 +6,7 @@ main#pkgdown-content {
 nav.navbar {
     position: static;
     width: calc(205px + 2rem);
+    min-height: 100vh;
     align-items: flex-start;
     padding: 0;
 }
