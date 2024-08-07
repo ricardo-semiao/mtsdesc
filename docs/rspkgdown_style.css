@@ -1,5 +1,10 @@
 /* Two columns content to fit new navbar */
-main#pkgdown-content {
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+#site-main {
     display: flex;
     flex-direction: row;
 }
@@ -27,13 +32,22 @@ nav.navbar div.container div#navbar {
 nav.navbar div.container div#navbar ul.navbar-nav {
     flex-direction: column;
     padding-left: 1rem;
-}
-nav.navbar div.container div#navbar li.nav-item {
     margin-top: 1rem;
 }
-nav.navbar div.container div#navbar ul.navbar-nav a.nav-link {
-    padding: 0;
+nav.navbar div.container div#navbar li.nav-item {
+    margin-top: 0.5rem;
 }
+nav.navbar div.container div#navbar li.nav-item span.fa-github::after {
+    content: "Source";
+    margin-left: 8px;
+    font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px
+}
+/*nav.navbar div.container div#navbar ul.navbar-nav a.nav-link, button.nav-link {
+    padding-top: 0;
+    padding-bottom: 0;
+}*/
 nav.navbar div.container div#navbar > form {
     margin-top: 2rem !important;
 }
@@ -56,8 +70,10 @@ nav.navbar div.container small.nav-text {
     nav.navbar {
         width: 150px;
     }
+    #navbar, #navbar > ul {
+        width: calc(150px - 2rem);
+    }
 }
-
 
 
 /* Adjust site constructs */
@@ -66,24 +82,24 @@ header#site-header {
     min-width: calc(150px + 250px + 10px);
 }
 footer#site-footer {
-    margin: 0;
+    margin-bottom: 0;
     min-width: calc(150px + 250px + 10px);
 }
-.container.template-home {
-    margin-bottom: calc(21px + 16px + 8px);
-}
-/*.fixed-top {
-    z-index: initial;
-} unneeded with static approach*/
 
 
 /* General margins and paddings */
-main#main {
+#site-main {
     margin-top: 1rem;
 }
-main#main .page-header {
+#site-main .page-header {
     min-height: 0;
 }
-main#main h2 {
+#site-main h2 {
     margin-top: 2rem;
+}
+#site-main > div.container {
+    margin-bottom: 1.5rem;
+}
+#dropdown-articles {
+    color: var(--green);
 }
