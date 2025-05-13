@@ -3,7 +3,7 @@ pluralize_and <- function(texts_vec) {
 }
 
 pluralize_or <- function(texts_vec) {
-  gsub("and", "or", pluralize_and("{texts_vec}"))
+  gsub("and", "or", pluralize_and(texts_vec))
 }
 
 roxy <- list()
@@ -80,7 +80,7 @@ roxy$args_geom <- function(funs_vec) {
 # Graph type and its geom arguments
 roxy$graph_type <- function(types_vec, isgeoms = TRUE) {
   texts <- purrr::map_chr(types_vec, \(x) {
-    glue("`'{.x}'`, for [geom_{.x}][ggplot2::geom_{.x}]")
+    glue("`'{x}'`, for [geom_{x}][ggplot2::geom_{x}]")
   }) %>%
     pluralize_or()
 
@@ -150,7 +150,7 @@ roxy$details_custom <- function(has_args_aes = FALSE) {
 
 roxy$details_methods <- function() {
   get_text <- function(topics_vec, class_vec, funs_vec) {
-    topic_text <- glue("varr:::{topics_vec}_setup") %>% pluralize_or()
+    topic_text <- glue("mtsdesc:::{topics_vec}_setup") %>% pluralize_or()
 
     funs_text <- ifelse(funs_vec == "none", "nothing", glue("[{funs_vec}]"))
 
@@ -166,23 +166,27 @@ roxy$details_methods <- function() {
     ")
   }
 
-  list(
-    acf = c("varest" = "stats::acf", "default" = "stats::acf"),
-    dispersion = c("default" = "none"),
-    distribution = c("varest" = "none", "default" = "none"),
-    fevd = c("varest" = "vars::fevd", "varfevd" = "none"),
-    fit = c("varest" = "none"),
-    history = c("varest" = "none", "default" = "none"),
-    irf = c("varest" = "vars::irf", "varirf" = "none"),
-    predict = c("varest" = "vars::predict.varest"),
-    select = c("list" = "none", "default" = "vars::VARselect"),
-    stability = c("varest" = "vars::stability", "varstabil" = "none")
-  ) %>%
-    purrr::imap(~ get_text(
-      `if`(.y == "acf", c("acf", "ccf"), .y),
-      names(.x),
-      .x
-    ))
+  purrr::imap(
+    list(
+      acf = c("varest" = "stats::acf", "default" = "stats::acf"),
+      dispersion = c("default" = "none"),
+      distribution = c("varest" = "none", "default" = "none"),
+      fevd = c("varest" = "vars::fevd", "varfevd" = "none"),
+      fit = c("varest" = "none"),
+      history = c("varest" = "none", "default" = "none"),
+      irf = c("varest" = "vars::irf", "varirf" = "none"),
+      predict = c("varest" = "vars::predict.varest"),
+      select = c("list" = "none", "default" = "vars::VARselect"),
+      stability = c("varest" = "vars::stability", "varstabil" = "none")
+    ),
+    function(classes, topic) {
+      get_text(
+        `if`(topic == "acf", c("acf", "ccf"), topic),
+        names(classes),
+        classes
+      )
+    }
+  )
 }
 
 

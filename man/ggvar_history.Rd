@@ -22,7 +22,7 @@ ggvar_history(
 
 \item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
-\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to {texts_vec}. Defaults to a integer sequence.}
+\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to \code{x$obs} or \code{nrow(x)}. Defaults to a integer sequence.}
 
 \item{faceted}{Should the graph be divided in facets?. If true, \code{args_aes} is ignored.}
 
@@ -61,7 +61,7 @@ See \code{vignette('customizing-graphs')} for more details.
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function mtsdesc:::history_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to nothing.
 \item Class \code{'default'}: passed to nothing.

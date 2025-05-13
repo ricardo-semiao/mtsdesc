@@ -8,6 +8,6 @@
 
 library(testthat)
 library(vdiffr)
-library(varr)
+library(mtsdesc)
 
-#test_check("varr") #turned off tests for now
+#test_check("mtsdesc") #turned off tests for now

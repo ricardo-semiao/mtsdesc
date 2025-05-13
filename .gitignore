@@ -8,4 +8,7 @@ inst/doc
 /doc
 /Meta
 personal
-site_assets
+site_assets/
+/doc/
+/Meta/
+**/.quarto/

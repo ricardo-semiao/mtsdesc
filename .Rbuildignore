@@ -8,6 +8,9 @@
 ^pkgdown$
 ^doc$
 ^Meta$
-^varr\.code-workspace$
+^mtsdesc\.code-workspace$
 ^personal$
 ^site_assets$
+^vignettes/\.quarto$
+^vignettes/*_files$
+^vignettes/_customizing_plots\.qmd$

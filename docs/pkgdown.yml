@@ -1,10 +1,8 @@
-pandoc: 3.1.13
-pkgdown: 2.1.0
-pkgdown_sha: ~
-articles:
-  customizing-graphs: customizing-graphs.html
-  dev-comments: dev-comments.html
-last_built: 2024-08-07T14:02Z
+pandoc: '3.4'
+pkgdown: 2.1.2.9000
+pkgdown_sha: 99457e7fa7f36696ae743b06aca59c0fdd97a7d6
+articles: {}
+last_built: 2025-05-13T18:14Z
 urls:
-  reference: https://ricardo-semiao.github.io/varr/reference
-  article: https://ricardo-semiao.github.io/varr/articles
+  reference: https://ricardo-semiao.github.io/mtsdesc/reference
+  article: https://ricardo-semiao.github.io/mtsdesc/articles

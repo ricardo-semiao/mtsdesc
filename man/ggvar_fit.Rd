@@ -20,7 +20,7 @@ ggvar_fit(
 
 \item{series}{A character vector with series (variables) to  consider. Defaults to all (\code{NULL}).}
 
-\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to {texts_vec}. Defaults to a integer sequence.}
+\item{index}{A vector of labels to the x-axis, normally dates. Must have length equal to \code{x$obs}. Defaults to a integer sequence.}
 
 \item{args_aes}{Defines aesthetics to differentiate the data. A named list of aesthetics names (\code{*}) -- arguments passed to \verb{ggplot2::scale_*_manual}. See more in the 'Customization' section.}
 
@@ -57,7 +57,7 @@ See \code{vignette('customizing-graphs')} for more details.
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function mtsdesc:::fit_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to nothing.
 }

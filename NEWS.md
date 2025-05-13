@@ -1,4 +1,4 @@
-# varr (development version)
+# mtsdesc (development version)
 
 * 25/07/2024 - Major refactoring of the codebase.
 * 11/13/2023 - Remade code styling with styler and lintr, created setup helpers ("setup_ggvar_...").

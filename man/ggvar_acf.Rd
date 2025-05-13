@@ -48,7 +48,7 @@ get residuals from.}
 \item{type}{The type of ACF to be computed. Can be either "correlation",
 "covariance", or "partial". Passed to \link[stats:acf]{acf}.}
 
-\item{graph_type}{The ggplot geom used to create the plot: {texts_vec}.}
+\item{graph_type}{The ggplot geom used to create the plot: \code{'segment'}, for \link[ggplot2:geom_segment]{geom_segment} or \code{'area'}, for \link[ggplot2:geom_ribbon]{geom_area}.}
 
 \item{args_type}{Arguments passed to the 'geom' chosen in \code{graph_type}.}
 
@@ -84,7 +84,7 @@ See \code{vignette('customizing-graphs')} for more details.
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function mtsdesc:::acf_setup or mtsdesc:::ccf_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to \link[stats:acf]{stats::acf}.
 \item Class \code{'default'}: passed to \link[stats:acf]{stats::acf}.

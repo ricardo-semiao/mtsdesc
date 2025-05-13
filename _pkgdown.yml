@@ -1,4 +1,27 @@
-url: https://ricardo-semiao.github.io/varr/
+url: https://ricardo-semiao.github.io/mtsdesc/
+
 template:
   bootstrap: 5
   package: rspkgdown
+
+reference:
+- title: General
+  contents:
+  - ggvar_acf
+  - ggvar_ccf
+  - ggvar_distribution
+  - ggvar_history
+  - ggvar_stability
+
+- title: Model-specific
+  contents:
+  - ggvar_dispersion
+  - ggvar_fevd
+  - ggvar_fit
+  - ggvar_irf
+  - ggvar_predict
+  - ggvar_select
+
+- title: Helpers
+  contents:
+  - get_gg_info

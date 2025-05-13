@@ -25,7 +25,7 @@ ggvar_fevd(
 \item{n.ahead}{An integer. The size of the forecast horizon, passed to
 \link[vars:fevd]{fevd}. Unused if \code{x} is of class varfevd.}
 
-\item{graph_type}{The ggplot geom used to create the plot: {texts_vec}.}
+\item{graph_type}{The ggplot geom used to create the plot: \code{'bar'}, for \link[ggplot2:geom_bar]{geom_bar} or \code{'line'}, for \link[ggplot2:geom_path]{geom_line}.}
 
 \item{args_aes}{Defines aesthetics to differentiate the data. A named list of aesthetics names (\code{*}) -- arguments passed to \verb{ggplot2::scale_*_manual}. See more in the 'Customization' section.}
 
@@ -60,7 +60,7 @@ See \code{vignette('customizing-graphs')} for more details.
 
 \subsection{Methods}{
 
-The data from \code{x} is extracted with the generic function {texts_vec}. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
+The data from \code{x} is extracted with the generic function mtsdesc:::fevd_setup. Each class conditions an external function to pass the \code{...} arguments to. Below there is a list with all the currently implemented classes:
 \itemize{
 \item Class \code{'varest'}: passed to \link[vars:fevd]{vars::fevd}.
 \item Class \code{'varfevd'}: passed to nothing.
